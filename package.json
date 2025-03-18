@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "dev": "next dev --turbopack",
     "lint": "next lint",
-    "prepare": "husky"
+    "lint:fix": "eslint --fix .",
+    "lint:strict": "tsc --noEmit",
+    "prepare": "husky",
+    "prettier:check": "prettier --check .",
+    "prettier:clean": "prettier --write .",
+    "start": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

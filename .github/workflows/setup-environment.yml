@@ -1,0 +1,54 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ runner.os }}-pnpm-${{ github.sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Install Node.js and pnpm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: |
+          rm -rf node_modules
+          rm -rf $(pnpm store path) || true
+          IS_ACTION=true pnpm install
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+  eslint:
+    needs: setup
+    uses: ./.github/workflows/eslint.yml
+    with:
+      cache-key: ${{ needs.setup.outputs.cache-key }}
