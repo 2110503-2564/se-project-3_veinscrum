@@ -1,0 +1,1 @@
+type GETMeResponse = DefaultResponse<User>;
