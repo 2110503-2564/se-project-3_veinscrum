@@ -2,6 +2,7 @@ import { figTree } from "@/fonts";
 import { cn } from "@/lib/utils";
 import { LibProviders } from "@/providers";
 import type { Metadata } from "next";
+import { Navbar } from "./_layouts/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,8 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn("antialiased", figTree.variable)}>
-        <LibProviders>{children}</LibProviders>
+      <body className={cn("antialiased", figTree.className)}>
+        <LibProviders>
+          <Navbar />
+          {children}
+        </LibProviders>
       </body>
     </html>
   );

@@ -8,10 +8,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   secret: process.env.AUTH_SECRET,
   callbacks: {
-    async jwt({ token }) {
+    async jwt({ token, user }) {
+      if (user?.token) {
+        token.token = user.token;
+      }
+
       return token;
     },
-    async session({ session }) {
+    async session({ session, token }) {
+      if (token.token) {
+        session.token = token.token;
+      }
+
       return session;
     },
   },
