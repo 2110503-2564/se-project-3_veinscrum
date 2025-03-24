@@ -31,7 +31,7 @@ export const Navbar = async () => {
     <nav className="w-full bg-white px-4 shadow-md">
       <div className="mx-auto flex max-w-(--screen-2xl) items-center justify-between py-4">
         <div>
-          <Link href="/" className="font-semibold">
+          <Link href={FrontendRoutes.HOME} className="font-semibold">
             Online Job Fair Registration
           </Link>
         </div>
