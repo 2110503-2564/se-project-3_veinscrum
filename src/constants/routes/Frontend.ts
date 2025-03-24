@@ -10,6 +10,7 @@ export enum FrontendRouteTargets {
 
   COMPANY_LIST = "/company",
   COMPANY_PROFILE = "/company/{id}",
+  COMPANY_CREATE = "/company/create",
 
   SESSION_LIST = "/session",
   SESSION_CREATE = "/session/create",
