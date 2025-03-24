@@ -10,7 +10,11 @@ import {
   FormMessage,
 } from "@/components/ui/shadcn/form";
 import { Input } from "@/components/ui/shadcn/input";
+import { BackendRoutes } from "@/constants/routes/Backend";
+import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -37,29 +41,34 @@ export default function CreateCompanyPage() {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof createCompanySchema>) => {
-    try {
-      const response = await fetch("/api/companies", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) throw new Error("Failed to create company");
-
-      toast.success("Company Created Successfully");
+  const { mutate: createCompany } = useMutation({
+    mutationFn: async (data: z.infer<typeof createCompanySchema>) => {
+      return await axios.post(BackendRoutes.COMPANIES, data);
+    },
+    onMutate: () => {
+      toast.dismiss();
+      toast.loading("Creating Company", { id: "create-company" });
+    },
+    onSuccess: () => {
+      toast.success("Company Created Successfully", { id: "create-company" });
       router.push("/");
-    } catch (error) {
-      toast.error("Error creating company");
-    }
-  };
+    },
+    onError: (error) => {
+      toast.error("Failed to create company", {
+        id: "create-company",
+        description: isAxiosError(error)
+          ? error.response?.data.error
+          : "Something went wrong",
+      });
+    },
+  });
 
   return (
     <Form {...form}>
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-sm space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit((data) => createCompany(data))}
         >
           <h1 className="text-center text-3xl font-bold">Create Company</h1>
           <FormField
