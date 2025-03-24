@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/shadcn/form";
 import { Input } from "@/components/ui/shadcn/input";
 import { BackendRoutes } from "@/constants/routes/Backend";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -45,13 +46,17 @@ export default function CreateCompanyPage() {
     mutationFn: async (data: z.infer<typeof createCompanySchema>) => {
       return await axios.post(BackendRoutes.COMPANIES, data);
     },
-    onMutate: () => {
-      toast.dismiss();
-      toast.loading("Creating Company", { id: "create-company" });
-    },
+    onMutate: () =>
+      toast.loading("Creating Company", {
+        id: "create-company",
+        description: "",
+      }),
     onSuccess: () => {
-      toast.success("Company Created Successfully", { id: "create-company" });
-      router.push("/");
+      toast.success("Company Created Successfully", {
+        id: "create-company",
+        description: "",
+      });
+      router.push(FrontendRoutes.COMPANY_LIST);
     },
     onError: (error) => {
       toast.error("Failed to create company", {

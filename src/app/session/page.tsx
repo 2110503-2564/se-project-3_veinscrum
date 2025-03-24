@@ -48,11 +48,9 @@ export default function UserInterviewSessionsPage() {
       {
         queryKey: [BackendRoutes.USERS_ID_SESSIONS({ id: userId })],
         queryFn: async () =>
-          (
-            await axios.get<GETAllInterviewSessionsResponse>(
-              BackendRoutes.USERS_ID_SESSIONS({ id: userId }),
-            )
-          ).data,
+          await axios.get<GETAllInterviewSessionsResponse>(
+            BackendRoutes.USERS_ID_SESSIONS({ id: userId }),
+          ),
         enabled: isUserDataReady,
       },
       {
@@ -89,12 +87,16 @@ export default function UserInterviewSessionsPage() {
     ) => {
       await axios.put(BackendRoutes.SESSIONS_ID({ id: data._id }), data);
     },
-    onMutate: () => {
-      toast.dismiss();
-      toast.loading("Updating session...", { id: "update-session" });
-    },
+    onMutate: () =>
+      toast.loading("Updating session...", {
+        id: "update-session",
+        description: "",
+      }),
     onSuccess: () => {
-      toast.success("Session updated successfully", { id: "update-session" });
+      toast.success("Session updated successfully", {
+        id: "update-session",
+        description: "",
+      });
       setInterviewSessionToUpdate(null);
       refreshInterviewSessionData();
     },
@@ -115,8 +117,16 @@ export default function UserInterviewSessionsPage() {
   } = useMutation({
     mutationFn: (data: { _id: string }) =>
       axios.delete(BackendRoutes.SESSIONS_ID({ id: data._id })),
+    onMutate: () =>
+      toast.loading("Deleting session...", {
+        id: "delete-session",
+        description: "",
+      }),
     onSuccess: () => {
-      toast.success("Session delete successfully", { id: "delete-session" });
+      toast.success("Session delete successfully", {
+        id: "delete-session",
+        description: "",
+      });
       setInterviewSessionToDelete(null);
       refreshInterviewSessionData();
     },
@@ -152,10 +162,12 @@ export default function UserInterviewSessionsPage() {
       <h1 className="text-center text-4xl font-bold">My Scheduled Sessions</h1>
 
       <div className="mx-auto h-[70vh] max-w-2xl space-y-2 overflow-y-auto pr-4">
-        {isInterviewSessionLoading ? (
+        {isInterviewSessionLoading || !interviewSessions ? (
           <p className="text-center">Loading sessions...</p>
-        ) : interviewSessions?.data.length ? (
-          interviewSessions.data.map((interviewSession) => (
+        ) : interviewSessions?.data.data.length == 0 ? (
+          <p className="text-center">There&apos;s nothing here.</p>
+        ) : (
+          interviewSessions.data?.data.map((interviewSession) => (
             <UserInterviewSessionCard
               key={interviewSession._id}
               interviewSession={interviewSession}
@@ -163,8 +175,6 @@ export default function UserInterviewSessionsPage() {
               onEdit={() => setInterviewSessionToUpdate(interviewSession)}
             />
           ))
-        ) : (
-          <p className="text-center">There&apos;s nothing here.</p>
         )}
       </div>
 

@@ -63,19 +63,21 @@ export default function SignUpPage() {
 
   const { mutate: signUp } = useMutation({
     mutationFn: async (data: z.infer<typeof signUpFormSchema>) => {
-      const { confirmPassword, ...rest } = data;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword: _, ...rest } = data;
 
       return await axios.post(BackendRoutes.AUTH_REGISTER, {
         ...rest,
         role: "user",
       });
     },
-    onMutate: () => {
-      toast.dismiss();
-      toast.loading("Signing up...", { id: "signup" });
-    },
+    onMutate: () =>
+      toast.loading("Signing up...", { id: "signup", description: "" }),
     onSuccess: () => {
-      toast.success("Signed up successfully", { id: "signup" });
+      toast.success("Signed up successfully", {
+        id: "signup",
+        description: "",
+      });
       router.push(FrontendRoutes.AUTH_SIGN_IN);
     },
     onError: (error) => {

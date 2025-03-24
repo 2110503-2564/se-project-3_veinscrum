@@ -13,15 +13,16 @@ export default function TestClientPage() {
 
   return (
     <div>
-      {companies?.data.data.map((company, idx) => (
-        <div key={idx}>
-          <p>{company.name}</p>
-          <p>{company.address}</p>
-          <p>{company.website}</p>
-          <p>{company.description}</p>
-          <p>{company.tel}</p>
-        </div>
-      ))}
+      {companies?.data &&
+        companies?.data.data?.map((company, idx) => (
+          <div key={idx}>
+            <p>{company.name}</p>
+            <p>{company.address}</p>
+            <p>{company.website}</p>
+            <p>{company.description}</p>
+            <p>{company.tel}</p>
+          </div>
+        ))}
     </div>
   );
 }

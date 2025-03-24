@@ -105,6 +105,8 @@ export function DateTimePicker24h({
             mode="single"
             selected={date}
             onSelect={handleDateSelect}
+            fromDate={new Date("2022-05-10")}
+            toDate={new Date("2022-05-13")}
             initialFocus
           />
           <div className="flex flex-col divide-y sm:h-[300px] sm:flex-row sm:divide-x sm:divide-y-0">
