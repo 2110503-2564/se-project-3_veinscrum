@@ -162,7 +162,7 @@ export default function UserInterviewSessionsPage() {
       <h1 className="text-center text-4xl font-bold">My Scheduled Sessions</h1>
 
       <div className="mx-auto min-h-[calc(100dvh-4.5rem)] max-w-2xl space-y-2 overflow-y-auto pr-4">
-        {isInterviewSessionLoading ? (
+        {isInterviewSessionLoading || !interviewSessions ? (
           <p className="text-center">Loading sessions...</p>
         ) : interviewSessions?.data.data.length == 0 ? (
           <p className="text-center">There&apos;s nothing here.</p>

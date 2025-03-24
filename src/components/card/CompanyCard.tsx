@@ -1,6 +1,6 @@
 "use client";
 
-import { InterviewSessionCardInfo } from "@/app/_components/InterviewSessionCardInfo";
+import { InterviewSessionCardInfo } from "@/components/card/InterviewSessionCardInfo";
 import { Button } from "@/components/ui/shadcn/button";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { Globe, MapPin, Phone } from "lucide-react";
