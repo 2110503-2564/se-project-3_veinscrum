@@ -28,7 +28,7 @@ export const Navbar = async () => {
     : null;
 
   return (
-    <nav className="w-full bg-white px-4 shadow-md">
+    <nav className="h-18 w-full bg-white px-4 shadow-md">
       <div className="mx-auto flex max-w-(--screen-2xl) items-center justify-between py-4">
         <div className="flex items-center gap-x-6">
           <Link href={FrontendRoutes.HOME} className="text-lg font-semibold">
@@ -43,19 +43,21 @@ export const Navbar = async () => {
             </Link>
           )}
           {user?.data.role === "user" && (
-            <Link
-              className="transition-all hover:font-medium"
-              href={FrontendRoutes.SESSION_LIST}
-            >
-              My Session
-            </Link>
+            <>
+              <Link
+                className="transition-all hover:font-medium"
+                href={FrontendRoutes.SESSION_LIST}
+              >
+                My Session
+              </Link>
+              <Link
+                className="transition-all hover:font-medium"
+                href={FrontendRoutes.COMPANY_LIST}
+              >
+                Companies
+              </Link>
+            </>
           )}
-          <Link
-            className="transition-all hover:font-medium"
-            href={FrontendRoutes.COMPANY_LIST}
-          >
-            Companies
-          </Link>
         </div>
         <div className="flex items-center gap-x-4">
           {!user ? (
