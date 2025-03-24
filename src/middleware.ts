@@ -11,22 +11,24 @@ const publicRoutes = [FrontendRoutes.HOME, ...unAuthRoutes];
 const adminRoutes = [
   FrontendRoutes.ADMIN_SESSION,
   FrontendRoutes.ADMIN_COMPANY,
+  FrontendRoutes.COMPANY_CREATE,
 ];
 
 const userRoutes = [FrontendRoutes.SESSION_LIST, FrontendRoutes.COMPANY_LIST];
 
 export default auth(async (req) => {
-  if (!publicRoutes.includes(req.nextUrl.pathname) && !req.auth) {
+  const currentPath = req.nextUrl.pathname;
+
+  if (!publicRoutes.includes(currentPath) && !req.auth) {
     return NextResponse.redirect(new URL(FrontendRoutes.AUTH_SIGN_IN, req.url));
   }
 
-  if (unAuthRoutes.includes(req.nextUrl.pathname) && req.auth) {
+  if (unAuthRoutes.includes(currentPath) && req.auth) {
     return NextResponse.redirect(new URL(FrontendRoutes.HOME, req.url));
   }
 
   if (
-    (adminRoutes.includes(req.nextUrl.pathname) ||
-      userRoutes.includes(req.nextUrl.pathname)) &&
+    (adminRoutes.includes(currentPath) || userRoutes.includes(currentPath)) &&
     req.auth?.token
   ) {
     const user = await fetch(withBaseRoute(BackendRoutes.AUTH_ME), {
@@ -39,9 +41,8 @@ export default auth(async (req) => {
       .catch(() => null);
 
     if (
-      (adminRoutes.includes(req.nextUrl.pathname) &&
-        user?.data.role !== "admin") ||
-      (userRoutes.includes(req.nextUrl.pathname) && user?.data.role !== "user")
+      (adminRoutes.includes(currentPath) && user?.data.role !== "admin") ||
+      (userRoutes.includes(currentPath) && user?.data.role !== "user")
     ) {
       return NextResponse.redirect(new URL(FrontendRoutes.HOME, req.url));
     }
