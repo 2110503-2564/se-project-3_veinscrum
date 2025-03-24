@@ -15,34 +15,17 @@ import {
   PaginationPrevious,
 } from "@/components/ui/shadcn/pagination";
 import { BackendRoutes } from "@/constants/routes/Backend";
+import { usePagination } from "@/hooks/usePagination";
 import { axios } from "@/lib/axios";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const usePagination = (props?: {
-  initialPage?: number;
-  initialLimit?: number;
-  initialSearch?: string;
-}) => {
-  const [page, setPage] = useState(props?.initialPage ?? 1);
-  const [limit, setLimit] = useState(props?.initialLimit ?? 4);
-
-  function getQuery() {
-    return {
-      page,
-      limit,
-    };
-  }
-
-  return { page, limit, setPage, setLimit, getQuery };
-};
-
 export default function AdminSessionsPage() {
   const queryClient = useQueryClient();
 
-  const { page, limit, setPage, setLimit, getQuery } = usePagination();
+  const { page, setPage, getQuery } = usePagination();
 
   const [interviewSessionToDelete, setInterviewSessionToDelete] =
     useState<Nullable<InterviewSession>>(null);
