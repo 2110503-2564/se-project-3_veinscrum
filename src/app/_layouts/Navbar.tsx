@@ -50,13 +50,15 @@ export const Navbar = async () => {
               >
                 My Session
               </Link>
-              <Link
-                className="transition-all hover:font-medium"
-                href={FrontendRoutes.COMPANY_LIST}
-              >
-                Companies
-              </Link>
             </>
+          )}
+          {user?.data.role != "admin" && (
+            <Link
+              className="transition-all hover:font-medium"
+              href={FrontendRoutes.COMPANY_LIST}
+            >
+              Companies
+            </Link>
           )}
         </div>
         <div className="flex items-center gap-x-4">
