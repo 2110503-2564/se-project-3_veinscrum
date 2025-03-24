@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const createCompanySchema = z.object({
-  companyName: z.string().nonempty("Company Name is required"),
+  name: z.string().nonempty("Company Name is required"),
   address: z.string().nonempty("Address is required"),
   website: z.string().nonempty("Website is required"),
   description: z.string().nonempty("Description is required"),
@@ -33,7 +33,7 @@ export default function CreateCompanyPage() {
   const form = useForm<z.infer<typeof createCompanySchema>>({
     resolver: zodResolver(createCompanySchema),
     defaultValues: {
-      companyName: "",
+      name: "",
       address: "",
       website: "",
       description: "",
@@ -73,7 +73,7 @@ export default function CreateCompanyPage() {
           <h1 className="text-center text-3xl font-bold">Create Company</h1>
           <FormField
             control={form.control}
-            name="companyName"
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Company Name</FormLabel>
