@@ -6,7 +6,11 @@ import { withBaseRoute } from "./utils/routes/withBaseRoute";
 
 const unAuthRoutes = [FrontendRoutes.AUTH_SIGN_IN, FrontendRoutes.AUTH_SIGN_UP];
 
-const publicRoutes = [FrontendRoutes.HOME, ...unAuthRoutes];
+const publicRoutes = [
+  FrontendRoutes.HOME,
+  FrontendRoutes.COMPANY_LIST,
+  ...unAuthRoutes,
+];
 
 const adminRoutes = [
   FrontendRoutes.ADMIN_SESSION,
