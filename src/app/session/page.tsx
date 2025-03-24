@@ -1,5 +1,11 @@
 "use client";
 
+import { UserInterviewSessionCard } from "@/components/card/UserInterviewSessionCard";
+import { DeleteInterviewSessionDialog } from "@/components/dialog/DeleteInterviewSessionDialog";
+import {
+  EditInterviewSessionDialog,
+  EditInterviewSessionFormSchema,
+} from "@/components/dialog/EditInterviewSessionDialog";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
 import {
@@ -12,12 +18,6 @@ import { isAxiosError } from "axios";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { UserInterviewSessionCard } from "../_components/UserInterviewSessionCard";
-import { DeleteInterviewSessionDialog } from "./_components/DeleteInterviewSessionDialog";
-import {
-  EditInterviewSessionDialog,
-  EditInterviewSessionFormSchema,
-} from "./_components/EditInterviewSessionDialog";
 
 export default function UserInterviewSessionsPage() {
   const queryClient = useQueryClient();
@@ -161,8 +161,8 @@ export default function UserInterviewSessionsPage() {
     <main className="mx-auto mt-16 space-y-8">
       <h1 className="text-center text-4xl font-bold">My Scheduled Sessions</h1>
 
-      <div className="mx-auto h-[70vh] max-w-2xl space-y-2 overflow-y-auto pr-4">
-        {isInterviewSessionLoading || !interviewSessions ? (
+      <div className="mx-auto min-h-[calc(100dvh-4.5rem)] max-w-2xl space-y-2 overflow-y-auto pr-4">
+        {isInterviewSessionLoading ? (
           <p className="text-center">Loading sessions...</p>
         ) : interviewSessions?.data.data.length == 0 ? (
           <p className="text-center">There&apos;s nothing here.</p>
