@@ -19,38 +19,27 @@ import {
   SelectValue,
 } from "@/components/ui/shadcn/select";
 import { BackendRoutes } from "@/constants/routes/Backend";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueries } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const createInterviewSessionFormSchema = z
-  .object({
-    company: z.string().nonempty(),
-    user: z.string().nonempty(),
-    date: z.date(),
-  })
-  .refine(
-    (data) => {
-      const startDate = new Date("2022-05-10");
-      const endDate = new Date("2022-05-13");
-      return data.date >= startDate && data.date <= endDate;
-    },
-    {
-      message:
-        "Interview sessions can only be scheduled from May 10th to May 13th, 2022.",
-      path: ["date"],
-    },
-  );
+const createInterviewSessionFormSchema = z.object({
+  company: z.string().nonempty(),
+  user: z.string().nonempty(),
+  date: z.date(),
+});
 
 export default function CreateInterviewSessionPage() {
   const params = useParams<{ companyId: Array<string> }>();
   const { status } = useSession();
+  const router = useRouter();
 
   const companyId = params.companyId ? (params.companyId[0] ?? "") : "";
 
@@ -77,7 +66,7 @@ export default function CreateInterviewSessionPage() {
             user: result.data.data._id,
           });
 
-          return result.data.data;
+          return result;
         },
         enabled: status == "authenticated",
       },
@@ -96,7 +85,7 @@ export default function CreateInterviewSessionPage() {
             form.reset({ ...formDefaultValues(), company: "" });
           }
 
-          return result.data;
+          return result;
         },
       },
     ],
@@ -113,15 +102,15 @@ export default function CreateInterviewSessionPage() {
   const { mutate: createInterviewSession } = useMutation({
     mutationFn: async (
       data: z.infer<typeof createInterviewSessionFormSchema>,
-    ) => {
-      return await axios.post(BackendRoutes.SESSIONS, data);
-    },
-    onMutate: () => {
-      toast.dismiss();
-      toast.loading("Creating Session", { id: "create-session" });
-    },
+    ) => await axios.post(BackendRoutes.SESSIONS, data),
+    onMutate: () =>
+      toast.loading("Creating Session", { id: "create-session", description: "" }),
     onSuccess: () => {
-      toast.success("Create Session successfully", { id: "create-session" });
+      toast.success("Create Session successfully", {
+        id: "create-session",
+        description: "",
+      });
+      router.push(FrontendRoutes.SESSION_LIST);
     },
     onError: (error) => {
       toast.error("Failed to create your session", {
@@ -133,9 +122,10 @@ export default function CreateInterviewSessionPage() {
     },
   });
 
-  if (isError) {
+  if (isLoading) return <p>Loading...</p>;
+
+  if (isError)
     return <p>There is Something wrong, but i do not know what that is.</p>;
-  }
 
   return (
     <Form {...form}>
@@ -161,11 +151,12 @@ export default function CreateInterviewSessionPage() {
                       <SelectValue placeholder="Select a Company" />
                     </SelectTrigger>
                     <SelectContent>
-                      {companies?.data.map((company, idx) => (
-                        <SelectItem key={idx} value={company.id}>
-                          {company.name}
-                        </SelectItem>
-                      ))}
+                      {companies?.data &&
+                        companies?.data.data.map((company, idx) => (
+                          <SelectItem key={idx} value={company.id}>
+                            {company.name}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -180,7 +171,7 @@ export default function CreateInterviewSessionPage() {
               <FormItem>
                 <FormLabel className="text-right">Your Name</FormLabel>
                 <FormControl>
-                  <Input value={me?.name ?? ""} disabled />
+                  <Input value={me?.data?.data?.name ?? ""} disabled />
                 </FormControl>
               </FormItem>
             )}

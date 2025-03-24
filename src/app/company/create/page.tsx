@@ -16,73 +16,51 @@ import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const signUpFormSchema = z
-  .object({
-    name: z.string().nonempty("Name is required"),
-    email: z
-      .string()
-      .email("Invalid email address")
-      .nonempty("Email is required"),
-    tel: z
-      .string()
-      .nonempty("Telephone number is required")
-      .regex(/^[0-9]+$/, "Telephone number must be a number"),
-    password: z
-      .string()
-      .nonempty("Password is required")
-      .min(6, "Password must be at least 6 characters long"),
-    confirmPassword: z
-      .string()
-      .nonempty("You must confirm your password")
-      .min(6, "Password must be at least 6 characters long"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Passwords do not match",
-  });
+const createCompanySchema = z.object({
+  name: z.string().nonempty("Company Name is required"),
+  address: z.string().nonempty("Address is required"),
+  website: z.string().nonempty("Website is required"),
+  description: z.string().nonempty("Description is required"),
+  tel: z.string().nonempty("Telephone number is required"),
+});
 
-export default function SignUpPage() {
+export default function CreateCompanyPage() {
   const router = useRouter();
-
-  const form = useForm<z.infer<typeof signUpFormSchema>>({
-    resolver: zodResolver(signUpFormSchema),
+  const form = useForm<z.infer<typeof createCompanySchema>>({
+    resolver: zodResolver(createCompanySchema),
     defaultValues: {
       name: "",
-      email: "",
+      address: "",
+      website: "",
+      description: "",
       tel: "",
-      password: "",
-      confirmPassword: "",
     },
   });
 
-  const { mutate: signUp } = useMutation({
-    mutationFn: async (data: z.infer<typeof signUpFormSchema>) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { confirmPassword: _, ...rest } = data;
-
-      return await axios.post(BackendRoutes.AUTH_REGISTER, {
-        ...rest,
-        role: "user",
-      });
+  const { mutate: createCompany } = useMutation({
+    mutationFn: async (data: z.infer<typeof createCompanySchema>) => {
+      return await axios.post(BackendRoutes.COMPANIES, data);
     },
     onMutate: () =>
-      toast.loading("Signing up...", { id: "signup", description: "" }),
+      toast.loading("Creating Company", {
+        id: "create-company",
+        description: "",
+      }),
     onSuccess: () => {
-      toast.success("Signed up successfully", {
-        id: "signup",
+      toast.success("Company Created Successfully", {
+        id: "create-company",
         description: "",
       });
-      router.push(FrontendRoutes.AUTH_SIGN_IN);
+      router.push(FrontendRoutes.COMPANY_LIST);
     },
     onError: (error) => {
-      toast.error("Failed to sign up", {
-        id: "signup",
+      toast.error("Failed to create company", {
+        id: "create-company",
         description: isAxiosError(error)
           ? error.response?.data.error
           : "Something went wrong",
@@ -95,15 +73,15 @@ export default function SignUpPage() {
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-sm space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((e) => signUp(e))}
+          onSubmit={form.handleSubmit((data) => createCompany(data))}
         >
-          <h1 className="text-center text-3xl font-bold">Sign up</h1>
+          <h1 className="text-center text-3xl font-bold">Create Company</h1>
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Company Name</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -113,12 +91,38 @@ export default function SignUpPage() {
           />
           <FormField
             control={form.control}
-            name="email"
+            name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Address</FormLabel>
                 <FormControl>
-                  <Input type="email" {...field} />
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Website</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,49 +133,17 @@ export default function SignUpPage() {
             name="tel"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Telephone number</FormLabel>
+                <FormLabel>Telephone</FormLabel>
                 <FormControl>
-                  <Input type="tel" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm password</FormLabel>
-                <FormControl>
-                  <Input type="password" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <Button type="submit" className="w-full" size="lg">
-            Sign up
+            Create
           </Button>
-          <div className="text-muted-foreground flex items-center justify-center gap-x-2 text-sm">
-            <p>Already have an account?</p>
-            <Button variant="link" asChild>
-              <Link href={FrontendRoutes.AUTH_SIGN_IN}>Sign in</Link>
-            </Button>
-          </div>
         </form>
       </main>
     </Form>

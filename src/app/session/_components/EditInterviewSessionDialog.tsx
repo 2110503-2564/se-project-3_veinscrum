@@ -115,14 +115,15 @@ export function EditInterviewSessionDialog({
                               <SelectValue placeholder="Select a company" />
                             </SelectTrigger>
                             <SelectContent>
-                              {companies?.map((company) => (
-                                <SelectItem
-                                  key={company.id}
-                                  value={company.id.toString()}
-                                >
-                                  {company.name}
-                                </SelectItem>
-                              ))}
+                              {companies &&
+                                companies?.map((company) => (
+                                  <SelectItem
+                                    key={company.id}
+                                    value={company.id.toString()}
+                                  >
+                                    {company.name}
+                                  </SelectItem>
+                                ))}
                             </SelectContent>
                           </Select>
                         )}
