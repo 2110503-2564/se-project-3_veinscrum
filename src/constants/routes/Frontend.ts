@@ -12,6 +12,7 @@ export enum FrontendRouteTargets {
   COMPANY_PROFILE = "/company/:id",
 
   SESSION_LIST = "/session",
+  SESSION_CREATE = "/session/create",
 }
 
 export const FrontendRoutes = getDynamicRoute(FrontendRouteTargets);

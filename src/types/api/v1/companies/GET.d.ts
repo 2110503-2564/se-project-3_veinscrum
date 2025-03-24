@@ -5,7 +5,7 @@ interface Company {
   website: string;
   description: string;
   tel: string;
-  sessions: Array<Session>;
+  sessions: Array<InterviewSession>;
 }
 
 interface GETAllCompaniesResponse
