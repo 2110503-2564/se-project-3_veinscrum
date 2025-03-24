@@ -68,7 +68,7 @@ export default function AdminSessionsPage() {
             await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES, {
               params: {
                 page: 1,
-                limit: 4,
+                limit: -1,
               },
             })
           ).data,
