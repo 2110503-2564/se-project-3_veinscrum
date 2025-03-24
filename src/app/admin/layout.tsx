@@ -14,7 +14,7 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-[calc(100dvh-4.5rem)]">
+    <div className="flex min-h-[calc(100dvh-4.5rem)] max-md:flex-col">
       <div className="shrink-0 space-y-2.5 border-r px-6 py-16">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         <div className="space-y-1.5">
