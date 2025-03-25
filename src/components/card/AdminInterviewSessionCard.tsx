@@ -53,7 +53,13 @@ export const AdminSessionCard: React.FC<AdminSessionCardProps> = ({
       />
       <InterviewSessionCardInfo
         icon={CalendarIcon}
-        text={new Date(interviewSession.date).toLocaleString()}
+        text={new Date(interviewSession.date).toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
       />
     </InterviewSessionCardWithDropdown>
   );
