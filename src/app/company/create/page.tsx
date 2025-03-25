@@ -56,7 +56,7 @@ export default function CreateCompanyPage() {
         id: "create-company",
         description: "",
       });
-      router.push(FrontendRoutes.COMPANY_LIST);
+      router.push(FrontendRoutes.ADMIN_COMPANY);
     },
     onError: (error) => {
       toast.error("Failed to create company", {
