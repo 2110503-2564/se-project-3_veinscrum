@@ -47,14 +47,12 @@ export default function AdminSessionsPage() {
       {
         queryKey: [BackendRoutes.COMPANIES],
         queryFn: async () =>
-          (
-            await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES, {
-              params: {
-                page: 1,
-                limit: -1,
-              },
-            })
-          ).data,
+          await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES, {
+            params: {
+              page: 1,
+              limit: -1,
+            },
+          }),
         enabled: !interviewSessionToUpdate,
       },
     ],
@@ -192,7 +190,7 @@ export default function AdminSessionsPage() {
       {interviewSessionToUpdate ? (
         <EditInterviewSessionDialog
           interviewSession={interviewSessionToUpdate}
-          companies={companies?.data}
+          companies={companies?.data?.data}
           isOpen={!!interviewSessionToUpdate}
           isPending={isInterviewSessionUpdating}
           isLoading={isCompaniesLoading}
