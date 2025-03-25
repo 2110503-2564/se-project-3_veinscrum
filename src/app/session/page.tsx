@@ -34,12 +34,11 @@ export default function UserInterviewSessionsPage() {
     error: meError,
   } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
-    queryFn: async () =>
-      (await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME)).data,
+    queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
     enabled: status == "authenticated",
   });
 
-  const userId = me?.data?._id || "";
+  const userId = me?.data?.data._id || "";
   const isUserDataReady = !isMeLoading && !meError && !!userId;
 
   // Data fetching

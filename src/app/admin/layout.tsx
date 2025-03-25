@@ -19,6 +19,7 @@ export default function AdminLayout({
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         <div className="space-y-1.5">
           <Button
+            asChild
             className={cn(
               "flex w-full justify-start px-2.5",
               pathname === FrontendRoutes.ADMIN_SESSION &&
@@ -28,7 +29,15 @@ export default function AdminLayout({
           >
             <Link href={FrontendRoutes.ADMIN_SESSION}>Interview Sessions</Link>
           </Button>
-          <Button className="flex w-full justify-start px-2.5" variant="ghost">
+          <Button
+            asChild
+            className={cn(
+              "flex w-full justify-start px-2.5",
+              pathname === FrontendRoutes.ADMIN_COMPANY &&
+                "bg-accent text-accent-foreground",
+            )}
+            variant="ghost"
+          >
             <Link href={FrontendRoutes.ADMIN_COMPANY}>Companies</Link>
           </Button>
         </div>

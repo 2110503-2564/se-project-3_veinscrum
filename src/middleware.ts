@@ -18,7 +18,12 @@ const adminRoutes = [
   FrontendRoutes.COMPANY_CREATE,
 ];
 
-const userRoutes = [FrontendRoutes.SESSION_LIST, FrontendRoutes.COMPANY_LIST];
+const userRoutes = [
+  FrontendRoutes.SESSION_LIST,
+  FrontendRoutes.COMPANY_LIST,
+  FrontendRoutes.SESSION_CREATE,
+  FrontendRoutes.SESSION_CREATE_ID,
+];
 
 export default auth(async (req) => {
   const currentPath = req.nextUrl.pathname;
@@ -31,10 +36,14 @@ export default auth(async (req) => {
     return NextResponse.redirect(new URL(FrontendRoutes.HOME, req.url));
   }
 
-  if (
-    (adminRoutes.includes(currentPath) || userRoutes.includes(currentPath)) &&
-    req.auth?.token
-  ) {
+  const isAdminRoute = adminRoutes.some(
+    (route) => currentPath === route || currentPath.startsWith(route + "/"),
+  );
+  const isUserRoute = userRoutes.some(
+    (route) => currentPath === route || currentPath.startsWith(route + "/"),
+  );
+
+  if ((isAdminRoute || isUserRoute) && req.auth?.token) {
     const user = await fetch(withBaseRoute(BackendRoutes.AUTH_ME), {
       headers: {
         Authorization: `Bearer ${req.auth.token}`,
@@ -46,6 +55,8 @@ export default auth(async (req) => {
 
     if (
       (adminRoutes.includes(currentPath) && user?.data.role !== "admin") ||
+      (user?.data.role === "admin" &&
+        currentPath.startsWith(FrontendRoutes.SESSION_LIST)) ||
       (userRoutes.includes(currentPath) && user?.data.role !== "user")
     ) {
       return NextResponse.redirect(new URL(FrontendRoutes.HOME, req.url));

@@ -42,14 +42,14 @@ export const Navbar = async () => {
               Dashboard
             </Link>
           )}
-          <>
+          {user?.data.role === "user" && (
             <Link
               className="transition-all hover:font-medium"
               href={FrontendRoutes.SESSION_LIST}
             >
               My Session
             </Link>
-          </>
+          )}
           {user?.data.role != "admin" && (
             <Link
               className="transition-all hover:font-medium"
