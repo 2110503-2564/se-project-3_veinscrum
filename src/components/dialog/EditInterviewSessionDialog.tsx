@@ -28,23 +28,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const editInterviewSessionFormSchema = z
-  .object({
-    company: z.string().nonempty(),
-    date: z.date(),
-  })
-  .refine(
-    (data) => {
-      const startDate = new Date("2022-05-10");
-      const endDate = new Date("2022-05-13");
-      return data.date >= startDate && data.date <= endDate;
-    },
-    {
-      message:
-        "Interview sessions can only be scheduled from May 10th to May 13th, 2022.",
-      path: ["date"],
-    },
-  );
+const editInterviewSessionFormSchema = z.object({
+  company: z.string().nonempty(),
+  date: z.date(),
+});
+
 export type EditInterviewSessionFormSchema = z.infer<
   typeof editInterviewSessionFormSchema
 >;
