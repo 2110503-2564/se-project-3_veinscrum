@@ -10,10 +10,14 @@ export enum FrontendRouteTargets {
 
   COMPANY_LIST = "/company",
   COMPANY_PROFILE = "/company/{id}",
+  COMPANY_CREATE = "/company/create",
 
   SESSION_LIST = "/session",
-  SESSION_CREATE = "/session/create/",
+  SESSION_CREATE = "/session/create",
   SESSION_CREATE_ID = "/session/create/{id}",
+
+  ADMIN_SESSION = "/admin/sessions",
+  ADMIN_COMPANY = "/admin/companies",
 }
 
 export const FrontendRoutes = getDynamicRoute(FrontendRouteTargets);

@@ -14,16 +14,12 @@ import { usePagination } from "@/hooks/usePagination";
 import { axios } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 
-export default function CompaniesPage() {
+export default function AdminCompaniesPage() {
   const { page, setPage, getQuery } = usePagination({
     initialLimit: 8,
   });
 
-  const {
-    data: companies,
-    isLoading,
-    error,
-  } = useQuery({
+  const companiesQuery = useQuery({
     queryKey: [BackendRoutes.COMPANIES, getQuery()],
     queryFn: async () =>
       await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES, {
@@ -31,29 +27,33 @@ export default function CompaniesPage() {
       }),
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Failed to load companies.</p>;
+  const companies = companiesQuery?.data;
+
+  const isCompaniesLoading = companiesQuery?.isLoading;
 
   return (
-    <main className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-(--breakpoint-xl) flex-col justify-between gap-y-16 py-16">
-      <div className="space-y-16">
-        <h1 className="text-center text-3xl font-bold">Explore Companies</h1>
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
-          {companies?.data.data &&
-            companies?.data.data.map((company, idx) => (
-              <CompanyCard key={idx} company={company} />
+    <main className="mx-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
+      <div>
+        <h1 className="text-center text-4xl font-bold">
+          All Scheduled Sessions
+        </h1>
+        <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
+          {companies?.data &&
+            companies?.data?.data?.map((company, idx) => (
+              <CompanyCard key={idx} company={company} variant="viewonly" />
             ))}
         </div>
       </div>
+
       <Pagination>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              disabled={!companies?.data?.pagination.prev || isLoading}
+              disabled={!companies?.data?.pagination.prev || isCompaniesLoading}
               onClick={() => setPage(page - 1)}
             />
           </PaginationItem>
-          {companies?.data?.pagination.prev && !isLoading && (
+          {companies?.data?.pagination.prev && !isCompaniesLoading && (
             <PaginationItem>
               <PaginationLink onClick={() => setPage(page - 1)}>
                 {page - 1}
@@ -63,7 +63,7 @@ export default function CompaniesPage() {
           <PaginationItem>
             <PaginationLink isActive>{page}</PaginationLink>
           </PaginationItem>
-          {companies?.data?.pagination.next && !isLoading && (
+          {companies?.data?.pagination.next && !isCompaniesLoading && (
             <PaginationItem>
               <PaginationLink onClick={() => setPage(page + 1)}>
                 {page + 1}
@@ -72,7 +72,7 @@ export default function CompaniesPage() {
           )}
           <PaginationItem>
             <PaginationNext
-              disabled={!companies?.data?.pagination.next || isLoading}
+              disabled={!companies?.data?.pagination.next || isCompaniesLoading}
               onClick={() => setPage(page + 1)}
             />
           </PaginationItem>

@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/shadcn/alert-dialog";
+import { buttonVariants } from "@/components/ui/shadcn/button";
 
 interface DeleteInterviewSessionDialogProps {
   interviewSession: InterviewSession;
@@ -35,7 +36,11 @@ export function DeleteInterviewSessionDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => onDelete()} disabled={isPending}>
+          <AlertDialogAction
+            className={buttonVariants({ variant: "destructive" })}
+            onClick={() => onDelete()}
+            disabled={isPending}
+          >
             {isPending ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>

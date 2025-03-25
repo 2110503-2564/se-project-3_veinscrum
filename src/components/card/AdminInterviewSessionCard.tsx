@@ -27,7 +27,11 @@ export const AdminSessionCard: React.FC<AdminSessionCardProps> = ({
       <DropdownMenuItem disabled={!onEdit} onClick={onEdit}>
         Edit Session
       </DropdownMenuItem>
-      <DropdownMenuItem disabled={!onDelete} onClick={onDelete}>
+      <DropdownMenuItem
+        variant="destructive"
+        disabled={!onDelete}
+        onClick={onDelete}
+      >
         Delete Session
       </DropdownMenuItem>
     </DropdownMenuContent>

@@ -1,9 +1,6 @@
 import { auth } from "@/auth";
-import { Button } from "@/components/ui/shadcn/button";
 import { BackendRoutes } from "@/constants/routes/Backend";
-import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { withBaseRoute } from "@/utils/routes/withBaseRoute";
-import Link from "next/link";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -26,9 +23,6 @@ export default async function ProfilePage() {
         <p>{user?.data.name}</p>
         <p>{user?.data.email}</p>
         <p>{user?.data.tel}</p>
-        <Button className="mt-2 w-full">
-          <Link href={FrontendRoutes.HOME}>Back to home</Link>
-        </Button>
       </div>
     </main>
   );
