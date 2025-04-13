@@ -1,5 +1,6 @@
 "use client";
 
+import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
 import {
   Form,
@@ -72,7 +73,7 @@ export default function CreateCompanyPage() {
     <Form {...form}>
       <main className="mx-auto mt-16">
         <form
-          className="mx-auto max-w-sm space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
+          className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
           onSubmit={form.handleSubmit((data) => createCompany(data))}
         >
           <h1 className="text-center text-3xl font-bold">Create Company</h1>
@@ -122,7 +123,10 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <TextEditor
+                    markdown={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
