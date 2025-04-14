@@ -36,7 +36,7 @@ export default async function ProfilePage() {
 
   return (
     <main className="mx-auto mt-16">
-      {accountRole === "user" ? (
+      {accountRole != "company" ? (
         //  user session
         <div className="mx-auto max-w-sm space-y-2 rounded-xl bg-white px-4 py-6 text-center drop-shadow-xl">
           <h1 className="text-2xl font-bold">Profile</h1>
@@ -46,18 +46,8 @@ export default async function ProfilePage() {
             <p>Tel : {user?.data.tel}</p>
           </div>
         </div>
-      ) : // admin session
-      accountRole === "admin" ? (
-        <div className="mx-auto max-w-sm space-y-2 rounded-xl bg-white px-4 py-6 text-center drop-shadow-xl">
-          <h1 className="text-2xl font-bold">Profile</h1>
-          <div className="mx-auto max-w-md text-left">
-            <p>User Name : {user?.data.name}</p>
-            <p>Email : {user?.data.email}</p>
-            <p>Tel : {user?.data.tel}</p>
-          </div>
-        </div>
-      ) : // company session
-      accountRole === "company" ? (
+      ) : (
+        // company session
         <div className="mx-auto max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
           <div className="mb-8 text-center">
             <div className="mb-2 flex justify-end">
@@ -103,10 +93,6 @@ export default async function ProfilePage() {
               </p>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="mx-auto">
-          <p>Role is undefile</p>
         </div>
       )}
     </main>
