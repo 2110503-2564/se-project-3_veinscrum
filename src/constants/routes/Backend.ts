@@ -16,6 +16,7 @@ export enum BackendRouteTargets {
   USERS_ID_SESSIONS = "/users/{id}/sessions",
   ADMIN_SESSION = "/admin/sessions",
   ADMIN_COMPANY = "/admin/companies",
+  JOB_LISTINGS = "/job-listings",
 }
 
 export const BackendRoutes = getDynamicRoute(BackendRouteTargets);
