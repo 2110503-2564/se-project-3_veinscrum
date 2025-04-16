@@ -49,7 +49,7 @@ export default function CreateCompanyPage() {
   const { mutate: createJob } = useMutation({
     mutationFn: async (data: z.infer<typeof createJobSchema>) => {
     //not sure route is correct 
-      return await axios.post(BackendRoutes.COMPANIES, data);
+      return await axios.post(BackendRoutes.JOB_LISTINGS, data);
     },
     onMutate: () =>
       toast.loading("Creating Job", {
