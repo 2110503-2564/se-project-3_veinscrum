@@ -28,6 +28,14 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({ company }) => {
             Book
           </Link>
         </Button>
+
+        {/* TEST ONLY */}
+        <Button asChild className="mt-4 w-full" variant="outline">
+          <Link href={`/company/profile/${company.id}`}>
+            TEST View Company Profile
+          </Link>
+        </Button>
+        
       </div>
     </div>
   );
