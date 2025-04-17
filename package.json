@@ -47,10 +47,10 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
-    "@eslint/eslintrc": "^3",
-    "@next/eslint-plugin-next": "^15.2.3",
+    "@eslint/eslintrc": "^3.3.1",
+    "@next/eslint-plugin-next": "15.3.0",
     "@playwright/test": "^1.51.1",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.4",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/eslint-plugin-query": "^5.73.3",
     "@types/node": "^20.17.30",
