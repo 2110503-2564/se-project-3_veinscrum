@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { defineConfig, devices } from "@playwright/test";
+=======
+import { defineConfig, devices } from '@playwright/test';
+>>>>>>> 6c1d441 (feat: init playwright)
 
 /**
  * Read environment variables from file.
