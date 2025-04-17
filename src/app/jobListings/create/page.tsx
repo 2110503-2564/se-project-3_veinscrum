@@ -16,9 +16,10 @@ import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -31,10 +32,22 @@ const createJobSchema = z.object({
 });
 
 export default function CreateCompanyPage() {
-  const params = useParams<{ companyId: Array<string> }>();
+  const { status } = useSession();
   const router = useRouter();
 
-  const companyId = params.companyId ? (params.companyId[0] ?? "") : "";
+  const {data: me, isLoading: isMeLoading, isError: isMeError} = useQuery({
+        queryKey: [BackendRoutes.AUTH_ME],
+        queryFn: async () => {
+          const result = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
+          return result;
+        },
+        enabled: status == "authenticated",
+        select: (data) => data.data.data,
+      },
+  );
+
+  const companyId = me?.company ?? "";
+
 
   const form = useForm<z.infer<typeof createJobSchema>>({
     resolver: zodResolver(createJobSchema),
@@ -123,7 +136,7 @@ export default function CreateCompanyPage() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" size="lg">
+          <Button type="submit" disabled={isMeLoading} className="w-full" size="lg">
             Create
           </Button>
         </form>
