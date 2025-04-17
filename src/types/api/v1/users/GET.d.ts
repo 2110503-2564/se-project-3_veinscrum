@@ -4,7 +4,8 @@ interface User {
   email: string;
   company: string;
   tel: string;
-  role: string;
+  role: "user" | "admin" | "company";
+  company: string;
 }
 
 interface GETAllUsersResponse
