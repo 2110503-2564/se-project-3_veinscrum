@@ -39,6 +39,13 @@ export default function CreateCompanyPage() {
         queryKey: [BackendRoutes.AUTH_ME],
         queryFn: async () => {
           const result = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
+
+        form.reset({
+          company: result.data.data.company,
+          image: "",
+          jobTitle: "",
+          description: "",
+        });
           return result;
         },
         enabled: status == "authenticated",
@@ -91,9 +98,13 @@ export default function CreateCompanyPage() {
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((data) => createJob(data))}
+          onSubmit={form.handleSubmit((data) => {console.log(data); createJob(data)})}
         >
           <h1 className="text-center text-3xl font-bold">Create Job</h1>
+          <FormField 
+            control={form.control}
+            name="company"
+            render={() => (<></>)}/>
           <FormField
             control={form.control}
             name="jobTitle"
@@ -136,7 +147,7 @@ export default function CreateCompanyPage() {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={isMeLoading} className="w-full" size="lg">
+          <Button type="submit"  className="w-full" size="lg" onClick={() => console.log(companyId, form.getValues())}>
             Create
           </Button>
         </form>
