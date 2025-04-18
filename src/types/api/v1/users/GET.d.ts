@@ -5,7 +5,6 @@ interface User {
   company: string;
   tel: string;
   role: "user" | "admin" | "company";
-  company: string;
 }
 
 interface GETAllUsersResponse
