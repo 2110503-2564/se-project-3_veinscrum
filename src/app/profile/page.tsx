@@ -2,8 +2,10 @@
 
 import {
   EditCompanyProfileDialog,
-  EditCompanyProfileFormSchema,
+  editCompanyProfileFormSchema,
 } from "@/components/dialog/EditCompanyProfileDialog";
+import { TextEditor } from "@/components/input/TextEditor";
+import { Button } from "@/components/ui/shadcn/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,112 +14,62 @@ import {
 } from "@/components/ui/shadcn/dropdown-menu";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
-import { withBaseRoute } from "@/utils/routes/withBaseRoute";
-import { useQuery } from "@tanstack/react-query";
-import { Ellipsis, Globe, Mail, MapPin, Phone } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { EllipsisIcon, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
-
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  tel: string;
-  role: string;
-  company?: string;
-}
-
-interface Company {
-  _id: string;
-  id: string;
-  name: string;
-  address: string;
-  website: string;
-  description: string;
-  tel: string;
-  sessions: Array<{
-    _id: string;
-    title: string;
-    date: string;
-    status: string;
-  }>;
-}
-
-interface GETMeResponse {
-  success: boolean;
-  message?: string;
-  data: User;
-}
-
-interface GETCompanyResponse {
-  success: boolean;
-  message?: string;
-  data: Company;
-}
+import { z } from "zod";
 
 export default function ProfilePage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
+  const queryClient = useQueryClient();
 
-  const { data: userResponse } = useQuery({
+  const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
     queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
     enabled: !!session?.token,
+    select: (data) => data?.data?.data,
   });
 
-  const user = userResponse?.data?.data;
-  const accountRole = user?.role;
-
-  const { data: companyResponse } = useQuery({
+  const { data: company, isLoading: isCompanyLoading } = useQuery({
     queryKey: [BackendRoutes.COMPANIES_ID({ id: user?.company || "" })],
     queryFn: async () =>
       await axios.get<GETCompanyResponse>(
         BackendRoutes.COMPANIES_ID({ id: user?.company || "" }),
       ),
     enabled: !!session?.token && !!user?.company,
+    select: (data) => data?.data?.data,
   });
 
-  const company = companyResponse?.data?.data;
-
-  const handleUpdateProfile = async (data: EditCompanyProfileFormSchema) => {
-    if (!company?._id) return;
-
-    try {
-      setIsUpdating(true);
-      const response = await fetch(
-        withBaseRoute(BackendRoutes.COMPANIES_ID({ id: company._id })),
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${session?.token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
-
-      toast.success("Profile updated successfully");
+  const { mutate: updateCompany, isPending } = useMutation({
+    mutationFn: async (data: z.infer<typeof editCompanyProfileFormSchema>) =>
+      await axios.put(
+        BackendRoutes.COMPANIES_ID({ id: company?.id ?? "" }),
+        data,
+      ),
+    onMutate: () => {
+      toast.loading("Updating company...", { id: "update-company" });
+    },
+    onError: () => {
+      toast.error("Failed to update company", { id: "update-company" });
+    },
+    onSuccess: () => {
+      toast.success("Company updated successfully", { id: "update-company" });
       setIsEditDialogOpen(false);
-      // Refresh the page to show updated data
-      window.location.reload();
-    } catch (error) {
-      toast.error("Failed to update profile");
-      console.error(error);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+      queryClient.invalidateQueries({
+        queryKey: [BackendRoutes.COMPANIES_ID({ id: company?.id ?? "" })],
+      });
+    },
+  });
+
+  if (isUserLoading || isCompanyLoading || status === "loading") return null;
 
   return (
     <main className="mx-auto mt-16">
-      {accountRole !== "company" ? (
-        //  user session
+      {user?.role !== "company" ? (
         <div className="mx-auto max-w-sm space-y-2 rounded-xl bg-white px-4 py-6 text-center drop-shadow-xl">
           <h1 className="text-2xl font-bold">Profile</h1>
           <div className="mx-auto max-w-md text-left">
@@ -126,17 +78,16 @@ export default function ProfilePage() {
             <p>Tel : {user?.tel}</p>
           </div>
         </div>
-      ) : 
-       (
+      ) : (
         <div className="mx-auto max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
           <div className="mb-8 text-center">
             <div className="mb-2 flex justify-end">
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="h-fit w-fit rounded-full p-2 transition-colors hover:bg-slate-100 focus:outline-none">
-                    <Ellipsis className="h-5 w-5 cursor-pointer transition-colors hover:text-gray-400" />
-                  </button>
-                </DropdownMenuTrigger>
+                <Button asChild variant="ghost" size="icon">
+                  <DropdownMenuTrigger>
+                    <EllipsisIcon />
+                  </DropdownMenuTrigger>
+                </Button>
                 <DropdownMenuContent>
                   <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                     Edit Profile
@@ -150,41 +101,41 @@ export default function ProfilePage() {
             <h1 className="text-2xl font-bold">{company?.name}</h1>
           </div>
 
-          <div className="flex flex-col items-start gap-8 md:flex-row">
-            {/* Company Icon */}
-            <div className="flex w-full justify-center md:w-1/3">
-              <div className="h-48 w-48 rounded-md bg-gray-200" />
+          <div className="grid grid-cols-3 gap-8">
+            <div className="flex w-full justify-center">
+              <Image
+                src={company?.logo ?? "/placeholder.png"}
+                alt={company?.name ?? "Company Logo"}
+                width={192}
+                height={192}
+                className="rounded-md object-cover"
+              />
             </div>
 
-            {/* Company info  */}
-            <div className="w-full space-y-4 md:w-2/3">
-              {/* Info box */}
+            <div className="col-span-2 w-full space-y-4">
               <div className="space-y-2 rounded-lg bg-gray-100 p-4 text-sm">
-                <p className="flex gap-3">
-                  <MapPin className="h-5 w-5 text-gray-600" />
+                <p className="flex items-center gap-x-3">
+                  <MapPin className="size-5 text-gray-600" />
                   {company?.address}
                 </p>
 
-                <p className="flex gap-3">
-                  <Mail className="h-5 w-5 text-gray-600" />
+                <p className="flex items-center gap-x-3">
+                  <Mail className="size-5 text-gray-600" />
                   {user?.email}
                 </p>
 
-                <p className="flex gap-3">
-                  <Globe className="h-5 w-5 text-gray-600" />
+                <p className="flex items-center gap-x-3">
+                  <Globe className="size-5 text-gray-600" />
                   {company?.website}
                 </p>
 
-                <p className="flex gap-3">
-                  <Phone className="h-5 w-5 text-gray-600" />
+                <p className="flex items-center gap-x-3">
+                  <Phone className="size-5 text-gray-600" />
                   {company?.tel}
                 </p>
               </div>
 
-              {/* Company description */}
-              <p className="text-sm leading-relaxed text-gray-700">
-                {company?.description}
-              </p>
+              <TextEditor markdown={company?.description} readOnly />
             </div>
           </div>
 
@@ -192,13 +143,13 @@ export default function ProfilePage() {
             <EditCompanyProfileDialog
               company={company}
               isOpen={isEditDialogOpen}
-              isPending={isUpdating}
+              isPending={isPending}
               onClose={() => setIsEditDialogOpen(false)}
-              onUpdate={handleUpdateProfile}
+              onUpdate={updateCompany}
             />
           )}
         </div>
-      ) }
+      )}
     </main>
   );
 }

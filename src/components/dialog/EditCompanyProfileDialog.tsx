@@ -10,30 +10,30 @@ import {
   DialogTitle,
 } from "@/components/ui/shadcn/dialog";
 import { Input } from "@/components/ui/shadcn/input";
-import { Textarea } from "@/components/ui/shadcn/textarea";
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { TextEditor } from "../input/TextEditor";
+import { Form, FormField, FormItem, FormLabel } from "../ui/shadcn/form";
 
-export interface EditCompanyProfileFormSchema {
-  name: string;
-  address: string;
-  website: string;
-  tel: string;
-  description: string;
-}
+export const editCompanyProfileFormSchema = z.object({
+  name: z.string().nonempty("Company name is required"),
+  address: z.string().nonempty("Address is required"),
+  website: z
+    .string()
+    .url("Invalid website URL")
+    .nonempty("Website is required"),
+  tel: z.string().nonempty("Telephone is required"),
+  description: z.string().nonempty("Description is required"),
+});
 
 interface EditCompanyProfileDialogProps {
-  company: {
-    _id: string;
-    name: string;
-    address: string;
-    website: string;
-    description: string;
-    tel: string;
-  };
+  company: Company;
   isOpen: boolean;
   isPending: boolean;
   onClose: () => void;
-  onUpdate: (data: EditCompanyProfileFormSchema) => void;
+  onUpdate: (data: z.infer<typeof editCompanyProfileFormSchema>) => void;
 }
 
 export function EditCompanyProfileDialog({
@@ -43,25 +43,20 @@ export function EditCompanyProfileDialog({
   onClose,
   onUpdate,
 }: EditCompanyProfileDialogProps) {
-  const [formData, setFormData] = useState<EditCompanyProfileFormSchema>({
-    name: company.name,
-    address: company.address,
-    website: company.website,
-    tel: company.tel,
-    description: company.description,
+  const form = useForm<z.infer<typeof editCompanyProfileFormSchema>>({
+    resolver: zodResolver(editCompanyProfileFormSchema),
+    defaultValues: {
+      name: company.name,
+      address: company.address,
+      website: company.website,
+      tel: company.tel,
+      description: company.description,
+    },
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onUpdate(formData);
-  };
+  useEffect(() => {
+    form.reset(company);
+  }, [company, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -73,82 +68,92 @@ export function EditCompanyProfileDialog({
             you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              Company Name
-            </label>
-            <Input
-              id="name"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((e) => onUpdate(e))}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
               name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter company name"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel htmlFor="name" className="text-sm font-medium">
+                    Company Name
+                  </FormLabel>
+                  <Input placeholder="Enter company name" {...field} />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="address" className="text-sm font-medium">
-              Address
-            </label>
-            <Input
-              id="address"
+            <FormField
+              control={form.control}
               name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Enter company address"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel htmlFor="address" className="text-sm font-medium">
+                    Address
+                  </FormLabel>
+                  <Input placeholder="Enter company address" {...field} />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="website" className="text-sm font-medium">
-              Website
-            </label>
-            <Input
-              id="website"
+            <FormField
+              control={form.control}
               name="website"
-              value={formData.website}
-              onChange={handleChange}
-              placeholder="Enter company website"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel htmlFor="website" className="text-sm font-medium">
+                    Website
+                  </FormLabel>
+                  <Input placeholder="Enter company website" {...field} />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="tel" className="text-sm font-medium">
-              Telephone
-            </label>
-            <Input
-              id="tel"
+            <FormField
+              control={form.control}
               name="tel"
-              value={formData.tel}
-              onChange={handleChange}
-              placeholder="Enter telephone number"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel htmlFor="tel" className="text-sm font-medium">
+                    Telephone
+                  </FormLabel>
+                  <Input placeholder="Enter telephone number" {...field} />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">
-              Description
-            </label>
-            <Textarea
-              id="description"
+            <FormField
+              control={form.control}
               name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Enter company description"
-              className="min-h-[100px]"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel
+                    htmlFor="description"
+                    className="text-sm font-medium"
+                  >
+                    Description
+                  </FormLabel>
+                  <TextEditor
+                    markdown={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              Save changes
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                Save changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
