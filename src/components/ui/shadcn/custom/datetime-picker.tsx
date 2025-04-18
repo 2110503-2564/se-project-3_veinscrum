@@ -4,9 +4,10 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/shadcn/custom/popover-dialog";
+} from "@/components/ui/shadcn/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/shadcn/scroll-area";
 import { cn } from "@/lib/utils";
+import { PopoverPortal } from "@radix-ui/react-popover";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import React from "react";
@@ -99,56 +100,60 @@ export function DateTimePicker24h({
           {date ? format(date, dateFormat) : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <div className="flex flex-col sm:flex-row">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleDateSelect}
-            fromDate={new Date("2022-05-10")}
-            toDate={new Date("2022-05-13")}
-            initialFocus
-          />
-          <div className="flex flex-col divide-y sm:h-[300px] sm:flex-row sm:divide-x sm:divide-y-0">
-            <ScrollArea className="w-64 sm:w-auto">
-              <div className="flex p-2 sm:flex-col">
-                {hours.reverse().map((hour) => (
-                  <Button
-                    key={hour}
-                    size="icon"
-                    variant={
-                      date && date.getHours() === hour ? "default" : "ghost"
-                    }
-                    className="aspect-square shrink-0 sm:w-full"
-                    onClick={(e) => handleTimeChange("hour", hour, e)}
-                  >
-                    {hour}
-                  </Button>
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" className="sm:hidden" />
-            </ScrollArea>
-            <ScrollArea className="w-64 sm:w-auto">
-              <div className="flex p-2 sm:flex-col">
-                {minutes.reverse().map((minute) => (
-                  <Button
-                    key={minute}
-                    size="icon"
-                    variant={
-                      date && date.getMinutes() === minute ? "default" : "ghost"
-                    }
-                    className="aspect-square shrink-0 sm:w-full"
-                    onClick={(e) => handleTimeChange("minute", minute, e)}
-                  >
-                    {minute.toString().padStart(2, "0")}
-                  </Button>
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" className="sm:hidden" />
-            </ScrollArea>
+      <PopoverPortal>
+        <PopoverContent className="w-auto p-0">
+          <div className="flex flex-col sm:flex-row">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleDateSelect}
+              fromDate={new Date("2022-05-10")}
+              toDate={new Date("2022-05-13")}
+              initialFocus
+            />
+            <div className="flex flex-col divide-y sm:h-[300px] sm:flex-row sm:divide-x sm:divide-y-0">
+              <ScrollArea className="w-64 sm:w-auto">
+                <div className="flex p-2 sm:flex-col">
+                  {hours.reverse().map((hour) => (
+                    <Button
+                      key={hour}
+                      size="icon"
+                      variant={
+                        date && date.getHours() === hour ? "default" : "ghost"
+                      }
+                      className="aspect-square shrink-0 sm:w-full"
+                      onClick={(e) => handleTimeChange("hour", hour, e)}
+                    >
+                      {hour}
+                    </Button>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="sm:hidden" />
+              </ScrollArea>
+              <ScrollArea className="w-64 sm:w-auto">
+                <div className="flex p-2 sm:flex-col">
+                  {minutes.reverse().map((minute) => (
+                    <Button
+                      key={minute}
+                      size="icon"
+                      variant={
+                        date && date.getMinutes() === minute
+                          ? "default"
+                          : "ghost"
+                      }
+                      className="aspect-square shrink-0 sm:w-full"
+                      onClick={(e) => handleTimeChange("minute", minute, e)}
+                    >
+                      {minute.toString().padStart(2, "0")}
+                    </Button>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="sm:hidden" />
+              </ScrollArea>
+            </div>
           </div>
-        </div>
-      </PopoverContent>
+        </PopoverContent>
+      </PopoverPortal>
     </Popover>
   );
 }

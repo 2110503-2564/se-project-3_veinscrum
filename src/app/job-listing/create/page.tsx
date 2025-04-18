@@ -1,8 +1,8 @@
 "use client";
 
+import { ImageUploadInput } from "@/components/input/ImageUpload";
 import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
-import { InputImage } from "@/components/ui/shadcn/custom/image-upload";
 import {
   Form,
   FormControl,
@@ -131,7 +131,7 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Job Image</FormLabel>
                 <FormControl>
-                  <InputImage onChange={field.onChange} />
+                  <ImageUploadInput onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
