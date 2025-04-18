@@ -46,7 +46,6 @@ export default function CreateCompanyPage() {
         jobTitle: "",
         description: "",
       });
-
       return result;
     },
     enabled: status == "authenticated",
