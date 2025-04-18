@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -32,6 +32,7 @@ const editJobSchema = z.object({
 });
 
 export default function EditJobPage() {
+  const params = useParams<{ jobId:string }>();
   const { status } = useSession();
   const router = useRouter();
 
@@ -65,23 +66,23 @@ export default function EditJobPage() {
 
   const { mutate: createJob } = useMutation({
     mutationFn: async (data: z.infer<typeof editJobSchema>) => {
-      return await axios.post(BackendRoutes.JOB_LISTINGS, data);
+      return await axios.put(BackendRoutes.JOB_LISTINGS_ID({id:params.jobId}), data);
     },
     onMutate: () =>
-      toast.loading("Creating Job", {
-        id: "create-job",
+      toast.loading("Editing Job", {
+        id: "edit-job",
         description: "",
       }),
     onSuccess: () => {
-      toast.success("Job Created Successfully", {
-        id: "create-job",
+      toast.success("Job Edited Successfully", {
+        id: "edit-job",
         description: "",
       });
       router.push(FrontendRoutes.COMPANY_PROFILE({ id: me?.company ?? "" }));
     },
     onError: (error) => {
-      toast.error("Failed to create Job", {
-        id: "create-job",
+      toast.error("Failed to edit Job", {
+        id: "edit-job",
         description: isAxiosError(error)
           ? error.response?.data.error
           : "Something went wrong",
@@ -145,7 +146,7 @@ export default function EditJobPage() {
             )}
           />
           <Button type="submit" className="w-full" size="lg">
-            Create
+            Update
           </Button>
         </form>
       </main>
