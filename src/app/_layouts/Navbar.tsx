@@ -28,12 +28,36 @@ export const Navbar = async () => {
     : null;
 
   return (
-    <nav className="w-full bg-white px-4 shadow-md">
-      <div className="mx-auto flex max-w-(--screen-2xl) items-center justify-between py-4">
-        <div>
-          <Link href={FrontendRoutes.HOME} className="font-semibold">
+    <nav className="h-18 w-full bg-white px-4 shadow-md">
+      <div className="mx-auto flex max-w-(--breakpoint-2xl) items-center justify-between py-4">
+        <div className="flex items-center gap-x-6">
+          <Link href={FrontendRoutes.HOME} className="text-lg font-semibold">
             Online Job Fair Registration
           </Link>
+          {user?.data.role === "admin" && (
+            <Link
+              className="transition-all hover:font-medium"
+              href={FrontendRoutes.ADMIN_SESSION}
+            >
+              Dashboard
+            </Link>
+          )}
+          {user?.data.role === "user" && (
+            <Link
+              className="transition-all hover:font-medium"
+              href={FrontendRoutes.SESSION_LIST}
+            >
+              My Session
+            </Link>
+          )}
+          {user?.data.role != "admin" && (
+            <Link
+              className="transition-all hover:font-medium"
+              href={FrontendRoutes.COMPANY_LIST}
+            >
+              Companies
+            </Link>
+          )}
         </div>
         <div className="flex items-center gap-x-4">
           {!user ? (

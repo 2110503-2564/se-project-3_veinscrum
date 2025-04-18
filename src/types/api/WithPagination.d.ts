@@ -7,6 +7,6 @@ interface WithPagination {
   count: number;
   pagination: {
     next?: Pagination;
-    previous?: Pagination;
+    prev?: Pagination;
   };
 }

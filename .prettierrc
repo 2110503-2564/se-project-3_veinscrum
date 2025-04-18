@@ -6,5 +6,5 @@
   ],
   "tabWidth": 2,
   "tailwindFunctions": ["clsx", "cx", "cva"],
-  "tailwindAttributes": ["classNames"]
+  "tailwindAttributes": ["classNames", "contentEditableClassName"]
 }
