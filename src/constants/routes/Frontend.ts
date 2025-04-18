@@ -18,6 +18,8 @@ export enum FrontendRouteTargets {
 
   ADMIN_SESSION = "/admin/sessions",
   ADMIN_COMPANY = "/admin/companies",
+
+  JOB_LISTINGS_CREATE_ID = "/job-listing/create",
 }
 
 export const FrontendRoutes = getDynamicRoute(FrontendRouteTargets);
