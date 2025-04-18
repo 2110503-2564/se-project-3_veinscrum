@@ -25,8 +25,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const createJobSchema = z.object({
-  company: z.string().nonempty(),
-  image: z.string(),
+  company: z.string().nonempty("Company is required"),
+  image: z.string().optional(),
   jobTitle: z.string().nonempty("Job Title is required"),
   description: z.string().nonempty("Description is required"),
 });
@@ -35,11 +35,7 @@ export default function CreateCompanyPage() {
   const { status } = useSession();
   const router = useRouter();
 
-  const {
-    data: me,
-    isLoading: isMeLoading,
-    isError: isMeError,
-  } = useQuery({
+  const { data: me } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
     queryFn: async () => {
       const result = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
@@ -50,18 +46,17 @@ export default function CreateCompanyPage() {
         jobTitle: "",
         description: "",
       });
+
       return result;
     },
     enabled: status == "authenticated",
     select: (data) => data.data.data,
   });
 
-  const companyId = me?.company ?? "";
-
   const form = useForm<z.infer<typeof createJobSchema>>({
     resolver: zodResolver(createJobSchema),
     defaultValues: {
-      company: companyId,
+      company: me?.company,
       image: "",
       jobTitle: "",
       description: "",
@@ -70,7 +65,6 @@ export default function CreateCompanyPage() {
 
   const { mutate: createJob } = useMutation({
     mutationFn: async (data: z.infer<typeof createJobSchema>) => {
-      //not sure route is correct
       return await axios.post(BackendRoutes.JOB_LISTINGS, data);
     },
     onMutate: () =>
@@ -83,7 +77,7 @@ export default function CreateCompanyPage() {
         id: "create-job",
         description: "",
       });
-      router.push(FrontendRoutes.COMPANY_PROFILE({ id: companyId }));
+      router.push(FrontendRoutes.COMPANY_PROFILE({ id: me?.company ?? "" }));
     },
     onError: (error) => {
       toast.error("Failed to create Job", {
@@ -100,10 +94,7 @@ export default function CreateCompanyPage() {
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((data) => {
-            console.log(data);
-            createJob(data);
-          })}
+          onSubmit={form.handleSubmit((e) => createJob(e))}
         >
           <h1 className="text-center text-3xl font-bold">Create Job</h1>
           <FormField
@@ -153,12 +144,7 @@ export default function CreateCompanyPage() {
               </FormItem>
             )}
           />
-          <Button
-            type="submit"
-            className="w-full"
-            size="lg"
-            onClick={() => console.log(companyId, form.getValues())}
-          >
+          <Button type="submit" className="w-full" size="lg">
             Create
           </Button>
         </form>
