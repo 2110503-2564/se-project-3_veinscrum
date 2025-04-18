@@ -2,6 +2,7 @@
 
 import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
+import { InputImage } from "@/components/ui/shadcn/custom/image-upload";
 import {
   Form,
   FormControl,
@@ -10,7 +11,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/shadcn/form";
-import { InputImage } from "@/components/ui/shadcn/custom/image-upload";
 import { Input } from "@/components/ui/shadcn/input";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
@@ -35,26 +35,28 @@ export default function CreateCompanyPage() {
   const { status } = useSession();
   const router = useRouter();
 
-  const {data: me, isLoading: isMeLoading, isError: isMeError} = useQuery({
-        queryKey: [BackendRoutes.AUTH_ME],
-        queryFn: async () => {
-          const result = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
+  const {
+    data: me,
+    isLoading: isMeLoading,
+    isError: isMeError,
+  } = useQuery({
+    queryKey: [BackendRoutes.AUTH_ME],
+    queryFn: async () => {
+      const result = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
 
-        form.reset({
-          company: result.data.data.company,
-          image: "",
-          jobTitle: "",
-          description: "",
-        });
-          return result;
-        },
-        enabled: status == "authenticated",
-        select: (data) => data.data.data,
-      },
-  );
+      form.reset({
+        company: result.data.data.company,
+        image: "",
+        jobTitle: "",
+        description: "",
+      });
+      return result;
+    },
+    enabled: status == "authenticated",
+    select: (data) => data.data.data,
+  });
 
   const companyId = me?.company ?? "";
-
 
   const form = useForm<z.infer<typeof createJobSchema>>({
     resolver: zodResolver(createJobSchema),
@@ -68,7 +70,7 @@ export default function CreateCompanyPage() {
 
   const { mutate: createJob } = useMutation({
     mutationFn: async (data: z.infer<typeof createJobSchema>) => {
-    //not sure route is correct 
+      //not sure route is correct
       return await axios.post(BackendRoutes.JOB_LISTINGS, data);
     },
     onMutate: () =>
@@ -98,13 +100,17 @@ export default function CreateCompanyPage() {
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((data) => {console.log(data); createJob(data)})}
+          onSubmit={form.handleSubmit((data) => {
+            console.log(data);
+            createJob(data);
+          })}
         >
           <h1 className="text-center text-3xl font-bold">Create Job</h1>
-          <FormField 
+          <FormField
             control={form.control}
             name="company"
-            render={() => (<></>)}/>
+            render={() => <></>}
+          />
           <FormField
             control={form.control}
             name="jobTitle"
@@ -125,7 +131,7 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Job Image</FormLabel>
                 <FormControl>
-                    <InputImage onChange={field.onChange}/>
+                  <InputImage onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -147,7 +153,12 @@ export default function CreateCompanyPage() {
               </FormItem>
             )}
           />
-          <Button type="submit"  className="w-full" size="lg" onClick={() => console.log(companyId, form.getValues())}>
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            onClick={() => console.log(companyId, form.getValues())}
+          >
             Create
           </Button>
         </form>
