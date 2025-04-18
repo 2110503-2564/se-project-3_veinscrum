@@ -89,7 +89,7 @@ export default function ProfilePage() {
       const response = await fetch(
         withBaseRoute(BackendRoutes.COMPANIES_ID({ id: company._id })),
         {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${session?.token}`,
             "Content-Type": "application/json",
