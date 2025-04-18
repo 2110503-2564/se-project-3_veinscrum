@@ -24,7 +24,11 @@ export const UserInterviewSessionCard: React.FC<
       <DropdownMenuItem disabled={!onEdit} onClick={onEdit}>
         Edit Session
       </DropdownMenuItem>
-      <DropdownMenuItem disabled={!onDelete} onClick={onDelete}>
+      <DropdownMenuItem
+        variant="destructive"
+        disabled={!onDelete}
+        onClick={onDelete}
+      >
         Delete Session
       </DropdownMenuItem>
     </DropdownMenuContent>
@@ -42,7 +46,13 @@ export const UserInterviewSessionCard: React.FC<
       />
       <InterviewSessionCardInfo
         icon={CalendarIcon}
-        text={interviewSession.date.toLocaleString()}
+        text={new Date(interviewSession.date).toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
       />
     </InterviewSessionCardWithDropdown>
   );

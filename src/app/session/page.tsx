@@ -1,5 +1,11 @@
 "use client";
 
+import { UserInterviewSessionCard } from "@/components/card/UserInterviewSessionCard";
+import { DeleteInterviewSessionDialog } from "@/components/dialog/DeleteInterviewSessionDialog";
+import {
+  EditInterviewSessionDialog,
+  EditInterviewSessionFormSchema,
+} from "@/components/dialog/EditInterviewSessionDialog";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
 import {
@@ -12,12 +18,6 @@ import { isAxiosError } from "axios";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { UserInterviewSessionCard } from "../_components/UserInterviewSessionCard";
-import { DeleteInterviewSessionDialog } from "./_components/DeleteInterviewSessionDialog";
-import {
-  EditInterviewSessionDialog,
-  EditInterviewSessionFormSchema,
-} from "./_components/EditInterviewSessionDialog";
 
 export default function UserInterviewSessionsPage() {
   const queryClient = useQueryClient();
@@ -34,12 +34,11 @@ export default function UserInterviewSessionsPage() {
     error: meError,
   } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
-    queryFn: async () =>
-      (await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME)).data,
+    queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
     enabled: status == "authenticated",
   });
 
-  const userId = me?.data?._id || "";
+  const userId = me?.data?.data._id || "";
   const isUserDataReady = !isMeLoading && !meError && !!userId;
 
   // Data fetching
@@ -161,7 +160,7 @@ export default function UserInterviewSessionsPage() {
     <main className="mx-auto mt-16 space-y-8">
       <h1 className="text-center text-4xl font-bold">My Scheduled Sessions</h1>
 
-      <div className="mx-auto h-[70vh] max-w-2xl space-y-2 overflow-y-auto pr-4">
+      <div className="mx-auto min-h-[calc(100dvh-4.5rem)] max-w-2xl space-y-2 overflow-y-auto pr-4">
         {isInterviewSessionLoading || !interviewSessions ? (
           <p className="text-center">Loading sessions...</p>
         ) : interviewSessions?.data.data.length == 0 ? (

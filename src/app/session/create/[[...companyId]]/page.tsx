@@ -63,7 +63,7 @@ export default function CreateInterviewSessionPage() {
 
           form.reset({
             ...formDefaultValues(),
-            user: result.data.data._id,
+            user: result?.data?.data?._id,
           });
 
           return result;
@@ -78,7 +78,7 @@ export default function CreateInterviewSessionPage() {
           );
 
           if (
-            !result.data.data.find(
+            !result?.data?.data?.find(
               (company) => company.id == form.getValues().company,
             )
           ) {
@@ -104,7 +104,10 @@ export default function CreateInterviewSessionPage() {
       data: z.infer<typeof createInterviewSessionFormSchema>,
     ) => await axios.post(BackendRoutes.SESSIONS, data),
     onMutate: () =>
-      toast.loading("Creating Session", { id: "create-session", description: "" }),
+      toast.loading("Creating Session", {
+        id: "create-session",
+        description: "",
+      }),
     onSuccess: () => {
       toast.success("Create Session successfully", {
         id: "create-session",
@@ -151,8 +154,8 @@ export default function CreateInterviewSessionPage() {
                       <SelectValue placeholder="Select a Company" />
                     </SelectTrigger>
                     <SelectContent>
-                      {companies?.data &&
-                        companies?.data.data.map((company, idx) => (
+                      {companies?.data?.data &&
+                        companies?.data?.data?.map((company, idx) => (
                           <SelectItem key={idx} value={company.id}>
                             {company.name}
                           </SelectItem>
