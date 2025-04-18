@@ -1,5 +1,6 @@
 "use client";
 
+import { ImageUploadInput } from "@/components/input/ImageUpload";
 import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
 import {
@@ -11,7 +12,6 @@ import {
   FormMessage,
 } from "@/components/ui/shadcn/form";
 import { Input } from "@/components/ui/shadcn/input";
-import { InputImage } from "@/components/ui/shadcn/custom/image-upload";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
@@ -79,7 +79,7 @@ export default function CreateCompanyPage() {
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
           onSubmit={form.handleSubmit((data) => {
             //console.log("Submitted values:", data);
-            createCompany(data)
+            createCompany(data);
           })}
         >
           <h1 className="text-center text-3xl font-bold">Create Company</h1>
@@ -99,11 +99,14 @@ export default function CreateCompanyPage() {
           <FormField
             control={form.control}
             name="logo"
-            render={({field}) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Logo</FormLabel>
                 <FormControl>
-                  <InputImage onChange={field.onChange}/>
+                  <ImageUploadInput
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -123,7 +126,7 @@ export default function CreateCompanyPage() {
               </FormItem>
             )}
           />
-          <div className="flex flex-row gap-4 justify-between">
+          <div className="flex flex-row justify-between gap-4">
             <div className="flex-1">
               <FormField
                 control={form.control}
@@ -137,7 +140,7 @@ export default function CreateCompanyPage() {
                     <FormMessage />
                   </FormItem>
                 )}
-            />
+              />
             </div>
             <div className="flex-1">
               <FormField

@@ -104,8 +104,8 @@ export default function ProfilePage() {
           <div className="grid grid-cols-3 gap-8">
             <div className="flex w-full justify-center">
               <Image
-                src={company?.logo ?? "/placeholder.png"}
-                alt={company?.name ?? "Company Logo"}
+                src={company?.logo || "/placeholder.png"}
+                alt={company?.name || "Company Logo"}
                 width={192}
                 height={192}
                 className="rounded-md object-cover"
