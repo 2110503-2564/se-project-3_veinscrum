@@ -126,8 +126,7 @@ export default function ProfilePage() {
             <p>Tel : {user?.tel}</p>
           </div>
         </div>
-      ) : 
-       (
+      ) : (
         <div className="mx-auto max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
           <div className="mb-8 text-center">
             <div className="mb-2 flex justify-end">
@@ -198,7 +197,7 @@ export default function ProfilePage() {
             />
           )}
         </div>
-      ) }
+      )}
     </main>
   );
 }

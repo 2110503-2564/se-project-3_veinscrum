@@ -104,7 +104,10 @@ export default function CreateInterviewSessionPage() {
       data: z.infer<typeof createInterviewSessionFormSchema>,
     ) => await axios.post(BackendRoutes.SESSIONS, data),
     onMutate: () =>
-      toast.loading("Creating Session", { id: "create-session", description: "" }),
+      toast.loading("Creating Session", {
+        id: "create-session",
+        description: "",
+      }),
     onSuccess: () => {
       toast.success("Create Session successfully", {
         id: "create-session",
