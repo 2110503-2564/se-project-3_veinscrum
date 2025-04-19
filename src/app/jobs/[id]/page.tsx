@@ -53,21 +53,18 @@ export default function JobDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-8">
-      <div className="mx-auto max-w-[1200px] rounded-lg bg-white p-8 shadow">
-        <h1 className="mb-12 text-2xl font-semibold" data-testid="job-title">
+    <div className="mx-auto max-w-3xl rounded-xl bg-white px-16 py-10 mt-16 space-y-6 shadow-md">
+        <h1 className="text-2xl font-semibold" data-testid="job-title">
           {job.jobTitle}
         </h1>
 
-        <div className="flex flex-col space-y-8">
-          <div className="grid grid-cols-2 gap-16">
-            {/* Left side - Image */}
-            <div data-testid="job-image">
+          <div className="flex flex-col items-start gap-8 md:flex-row">
+            <div className="shadow-md h-36 w-36" data-testid="job-image">
               {job.image ? (
                 <img
                   src={job.image}
                   alt={job.jobTitle}
-                  className="object-cover"
+                  className="h-full w-full object-center rounded p-1"
                 />
               ) : (
                 <div
@@ -79,31 +76,26 @@ export default function JobDetailPage() {
               )}
             </div>
 
-            {/* Right side - Description */}
-            <div>
-              <p
+            <div className="w-full space-y-4 md:w-2/3">
+              <p 
                 className="pr-8 text-justify text-gray-600"
                 data-testid="job-description"
-              >
-                {job.description}
+              >{job.description}
               </p>
+
+              
             </div>
           </div>
-
-          {/* Button below both columns */}
-          <div className="flex justify-center">
-            <Button
-              className="w-[250px] rounded-md bg-black py-3 text-center text-white transition-colors hover:bg-gray-800"
-              onClick={() => {
-                // TODO: Implement interview booking logic
-                console.log("Book interview clicked");
-              }}
-            >
-              Book Interview Session
-            </Button>
-          </div>
-        </div>
-      </div>
+        <div className="flex justify-center">
+                <Button
+                  className="w-48 h-10 rounded-md bg-black py-3 text-center text-white transition-colors hover:bg-gray-800"
+                  onClick={() => {
+                    console.log("Book interview clicked");
+                  }}
+                >Book Interview Session
+                </Button>
+              </div>
+          
     </div>
   );
 }
