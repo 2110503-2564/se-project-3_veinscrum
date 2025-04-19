@@ -122,7 +122,10 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Job Image</FormLabel>
                 <FormControl>
-                  <ImageUploadInput onChange={field.onChange} />
+                  <ImageUploadInput
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

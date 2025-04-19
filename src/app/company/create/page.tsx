@@ -1,5 +1,6 @@
 "use client";
 
+import { ImageUploadInput } from "@/components/input/ImageUpload";
 import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
 import {
@@ -24,6 +25,7 @@ import { z } from "zod";
 
 const createCompanySchema = z.object({
   name: z.string().nonempty("Company Name is required"),
+  logo: z.string().optional(),
   address: z.string().nonempty("Address is required"),
   website: z.string().nonempty("Website is required"),
   description: z.string().nonempty("Description is required"),
@@ -36,6 +38,7 @@ export default function CreateCompanyPage() {
     resolver: zodResolver(createCompanySchema),
     defaultValues: {
       name: "",
+      logo: "",
       address: "",
       website: "",
       description: "",
@@ -74,7 +77,10 @@ export default function CreateCompanyPage() {
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((data) => createCompany(data))}
+          onSubmit={form.handleSubmit((data) => {
+            //console.log("Submitted values:", data);
+            createCompany(data);
+          })}
         >
           <h1 className="text-center text-3xl font-bold">Create Company</h1>
           <FormField
@@ -92,6 +98,23 @@ export default function CreateCompanyPage() {
           />
           <FormField
             control={form.control}
+            name="logo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Logo</FormLabel>
+                <FormControl>
+                  <ImageUploadInput
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="address"
             render={({ field }) => (
               <FormItem>
@@ -103,19 +126,38 @@ export default function CreateCompanyPage() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="website"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex flex-row justify-between gap-4">
+            <div className="flex-1">
+              <FormField
+                control={form.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Website</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="flex-1">
+              <FormField
+                control={form.control}
+                name="tel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Telephone</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
           <FormField
             control={form.control}
             name="description"
@@ -127,19 +169,6 @@ export default function CreateCompanyPage() {
                     markdown={field.value}
                     onChange={field.onChange}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="tel"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Telephone</FormLabel>
-                <FormControl>
-                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
