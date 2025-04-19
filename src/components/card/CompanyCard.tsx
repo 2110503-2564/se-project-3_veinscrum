@@ -24,7 +24,10 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
       )}
     >
       <div>
-        <h2 className="text-xl font-bold">{company.name}</h2>
+        <Link href={`/company/${company.id}`}
+          className="text-xl font-bold transition-all duration-300 hover:text-blue-600 hover:underline">{company.name}
+        </Link>
+
         <p className="text-sm text-gray-600">{company.description}</p>
       </div>
       <div>
