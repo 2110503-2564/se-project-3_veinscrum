@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { cn } from "@/lib/utils";
 import { Globe, MapPin, Phone } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import removeMd from "remove-markdown";
 
 interface CompanyCardProps {
@@ -17,12 +17,16 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
   company,
   variant = "default",
 }) => {
+  const router = useRouter();
   return (
     <div
       className={cn(
-        "flex h-68 w-64 flex-col justify-between rounded-lg bg-white p-4 pb-6 shadow-md",
+        "hover:bg-accent flex h-68 w-64 cursor-pointer flex-col justify-between rounded-lg bg-white p-4 pb-6 shadow-md ring-gray-200 transition hover:ring",
         { "h-52": variant === "viewonly" },
       )}
+      onClick={() =>
+        router.push(FrontendRoutes.COMPANY_PROFILE({ companyId: company.id }))
+      }
     >
       <div className="space-y-1">
         <h2 className="text-xl font-bold">{company.name}</h2>
@@ -37,10 +41,14 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
           <InterviewSessionCardInfo icon={Phone} text={company.tel} />
         </div>
         {variant === "default" && (
-          <Button asChild className="mt-4 w-full">
-            <Link href={FrontendRoutes.SESSION_CREATE_ID({ id: company.id })}>
-              Book
-            </Link>
+          <Button
+            className="mt-4 w-full"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(FrontendRoutes.SESSION_CREATE_ID({ id: company.id }));
+            }}
+          >
+            Book Session
           </Button>
         )}
       </div>
