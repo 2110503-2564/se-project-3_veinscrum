@@ -19,31 +19,38 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useSession } from "next-auth/react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 const editJobSchema = z.object({
-  company: z.string().nonempty("Company is required"),
   image: z.string().optional(),
   jobTitle: z.string().nonempty("Job Title is required"),
   description: z.string().nonempty("Description is required"),
 });
 
 export default function EditJobPage() {
-  const params = useParams<{ jobId:string }>();
+  const params = useParams<{ jobId: string }>();
   const { status } = useSession();
   const router = useRouter();
 
-  const { data: defaultJob, isLoading: jobLoading, isError: jobEror } = useQuery({
-    queryKey: [BackendRoutes.JOB_LISTINGS_ID({id:params.jobId})],
-    queryFn: async () => { 
+  const form = useForm<z.infer<typeof editJobSchema>>({
+    resolver: zodResolver(editJobSchema),
+  });
 
-      const result = await axios.get<GETJobListingResponse>(BackendRoutes.JOB_LISTINGS_ID({id:params.jobId}));
+  const {
+    data: job,
+    isLoading: jobLoading,
+    isError: jobError,
+  } = useQuery({
+    queryKey: [BackendRoutes.JOB_LISTINGS_ID({ id: params.jobId })],
+    queryFn: async () => {
+      const result = await axios.get<GETJobListingResponse>(
+        BackendRoutes.JOB_LISTINGS_ID({ id: params.jobId }),
+      );
 
       form.reset({
-        company: result.data.data.company,
         image: result.data.data.image,
         jobTitle: result.data.data.jobTitle,
         description: result.data.data.description,
@@ -55,20 +62,12 @@ export default function EditJobPage() {
     select: (data) => data.data.data,
   });
 
-  const form = useForm<z.infer<typeof editJobSchema>>({
-    resolver: zodResolver(editJobSchema),
-    defaultValues: {
-      company: defaultJob?.company,
-      image: defaultJob?.image,
-      jobTitle: defaultJob?.jobTitle,
-      description: defaultJob?.description,
-    },
-  });
-
-  const { mutate: createJob } = useMutation({
-    mutationFn: async (data: z.infer<typeof editJobSchema>) => {
-      return await axios.put(BackendRoutes.JOB_LISTINGS_ID({id:params.jobId}), data);
-    },
+  const { mutate: editJob } = useMutation({
+    mutationFn: async (data: z.infer<typeof editJobSchema>) =>
+      axios.put(BackendRoutes.JOB_LISTINGS_ID({ id: params.jobId }), {
+        ...data,
+        company: job?.company,
+      }),
     onMutate: () =>
       toast.loading("Editing Job", {
         id: "edit-job",
@@ -79,7 +78,7 @@ export default function EditJobPage() {
         id: "edit-job",
         description: "",
       });
-      router.push(FrontendRoutes.COMPANY_PROFILE({ id: defaultJob?.company ?? "" }));
+      router.push(FrontendRoutes.COMPANY_PROFILE({ id: job?.company ?? "" }));
     },
     onError: (error) => {
       toast.error("Failed to edit Job", {
@@ -92,21 +91,16 @@ export default function EditJobPage() {
   });
 
   if (jobLoading) return <div>Loading...</div>;
-  if (jobEror) return <div>Error loading job</div>;
+  if (jobError) return <div>Error loading job</div>;
 
   return (
     <Form {...form}>
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((e) => createJob(e))}
+          onSubmit={form.handleSubmit((e) => editJob(e))}
         >
           <h1 className="text-center text-3xl font-bold">Edit Job</h1>
-          <FormField
-            control={form.control}
-            name="company"
-            render={() => <></>}
-          />
           <FormField
             control={form.control}
             name="jobTitle"
@@ -127,7 +121,10 @@ export default function EditJobPage() {
               <FormItem>
                 <FormLabel>Job Image</FormLabel>
                 <FormControl>
-                  <ImageUploadInput onChange={field.onChange} defaultImage={defaultJob?.image}/>
+                  <ImageUploadInput
+                    onChange={field.onChange}
+                    defaultImage={job?.image}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
