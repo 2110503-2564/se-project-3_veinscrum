@@ -15,10 +15,10 @@ const publicRoutes = [
 const adminRoutes = [
   FrontendRoutes.ADMIN_SESSION,
   FrontendRoutes.ADMIN_COMPANY,
-  FrontendRoutes.COMPANY_CREATE,
 ];
 
 const userRoutes = [
+  FrontendRoutes.COMPANY_CREATE,
   FrontendRoutes.SESSION_LIST,
   FrontendRoutes.COMPANY_LIST,
   FrontendRoutes.SESSION_CREATE,

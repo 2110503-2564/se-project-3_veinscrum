@@ -15,8 +15,9 @@ import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ const createCompanySchema = z.object({
   address: z.string().nonempty("Address is required"),
   website: z.string().nonempty("Website is required"),
   description: z.string().nonempty("Description is required"),
+  owner: z.string().nonempty("Owner is required"),
   tel: z.string().nonempty("Telephone number is required"),
 });
 
@@ -38,9 +40,23 @@ export default function CreateCompanyPage() {
       name: "",
       address: "",
       website: "",
+      owner: "",
       description: "",
       tel: "",
     },
+  });
+
+  const { data: session, status } = useSession();
+
+  const { data: user, isLoading: isUserLoading } = useQuery({
+    queryKey: [BackendRoutes.AUTH_ME],
+    queryFn: async () => {
+      const response = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
+      form.reset({ owner: response.data.data._id });
+      return response;
+    },
+    enabled: !!session?.token,
+    select: (data) => data?.data?.data,
   });
 
   const { mutate: createCompany } = useMutation({

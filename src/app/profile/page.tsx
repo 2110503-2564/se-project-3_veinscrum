@@ -101,8 +101,8 @@ export default function ProfilePage() {
             <h1 className="text-2xl font-bold">{company?.name}</h1>
           </div>
 
-          <div className="grid grid-cols-3 gap-8">
-            <div className="flex w-full justify-center">
+          <div className="flex flex-col gap-8 md:grid md:grid-cols-3">
+            <div className="flex h-[192px] w-full items-center justify-center">
               <Image
                 src={company?.logo ?? "/placeholder.png"}
                 alt={company?.name ?? "Company Logo"}
@@ -118,17 +118,14 @@ export default function ProfilePage() {
                   <MapPin className="size-5 text-gray-600" />
                   {company?.address}
                 </p>
-
                 <p className="flex items-center gap-x-3">
                   <Mail className="size-5 text-gray-600" />
                   {user?.email}
                 </p>
-
                 <p className="flex items-center gap-x-3">
                   <Globe className="size-5 text-gray-600" />
                   {company?.website}
                 </p>
-
                 <p className="flex items-center gap-x-3">
                   <Phone className="size-5 text-gray-600" />
                   {company?.tel}
