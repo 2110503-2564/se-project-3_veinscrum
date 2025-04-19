@@ -36,16 +36,17 @@ export default function EditJobPage() {
   const { status } = useSession();
   const router = useRouter();
 
-  const { data: me } = useQuery({
-    queryKey: [BackendRoutes.AUTH_ME],
-    queryFn: async () => {
-      const result = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
+  const { data: defaultJob, isLoading: jobLoading, isError: jobEror } = useQuery({
+    queryKey: [BackendRoutes.JOB_LISTINGS_ID({id:params.jobId})],
+    queryFn: async () => { 
+
+      const result = await axios.get<GETJobListingResponse>(BackendRoutes.JOB_LISTINGS_ID({id:params.jobId}));
 
       form.reset({
         company: result.data.data.company,
-        image: "",
-        jobTitle: "",
-        description: "",
+        image: result.data.data.image,
+        jobTitle: result.data.data.jobTitle,
+        description: result.data.data.description,
       });
 
       return result;
@@ -57,10 +58,10 @@ export default function EditJobPage() {
   const form = useForm<z.infer<typeof editJobSchema>>({
     resolver: zodResolver(editJobSchema),
     defaultValues: {
-      company: me?.company,
-      image: "",
-      jobTitle: "",
-      description: "",
+      company: defaultJob?.company,
+      image: defaultJob?.image,
+      jobTitle: defaultJob?.jobTitle,
+      description: defaultJob?.description,
     },
   });
 
@@ -78,7 +79,7 @@ export default function EditJobPage() {
         id: "edit-job",
         description: "",
       });
-      router.push(FrontendRoutes.COMPANY_PROFILE({ id: me?.company ?? "" }));
+      router.push(FrontendRoutes.COMPANY_PROFILE({ id: defaultJob?.company ?? "" }));
     },
     onError: (error) => {
       toast.error("Failed to edit Job", {
@@ -89,6 +90,9 @@ export default function EditJobPage() {
       });
     },
   });
+
+  if (jobLoading) return <div>Loading...</div>;
+  if (jobEror) return <div>Error loading job</div>;
 
   return (
     <Form {...form}>
