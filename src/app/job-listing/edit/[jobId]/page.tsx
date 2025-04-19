@@ -78,7 +78,9 @@ export default function EditJobPage() {
         id: "edit-job",
         description: "",
       });
-      router.push(FrontendRoutes.COMPANY_PROFILE({ id: job?.company ?? "" }));
+      router.push(
+        FrontendRoutes.COMPANY_PROFILE({ companyId: job?.company ?? "" }),
+      );
     },
     onError: (error) => {
       toast.error("Failed to edit Job", {

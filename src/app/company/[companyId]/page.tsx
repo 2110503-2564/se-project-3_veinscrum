@@ -1,14 +1,16 @@
 "use client";
 
 import { JobCard } from "@/components/card/JobCard";
+import { TextEditor } from "@/components/input/TextEditor";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
-import { Globe, Mail, MapPin, Phone } from "lucide-react";
+import { Globe, MapPin, Phone } from "lucide-react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 
 export default function CompanyProfilePage() {
-  const { id: companyId } = useParams();
+  const { companyId } = useParams<{ companyId: string }>();
 
   const {
     data: companyResponse,
@@ -18,7 +20,9 @@ export default function CompanyProfilePage() {
   } = useQuery({
     queryKey: ["company", companyId],
     queryFn: async () =>
-      await axios.get(BackendRoutes.COMPANIES_ID({ id: companyId as string })),
+      await axios.get<GETCompanyResponse>(
+        BackendRoutes.COMPANIES_ID({ companyId }),
+      ),
     enabled: !!companyId,
     select: (data) => data?.data?.data,
   });
@@ -54,50 +58,44 @@ export default function CompanyProfilePage() {
   }
 
   return (
-    <>
-    <div className="mx-auto max-w-3xl rounded-xl bg-white px-6 py-10 mt-16 shadow-md">
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold">{company.name}</h1>
-      </div>
-
-      <div className="flex flex-col items-start gap-8 md:flex-row">
-        {/* Company Icon */}
-        <div className="flex w-full justify-center md:w-1/3">
-          <div className="h-36 w-36 rounded-md bg-gray-200" />
+    <div className="mx-auto my-16 max-w-3xl space-y-8">
+      <div className="rounded-xl bg-white px-6 py-10 shadow-md">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold">{company.name}</h1>
         </div>
 
-        {/* Company info */}
-        <div className="w-full space-y-4 md:w-2/3">
-          <div className="space-y-2 rounded-lg bg-gray-100 p-4 text-sm">
-            <p className="flex gap-3">
-              <MapPin className="h-5 w-5 text-gray-600" />
-              {company.address}
-            </p>
+        <div className="flex items-center gap-8 max-md:flex-col">
+          <Image
+            src={company.logo || "/placeholder.png"}
+            alt={company.name}
+            width={100}
+            height={100}
+            className="mx-auto size-36 rounded-md object-cover"
+          />
 
-            <p className="flex gap-3">
-              <Mail className="h-5 w-5 text-gray-600" />
-              Email:
-            </p>
+          <div className="w-full space-y-4">
+            <div className="space-y-2 rounded-lg bg-gray-100 p-4 text-sm">
+              <p className="flex gap-x-3">
+                <MapPin className="size-5 text-gray-600" />
+                {company.address}
+              </p>
 
-            <p className="flex gap-3">
-              <Globe className="h-5 w-5 text-gray-600" />
-              {company.website}
-            </p>
+              <p className="flex gap-x-3">
+                <Globe className="size-5 text-gray-600" />
+                {company.website}
+              </p>
 
-            <p className="flex gap-3">
-              <Phone className="h-5 w-5 text-gray-600" />
-              {company.tel}
-            </p>
+              <p className="flex gap-x-3">
+                <Phone className="size-5 text-gray-600" />
+                {company.tel}
+              </p>
+            </div>
           </div>
         </div>
+        <TextEditor markdown={company.description} readOnly />
       </div>
 
-      <p className="mt-6 text-sm leading-relaxed text-gray-700">
-        {company.description}
-      </p>
-    </div>
-
-      <div className="mx-auto max-w-3xl rounded-xl bg-white px-6 py-10 mt-16 shadow-md">
+      <div className="rounded-xl bg-white px-6 py-10 shadow-md">
         <h2 className="mb-8 text-center text-2xl font-bold">Job Listings</h2>
         <div className="mx-auto max-w-3xl space-y-4">
           {jobs.length === 0 ? (
@@ -105,9 +103,9 @@ export default function CompanyProfilePage() {
               No job listings available.
             </p>
           ) : (
-            jobs.map((job: { _id: string; jobTitle: string }) => (
+            jobs.map((job, idx) => (
               <JobCard
-                key={job._id}
+                key={idx}
                 id={job._id}
                 jobTitle={job.jobTitle}
                 companyName={company.name}
@@ -118,6 +116,6 @@ export default function CompanyProfilePage() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

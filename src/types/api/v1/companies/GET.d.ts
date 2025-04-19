@@ -6,6 +6,7 @@ interface Company {
   description: string;
   tel: string;
   sessions: Array<InterviewSession>;
+  jobListings: Array<JobListing>;
   logo?: string;
 }
 

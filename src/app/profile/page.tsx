@@ -35,10 +35,10 @@ export default function ProfilePage() {
   });
 
   const { data: company, isLoading: isCompanyLoading } = useQuery({
-    queryKey: [BackendRoutes.COMPANIES_ID({ id: user?.company || "" })],
+    queryKey: [BackendRoutes.COMPANIES_ID({ companyId: user?.company || "" })],
     queryFn: async () =>
       await axios.get<GETCompanyResponse>(
-        BackendRoutes.COMPANIES_ID({ id: user?.company || "" }),
+        BackendRoutes.COMPANIES_ID({ companyId: user?.company || "" }),
       ),
     enabled: !!session?.token && !!user?.company,
     select: (data) => data?.data?.data,
@@ -47,7 +47,7 @@ export default function ProfilePage() {
   const { mutate: updateCompany, isPending } = useMutation({
     mutationFn: async (data: z.infer<typeof editCompanyProfileFormSchema>) =>
       await axios.put(
-        BackendRoutes.COMPANIES_ID({ id: company?.id ?? "" }),
+        BackendRoutes.COMPANIES_ID({ companyId: company?.id ?? "" }),
         data,
       ),
     onMutate: () => {
@@ -60,7 +60,9 @@ export default function ProfilePage() {
       toast.success("Company updated successfully", { id: "update-company" });
       setIsEditDialogOpen(false);
       queryClient.invalidateQueries({
-        queryKey: [BackendRoutes.COMPANIES_ID({ id: company?.id ?? "" })],
+        queryKey: [
+          BackendRoutes.COMPANIES_ID({ companyId: company?.id ?? "" }),
+        ],
       });
     },
   });

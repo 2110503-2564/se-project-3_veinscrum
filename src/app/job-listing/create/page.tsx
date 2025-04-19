@@ -25,7 +25,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const createJobSchema = z.object({
-  company: z.string().nonempty("Company is required"),
   image: z.string().optional(),
   jobTitle: z.string().nonempty("Job Title is required"),
   description: z.string().nonempty("Description is required"),
@@ -37,18 +36,7 @@ export default function CreateCompanyPage() {
 
   const { data: me } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
-    queryFn: async () => {
-      const result = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
-
-      form.reset({
-        company: result.data.data.company,
-        image: "",
-        jobTitle: "",
-        description: "",
-      });
-
-      return result;
-    },
+    queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
     enabled: status == "authenticated",
     select: (data) => data.data.data,
   });
@@ -56,7 +44,6 @@ export default function CreateCompanyPage() {
   const form = useForm<z.infer<typeof createJobSchema>>({
     resolver: zodResolver(createJobSchema),
     defaultValues: {
-      company: me?.company,
       image: "",
       jobTitle: "",
       description: "",
@@ -64,9 +51,11 @@ export default function CreateCompanyPage() {
   });
 
   const { mutate: createJob } = useMutation({
-    mutationFn: async (data: z.infer<typeof createJobSchema>) => {
-      return await axios.post(BackendRoutes.JOB_LISTINGS, data);
-    },
+    mutationFn: async (data: z.infer<typeof createJobSchema>) =>
+      await axios.post(BackendRoutes.JOB_LISTINGS, {
+        ...data,
+        company: me?.company,
+      }),
     onMutate: () =>
       toast.loading("Creating Job", {
         id: "create-job",
@@ -77,7 +66,9 @@ export default function CreateCompanyPage() {
         id: "create-job",
         description: "",
       });
-      router.push(FrontendRoutes.COMPANY_PROFILE({ id: me?.company ?? "" }));
+      router.push(
+        FrontendRoutes.COMPANY_PROFILE({ companyId: me?.company ?? "" }),
+      );
     },
     onError: (error) => {
       toast.error("Failed to create Job", {
@@ -97,11 +88,6 @@ export default function CreateCompanyPage() {
           onSubmit={form.handleSubmit((e) => createJob(e))}
         >
           <h1 className="text-center text-3xl font-bold">Create Job</h1>
-          <FormField
-            control={form.control}
-            name="company"
-            render={() => <></>}
-          />
           <FormField
             control={form.control}
             name="jobTitle"
