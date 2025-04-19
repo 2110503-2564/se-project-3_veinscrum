@@ -1,0 +1,1 @@
+type GETJobListingResponse = DefaultResponse<JobListing>;
