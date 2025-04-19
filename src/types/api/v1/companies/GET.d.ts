@@ -5,6 +5,7 @@ interface Company {
   website: string;
   description: string;
   tel: string;
+  owner: string;
   sessions: Array<InterviewSession>;
   jobListings: Array<JobListing>;
   logo?: string;
