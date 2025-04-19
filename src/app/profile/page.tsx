@@ -66,6 +66,26 @@ export default function ProfilePage() {
     },
   });
 
+  const { mutate: deleteCompany, isPending: isDeleteCompanyPending } = useMutation({
+    mutationFn: async () =>
+      await axios.delete(
+        BackendRoutes.COMPANIES_ID({ id: company?.id ?? "" }),
+      ),
+      onMutate: () => {
+        toast.loading("Deleting company...", { id: "delete-company" });
+      },
+      onError: () => {
+        toast.error("Failed to delete company", { id: "delete-company" });
+      },
+      onSuccess: () => {
+        toast.success("Company deleted successfully", { id: "delete-company" });
+        setIsEditDialogOpen(false);
+        queryClient.invalidateQueries({
+          queryKey: [BackendRoutes.COMPANIES_ID({ id: company?.id ?? "" })],
+        });
+      },
+  });
+
   if (isUserLoading || isCompanyLoading || status === "loading") return null;
 
   return (
@@ -93,7 +113,7 @@ export default function ProfilePage() {
                   <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                     Edit Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                  <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => { if (confirm("Are you sure you want to delete this company profile?")) { deleteCompany(); }}}>
                     Delete Profile
                   </DropdownMenuItem>
                 </DropdownMenuContent>
