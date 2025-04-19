@@ -16,11 +16,32 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("should navigate to admin sessions page", async ({ page }) => {
-  // Navigate to admin companies page
-  await page.goto(withFrontendRoute(BackendRoutes.ADMIN_SESSION));
+  
+  // Click on the user button (with name "Brenda Luettgen") to open the dropdown menu
+  await page.getByRole("button", { name: "Brenda Luettgen" }).click();
 
-  // Verify we're on the admin companies page
+  // Click on the "Profile" option in the dropdown menu
+  await page.getByRole("menuitem", { name: "Profile" }).click();
+
+  // Assert that the text "ProfileBrenda" is visible on the page
+  await expect(page.getByText("ProfileBrenda")).toBeVisible();
+
+  // Assert that the heading with the name "Profile" is visible
+  await expect(page.getByRole("heading", { name: "Profile" })).toBeVisible();
+
+  // Assert that the user's full name "Brenda Luettgen" is visible within the main section
   await expect(
-    page.getByRole("heading", { name: "All Scheduled Sessions" }),
+    page.getByRole("main").getByText("Brenda Luettgen"),
+  ).toBeVisible();
+
+  // Assert that the user's email "Keaton_Yost@yahoo.com" is visible
+  await expect(page.getByText("Keaton_Yost@yahoo.com")).toBeVisible();
+
+  // Assert that a phone number ending in "-960-2295" is visible
+  await expect(page.getByText("-960-2295")).toBeVisible();
+
+  // Assert that the user button (with name "Brenda Luettgen") is still visible
+  await expect(
+    page.getByRole("button", { name: "Brenda Luettgen" }),
   ).toBeVisible();
 });
