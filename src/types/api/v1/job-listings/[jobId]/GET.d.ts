@@ -1,1 +1,1 @@
-type GETJobListingResponse = DefaultResponse<jobListing>;
+type GETJobListingResponse = DefaultResponse<JobListing>;
