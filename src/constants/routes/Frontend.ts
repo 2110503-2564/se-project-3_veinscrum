@@ -4,6 +4,7 @@ export enum FrontendRouteTargets {
   HOME = "/",
   TEST_CLIENT = "/test/client",
   AUTH_SIGN_UP = "/auth/signup",
+  AUTH_SIGN_UP_COMPANY = "/auth/signup/company",
   AUTH_SIGN_IN = "/auth/signin",
 
   PROFILE = "/profile",

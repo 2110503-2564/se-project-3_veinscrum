@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/shadcn/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -29,37 +30,28 @@ export const editCompanyProfileFormSchema = z.object({
 });
 
 interface EditCompanyProfileDialogProps {
-  company: Company;
-  isOpen: boolean;
+  company?: Company;
   isPending: boolean;
-  onClose: () => void;
   onUpdate: (data: z.infer<typeof editCompanyProfileFormSchema>) => void;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
-export function EditCompanyProfileDialog({
-  company,
-  isOpen,
-  isPending,
-  onClose,
-  onUpdate,
-}: EditCompanyProfileDialogProps) {
+export const EditCompanyProfileDialog: React.FC<
+  EditCompanyProfileDialogProps
+> = ({ company, isPending, onUpdate, isOpen, setIsOpen }) => {
   const form = useForm<z.infer<typeof editCompanyProfileFormSchema>>({
     resolver: zodResolver(editCompanyProfileFormSchema),
-    defaultValues: {
-      name: company.name,
-      address: company.address,
-      website: company.website,
-      tel: company.tel,
-      description: company.description,
-    },
   });
 
   useEffect(() => {
+    if (!company) return;
+
     form.reset(company);
   }, [company, form]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Company Profile</DialogTitle>
@@ -145,9 +137,11 @@ export function EditCompanyProfileDialog({
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="submit" disabled={isPending}>
                 Save changes
               </Button>
@@ -157,4 +151,4 @@ export function EditCompanyProfileDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};

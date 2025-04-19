@@ -83,20 +83,27 @@ export default function ProfilePage() {
           <div className="mb-8 text-center">
             <div className="mb-2 flex justify-end">
               <DropdownMenu>
-                <Button asChild variant="ghost" size="icon">
-                  <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
                     <EllipsisIcon />
-                  </DropdownMenuTrigger>
-                </Button>
+                  </Button>
+                </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                     Edit Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600">
+                  <DropdownMenuItem className="text-red-600 focus:text-red-600">
                     Delete Profile
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <EditCompanyProfileDialog
+                company={company}
+                isPending={isPending}
+                onUpdate={updateCompany}
+                isOpen={isEditDialogOpen}
+                setIsOpen={setIsEditDialogOpen}
+              />
             </div>
             <h1 className="text-2xl font-bold">{company?.name}</h1>
           </div>
@@ -138,16 +145,6 @@ export default function ProfilePage() {
               <TextEditor markdown={company?.description} readOnly />
             </div>
           </div>
-
-          {company && (
-            <EditCompanyProfileDialog
-              company={company}
-              isOpen={isEditDialogOpen}
-              isPending={isPending}
-              onClose={() => setIsEditDialogOpen(false)}
-              onUpdate={updateCompany}
-            />
-          )}
         </div>
       )}
     </main>
