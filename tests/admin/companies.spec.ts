@@ -16,7 +16,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("should navigate to admin sessions page", async ({ page }) => {
-  
   // Click on the user button (with name "Brenda Luettgen") to open the dropdown menu
   await page.getByRole("button", { name: "Brenda Luettgen" }).click();
 
