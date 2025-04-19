@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 interface ImageUploadInputProps {
   value?: string;
   onChange: (base64: string) => void;
-  defaultImage?: string;
 }
 
 export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({

@@ -122,8 +122,8 @@ export default function EditJobPage() {
                 <FormLabel>Job Image</FormLabel>
                 <FormControl>
                   <ImageUploadInput
+                    value={field.value}
                     onChange={field.onChange}
-                    defaultImage={job?.image}
                   />
                 </FormControl>
                 <FormMessage />
