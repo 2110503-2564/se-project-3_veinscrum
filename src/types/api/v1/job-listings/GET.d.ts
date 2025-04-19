@@ -1,4 +1,5 @@
 interface JobListing {
+  _id: string;
   company: string;
   image: string;
   jobTitle: string;
