@@ -1,3 +1,4 @@
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 import NextAuth from "next-auth";
 import { EmailPasswordProvider } from "./provider/EmailPassword";
 
@@ -22,5 +23,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       return session;
     },
+  },
+  pages: {
+    signIn: FrontendRoutes.AUTH_SIGN_IN,
+    signOut: "/",
   },
 });

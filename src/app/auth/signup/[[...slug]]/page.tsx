@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -49,6 +49,7 @@ const signUpFormSchema = z
 
 export default function SignUpPage() {
   const router = useRouter();
+  const params = useParams<{ slug: Array<string> }>();
 
   const form = useForm<z.infer<typeof signUpFormSchema>>({
     resolver: zodResolver(signUpFormSchema),
@@ -61,14 +62,18 @@ export default function SignUpPage() {
     },
   });
 
+  console.log(params.slug);
+
   const { mutate: signUp } = useMutation({
     mutationFn: async (data: z.infer<typeof signUpFormSchema>) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword: _, ...rest } = data;
 
+      const isCompany = params.slug?.includes("company");
+
       return await axios.post(BackendRoutes.AUTH_REGISTER, {
         ...rest,
-        role: "user",
+        role: isCompany ? "company" : "user",
       });
     },
     onMutate: () =>

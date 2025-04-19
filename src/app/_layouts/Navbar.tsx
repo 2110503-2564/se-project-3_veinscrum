@@ -1,17 +1,10 @@
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/shadcn/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/shadcn/dropdown-menu";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { withBaseRoute } from "@/utils/routes/withBaseRoute";
-import { ChevronDownIcon } from "lucide-react";
 import Link from "next/link";
-import { LogoutMenuItem } from "../_components/LogoutMenuItem";
+import { AuthenticatedDropdownMenu } from "./AuthenticatedDropdownMenu";
 
 export const Navbar = async () => {
   const session = await auth();
@@ -34,29 +27,30 @@ export const Navbar = async () => {
           <Link href={FrontendRoutes.HOME} className="text-lg font-semibold">
             Online Job Fair Registration
           </Link>
-          {user?.data.role === "admin" && (
+          {user?.data.role === "admin" ? (
             <Link
               className="transition-all hover:font-medium"
               href={FrontendRoutes.ADMIN_SESSION}
             >
               Dashboard
             </Link>
-          )}
-          {user?.data.role === "user" && (
-            <Link
-              className="transition-all hover:font-medium"
-              href={FrontendRoutes.SESSION_LIST}
-            >
-              My Session
-            </Link>
-          )}
-          {user?.data.role != "admin" && (
-            <Link
-              className="transition-all hover:font-medium"
-              href={FrontendRoutes.COMPANY_LIST}
-            >
-              Companies
-            </Link>
+          ) : (
+            <>
+              {session?.token && (
+                <Link
+                  className="transition-all hover:font-medium"
+                  href={FrontendRoutes.SESSION_LIST}
+                >
+                  My Session
+                </Link>
+              )}
+              <Link
+                className="transition-all hover:font-medium"
+                href={FrontendRoutes.COMPANY_LIST}
+              >
+                Companies
+              </Link>
+            </>
           )}
         </div>
         <div className="flex items-center gap-x-4">
@@ -70,22 +64,10 @@ export const Navbar = async () => {
               </Button>
             </>
           ) : (
-            <>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="lg">
-                    <p>{user.data.name}</p>
-                    <ChevronDownIcon />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem asChild>
-                    <Link href={FrontendRoutes.PROFILE}>Profile</Link>
-                  </DropdownMenuItem>
-                  <LogoutMenuItem token={session?.token} />
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
+            <AuthenticatedDropdownMenu
+              name={user.data.name}
+              token={session?.token}
+            />
           )}
         </div>
       </div>
