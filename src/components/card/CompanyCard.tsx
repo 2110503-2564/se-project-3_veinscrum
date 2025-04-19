@@ -6,6 +6,7 @@ import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { cn } from "@/lib/utils";
 import { Globe, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
+import removeMd from "remove-markdown";
 
 interface CompanyCardProps {
   company: Company;
@@ -23,9 +24,11 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
         { "h-52": variant === "viewonly" },
       )}
     >
-      <div>
+      <div className="space-y-1">
         <h2 className="text-xl font-bold">{company.name}</h2>
-        <p className="text-sm text-gray-600">{company.description}</p>
+        <p className="line-clamp-3 text-sm break-words text-gray-600">
+          {removeMd(company.description)}
+        </p>
       </div>
       <div>
         <div className="space-y-1">
