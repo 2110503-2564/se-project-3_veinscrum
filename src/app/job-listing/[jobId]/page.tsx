@@ -73,7 +73,7 @@ export default function JobDetailPage() {
           await axios.get<GETJobListingResponse>(
             BackendRoutes.JOB_LISTINGS_ID({ id: jobId }),
           ),
-        enabled: !!jobId && status === "authenticated",
+        enabled: !!jobId,
         select: (data: AxiosResponse<GETJobListingResponse>) =>
           data?.data?.data,
       },
