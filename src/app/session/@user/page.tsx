@@ -146,6 +146,7 @@ export default function UserInterviewSessionsPage() {
       </div>
     );
   }
+  if (status === 'loading') return null;
 
   return (
     <main className="mx-auto mt-16 space-y-8">
