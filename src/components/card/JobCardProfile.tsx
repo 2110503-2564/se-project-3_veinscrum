@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/shadcn/card";
 import { Building2, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/shadcn/button";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 
 interface JobCardProps {
   id: string;
@@ -70,19 +71,20 @@ export function JobCardProfile({
               View Details
             </Button>
           </Link>
-          <Button
-              variant="outline"
-              size="sm"
-            >
-              Update Details
-          </Button>
+          <Link href={FrontendRoutes.JOB_LISTINGS_ID_EDIT({jobId: id })}>
+            <Button
+                variant="outline"
+                size="sm"
+              >
+                Update Details
+            </Button>
+          </Link>
           <Button
               variant="destructive"
               size="sm"
             >
               Delete Details
           </Button>
-            
         </div>
       </CardContent>
     </Card>
