@@ -16,7 +16,7 @@ import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,7 @@ const createCompanySchema = z.object({
 
 export default function CreateCompanyPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof createCompanySchema>>({
     resolver: zodResolver(createCompanySchema),
     defaultValues: {
@@ -72,6 +73,9 @@ export default function CreateCompanyPage() {
       toast.success("Company Created Successfully", {
         id: "create-company",
         description: "",
+      });
+      queryClient.invalidateQueries({
+        queryKey: [BackendRoutes.AUTH_ME],
       });
       router.push(FrontendRoutes.ADMIN_COMPANY);
     },

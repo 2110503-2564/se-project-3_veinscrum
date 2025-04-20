@@ -4,15 +4,15 @@ import { Page } from "@playwright/test";
 
 const CREDENTIALS = {
   admin: {
-    email: "admin@gmail.com",
-    password: "12345678",
+    email: "alice@eventplanner.com",
+    password: "g00dD@y$",
   },
   company: {
-    email: "comp01@gmail.com",
-    password: "12345678",
+    email: "testJob@gmail.com",
+    password: "TJ6666",
   },
   user: {
-    email: "user01@gmail.com",
+    email: "joshman@gmail.com",
     password: "12345678",
   },
 };
@@ -52,4 +52,5 @@ export async function signIn(
     );
   await page.getByRole("main").getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
+  await page.waitForLoadState("domcontentloaded");
 }

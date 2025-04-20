@@ -1,5 +1,6 @@
 "use client";
 
+import { JobCard } from "@/components/card/JobCard";
 import {
   Pagination,
   PaginationContent,
@@ -12,7 +13,6 @@ import { BackendRoutes } from "@/constants/routes/Backend";
 import { usePagination } from "@/hooks/usePagination";
 import { axios } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
-import { JobCard } from "@/components/card/JobCard";
 
 export default function AdminCompaniesPage() {
   const { page, setPage, getQuery } = usePagination({
@@ -35,15 +35,11 @@ export default function AdminCompaniesPage() {
     <main className="mx-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="text-center text-4xl font-bold">
-            All Job lishtings
-          </h1>
+          <h1 className="text-center text-4xl font-bold">All Job lishtings</h1>
         </div>
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
           {jobListings?.data &&
             jobListings?.data?.data?.map((job, idx) => (
-                console.log(job),
-              console.log(job.company),
               <JobCard key={idx} jobListing={job} company={job.company} />
             ))}
         </div>
@@ -53,7 +49,9 @@ export default function AdminCompaniesPage() {
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              disabled={!jobListings?.data?.pagination.prev || isjobListingsLoading}
+              disabled={
+                !jobListings?.data?.pagination.prev || isjobListingsLoading
+              }
               onClick={() => setPage(page - 1)}
             />
           </PaginationItem>
@@ -76,7 +74,9 @@ export default function AdminCompaniesPage() {
           )}
           <PaginationItem>
             <PaginationNext
-              disabled={!jobListings?.data?.pagination.next || isjobListingsLoading}
+              disabled={
+                !jobListings?.data?.pagination.next || isjobListingsLoading
+              }
               onClick={() => setPage(page + 1)}
             />
           </PaginationItem>
@@ -85,4 +85,3 @@ export default function AdminCompaniesPage() {
     </main>
   );
 }
-

@@ -23,6 +23,8 @@ test.describe("Company CRUD", () => {
     });
   });
 
+  test.describe.configure({ mode: "serial" });
+
   test("US1-1: Create Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
@@ -35,6 +37,7 @@ test.describe("Company CRUD", () => {
     await page.getByRole("menuitem", { name: "Create Company" }).click();
 
     await page.waitForURL(FrontendRoutes.COMPANY_CREATE);
+    await page.waitForLoadState("domcontentloaded");
 
     await expect(
       page.getByRole("heading", { name: "Create Company" }),
@@ -57,6 +60,7 @@ test.describe("Company CRUD", () => {
     await page.getByRole("button", { name: "Create" }).click();
 
     await page.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
+    await page.waitForLoadState("domcontentloaded");
   });
 
   test("US1-2: View Company", async () => {
@@ -65,7 +69,9 @@ test.describe("Company CRUD", () => {
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
+
     await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
+    await page.waitForLoadState("domcontentloaded");
 
     await expect(
       page.getByRole("heading", { name: companyName }),
@@ -85,7 +91,9 @@ test.describe("Company CRUD", () => {
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
+
     await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
+    await page.waitForLoadState("domcontentloaded");
 
     await expect(
       page.getByRole("heading", { name: companyName }),
@@ -152,10 +160,13 @@ test.describe("Company CRUD", () => {
   test("US1-4: Delete Company", async () => {
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
+
     await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
+    await page.waitForLoadState("domcontentloaded");
 
     await page.getByTestId("company-profile-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Delete Profile" }).click();
+
     await page.getByRole("button", { name: "Delete" }).click();
     await expect(
       page.getByRole("heading", { name: "No Company Profile" }),

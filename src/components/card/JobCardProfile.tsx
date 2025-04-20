@@ -32,10 +32,8 @@ export function JobCardProfile({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { mutate: deleteJob, isPending } = useMutation({
-    mutationFn: async () => {
-      console.log(BackendRoutes.JOB_LISTINGS_ID({ id }));
-      await axios.delete(BackendRoutes.JOB_LISTINGS_ID({ id }));
-    },
+    mutationFn: async () =>
+      await axios.delete(BackendRoutes.JOB_LISTINGS_ID({ id })),
     onMutate: () => {
       toast.loading("Deleting job...", { id: "delete-job" });
     },
