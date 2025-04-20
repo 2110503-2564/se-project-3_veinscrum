@@ -19,6 +19,7 @@ export enum FrontendRouteTargets {
 
   ADMIN_SESSION = "/admin/sessions",
   ADMIN_COMPANY = "/admin/companies",
+  ADMIN_JOB_LISTINGS = "/admin/job-listings",
 
   JOB_LISTINGS_CREATE = "/job-listing/create",
   JOB_LISTINGS_ID = "/job-listing/{jobId}",
