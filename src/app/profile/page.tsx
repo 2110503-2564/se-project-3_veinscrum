@@ -81,23 +81,24 @@ export default function ProfilePage() {
       },
     });
 
-  const { mutate: deleteCompany } = useMutation({
-    mutationFn: async () =>
-      await axios.delete(
-        BackendRoutes.COMPANIES_ID({ companyId: company?.id ?? "" }),
-      ),
-    onMutate: () => {
-      toast.loading("Deleting company...", { id: "delete-company" });
-    },
-    onError: () => {
-      toast.error("Failed to delete company", { id: "delete-company" });
-    },
-    onSuccess: async () => {
-      toast.success("Company deleted successfully", { id: "delete-company" });
-      setIsDeleteCompanyDialogOpen(false);
-      refreshCompany();
-    },
-  });
+  const { mutate: deleteCompany, isPending: isDeleteCompanyPending } =
+    useMutation({
+      mutationFn: async () =>
+        await axios.delete(
+          BackendRoutes.COMPANIES_ID({ companyId: company?.id ?? "" }),
+        ),
+      onMutate: () => {
+        toast.loading("Deleting company...", { id: "delete-company" });
+      },
+      onError: () => {
+        toast.error("Failed to delete company", { id: "delete-company" });
+      },
+      onSuccess: async () => {
+        toast.success("Company deleted successfully", { id: "delete-company" });
+        setIsDeleteCompanyDialogOpen(false);
+        refreshCompany();
+      },
+    });
 
   const { mutate: deleteJobListing, isPending: isDeleteJobListingPending } =
     useMutation({
@@ -180,7 +181,7 @@ export default function ProfilePage() {
                   />
                   <DeleteCompanyProfileDialog
                     isOpen={isDeleteCompanyDialogOpen}
-                    isPending={isUpdateCompanyPending}
+                    isPending={isDeleteCompanyPending}
                     onClose={() => setIsDeleteCompanyDialogOpen(false)}
                     onDelete={() => {
                       deleteCompany();

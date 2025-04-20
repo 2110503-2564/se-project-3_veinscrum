@@ -30,18 +30,18 @@ export default function AdminJobListingsPage() {
   const [selectedJobId, setSelectedJobId] = useState<string>("");
 
   // Refresh data helper function
-  const refreshCompany = async () => {
+  const refreshJobListings = async () => {
     await queryClient.invalidateQueries({
       queryKey: [BackendRoutes.JOB_LISTINGS],
     });
-    
+
     // Check if current page is now empty (except for page 1)
     if (page > 1) {
       const currentData = await axios.get<GETAllJobListingsResponse>(
         BackendRoutes.JOB_LISTINGS,
-        { params: getQuery() }
+        { params: getQuery() },
       );
-      
+
       // If the current page has no data after deletion, go to previous page
       if (currentData?.data?.data?.length === 0) {
         setPage(page - 1);
@@ -71,7 +71,7 @@ export default function AdminJobListingsPage() {
         queryFn: async () =>
           await axios.get<GETAllJobListingsResponse>(
             BackendRoutes.JOB_LISTINGS,
-            { params: getQuery() }
+            { params: getQuery() },
           ),
         enabled: status === "authenticated",
         select: (data: AxiosResponse<GETAllJobListingsResponse>) => data?.data,
@@ -91,7 +91,7 @@ export default function AdminJobListingsPage() {
       },
       onSuccess: () => {
         toast.success("Job deleted successfully", { id: "delete-job" });
-        refreshCompany();
+        refreshJobListings();
         setIsDeleteJobListingDialogOpen(false);
         setSelectedJobId("");
       },
@@ -135,7 +135,9 @@ export default function AdminJobListingsPage() {
                 location={job.company.address}
                 tel={job.company.tel}
                 requestedUser={me}
-                isDeleteDialogOpen={isDeleteJobListingDialogOpen && selectedJobId === job._id}
+                isDeleteDialogOpen={
+                  isDeleteJobListingDialogOpen && selectedJobId === job._id
+                }
                 isDeletePending={isDeleteJobListingPending}
                 onDelete={(jobListingId) =>
                   deleteJobListing({ id: jobListingId })
