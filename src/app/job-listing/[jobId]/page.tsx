@@ -1,5 +1,6 @@
 "use client";
 
+import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
 import { DateTimePicker24h } from "@/components/ui/shadcn/custom/datetime-picker";
 import {
@@ -21,8 +22,9 @@ import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
+import { useMutation, useQueries } from "@tanstack/react-query";
+import { AxiosResponse, isAxiosError } from "axios";
+import { Building2, MapPin, Phone } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -48,26 +50,46 @@ export default function JobDetailPage() {
     resolver: zodResolver(createSessionFormSchema),
   });
 
-  const {
-    data: job,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: [BackendRoutes.JOB_LISTINGS_ID({ id: jobId })],
-    queryFn: async () =>
-      await axios.get(BackendRoutes.JOB_LISTINGS_ID({ id: jobId })),
-    enabled: !!jobId,
-    select: (data) => data?.data?.data,
+  const [
+    { data: me, isLoading: isMeLoading },
+    {
+      data: job,
+      isLoading: isJobLoading,
+      isError: isJobError,
+      error: jobError,
+    },
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: [BackendRoutes.AUTH_ME],
+        queryFn: async () =>
+          await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
+        enabled: status === "authenticated",
+        select: (data: AxiosResponse<GETMeResponse>) => data.data.data,
+      },
+      {
+        queryKey: [BackendRoutes.JOB_LISTINGS_ID({ id: jobId })],
+        queryFn: async () =>
+          await axios.get<GETJobListingResponse>(
+            BackendRoutes.JOB_LISTINGS_ID({ id: jobId }),
+          ),
+        enabled: !!jobId,
+        select: (data: AxiosResponse<GETJobListingResponse>) =>
+          data?.data?.data,
+      },
+    ],
   });
 
-  const { mutate: createInterviewSession } = useMutation({
+  const {
+    mutate: createInterviewSession,
+    isPending: isCreateInterviewSessionPending,
+  } = useMutation({
     mutationFn: async (data: z.infer<typeof createSessionFormSchema>) =>
       await axios.post<POSTSessionResponse, POSTSessionRequest>(
         BackendRoutes.SESSIONS,
         {
           jobListing: jobId,
-          companyId: job?.companyId,
+          company: job?.company,
           date: data.date,
         },
       ),
@@ -93,7 +115,7 @@ export default function JobDetailPage() {
     },
   });
 
-  if (isLoading) {
+  if (isJobLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-gray-500">Loading job details...</p>
@@ -101,12 +123,12 @@ export default function JobDetailPage() {
     );
   }
 
-  if (isError) {
+  if (isJobError) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-red-500">
           Error loading job details:{" "}
-          {(error as Error)?.message || "Unknown error"}
+          {(jobError as Error)?.message || "Unknown error"}
         </p>
       </div>
     );
@@ -121,31 +143,65 @@ export default function JobDetailPage() {
   }
 
   return (
-    <div className="mx-auto mt-16 max-w-3xl space-y-6 rounded-xl bg-white px-16 py-10 shadow-md">
-      <h1 className="text-2xl font-semibold" data-testid="job-title">
-        {job.jobTitle}
-      </h1>
-
-      <div className="flex flex-col items-start gap-8 md:flex-row">
+    <div className="mx-auto mt-16 max-w-3xl space-y-6 rounded-xl bg-white px-7 py-10 shadow-md sm:px-16">
+      <div className="flex w-full flex-col items-center gap-10 sm:flex-row sm:items-start">
         <Image
           data-testid="job-image"
           src={job.image || "/placeholder.png"}
           alt={job.jobTitle}
-          className="size-36 rounded-md object-cover"
-          width={144}
-          height={144}
+          className="size-48 rounded-md object-cover"
+          width={288}
+          height={288}
         />
 
-        <div className="w-full space-y-4 md:w-2/3">
-          <p
-            className="pr-8 text-justify text-gray-600"
-            data-testid="job-description"
-          >
-            {job.description}
-          </p>
+        <div className="w-full space-y-3 pt-0 sm:pt-5">
+          <div>
+            <h3
+              className="text-2xl font-semibold text-gray-900"
+              data-testid="job-title"
+            >
+              {job.jobTitle}
+            </h3>
+            <div className="mt-1 flex items-center gap-1.5 text-gray-600">
+              <Building2 className="h-3.5 w-3.5" />
+              <span className="text-xs" data-testid="company-name">
+                {job.company.name}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-1.5 rounded-md bg-gray-50 p-2 text-xs">
+            {job.company.address && (
+              <p className="flex items-center gap-x-2">
+                <MapPin className="h-3.5 w-3.5 text-gray-600" />
+                <span className="text-gray-600" data-testid="company-address">
+                  {job.company.address}
+                </span>
+              </p>
+            )}
+            {job.company.tel && (
+              <p className="flex items-center gap-x-2">
+                <Phone className="h-3.5 w-3.5 text-gray-600" />
+                <span className="text-gray-600" data-testid="company-tel">
+                  {job.company.tel}
+                </span>
+              </p>
+            )}
+          </div>
         </div>
       </div>
-      {status === "authenticated" && (
+
+      <div className="flex flex-col items-start gap-8 md:flex-row">
+        <div className="w-full space-y-4">
+          <TextEditor
+            readOnly
+            markdown={job.description}
+            data-testid="job-description"
+          />
+        </div>
+      </div>
+
+      {status === "authenticated" && !(isMeLoading || me?.role !== "user") && (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button className="w-full">Book Interview Session</Button>
@@ -180,7 +236,13 @@ export default function JobDetailPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={
+                    isCreateInterviewSessionPending || me?.role !== "user"
+                  }
+                >
                   Book Interview Session
                 </Button>
               </form>
