@@ -110,11 +110,9 @@ export default function AdminSessionsPage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
+    <main className="mx-auto flex w-full flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
       <div>
-        <h1 className="text-center text-4xl font-bold">
-          All Scheduled Sessions
-        </h1>
+        <h1 className="text-left text-4xl font-bold">All Scheduled Sessions</h1>
         <div className="mt-4 space-y-2.5">
           {sessions?.data &&
             sessions?.data?.data?.map((session, idx) => (

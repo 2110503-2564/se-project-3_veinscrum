@@ -79,10 +79,6 @@ export default function CompanyProfilePage() {
 
   const jobs = company?.jobListings || [];
 
-  const isAdmin = me?.role === "admin";
-  const isOwner = me?.role === "company" && me.company === company?.id;
-  const canEdit = me && (isAdmin || isOwner);
-
   if (isCompanyLoading) {
     return (
       <div className="flex min-h-[200px] items-center justify-center">
@@ -153,7 +149,7 @@ export default function CompanyProfilePage() {
           <div></div>
           <h2 className="text-center text-2xl font-bold">Job Listings</h2>
 
-          {canEdit && (
+          {me?.role === "company" && (
             <div className="flex justify-end">
               <div className="shrink-0">
                 <Button
