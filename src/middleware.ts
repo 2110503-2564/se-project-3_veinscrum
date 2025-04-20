@@ -1,49 +1,69 @@
 import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { BackendRoutes } from "./constants/routes/Backend";
-import { FrontendRoutes } from "./constants/routes/Frontend";
+import {
+  FrontendRoutes,
+  FrontendRouteTargets,
+} from "./constants/routes/Frontend";
 import { withBaseRoute } from "./utils/routes/withBaseRoute";
 
 const unAuthRoutes = [
-  FrontendRoutes.AUTH_SIGN_IN,
-  FrontendRoutes.AUTH_SIGN_UP,
-  FrontendRoutes.AUTH_SIGN_UP_COMPANY,
+  FrontendRouteTargets.AUTH_SIGN_IN,
+  FrontendRouteTargets.AUTH_SIGN_UP,
+  FrontendRouteTargets.AUTH_SIGN_UP_COMPANY,
 ];
 
 const publicRoutes = [
-  FrontendRoutes.HOME,
-  FrontendRoutes.COMPANY_LIST,
+  FrontendRouteTargets.HOME,
+  FrontendRouteTargets.COMPANY_LIST,
+  FrontendRouteTargets.COMPANY_PROFILE,
+  FrontendRouteTargets.JOB_LISTINGS_ID,
   ...unAuthRoutes,
 ];
 
 const adminRoutes = [
-  FrontendRoutes.ADMIN_SESSION,
-  FrontendRoutes.ADMIN_COMPANY,
+  FrontendRouteTargets.ADMIN_SESSION,
+  FrontendRouteTargets.ADMIN_COMPANY,
 ];
 
 const userRoutes = [
-  FrontendRoutes.SESSION_LIST,
-  FrontendRoutes.SESSION_CREATE,
-  FrontendRoutes.SESSION_CREATE_ID,
+  FrontendRouteTargets.SESSION_LIST,
+  FrontendRouteTargets.SESSION_CREATE,
+  FrontendRouteTargets.SESSION_CREATE_ID,
 ];
 
 const companyRoutes = [
-  FrontendRoutes.COMPANY_CREATE,
-  FrontendRoutes.SESSION_LIST,
+  FrontendRouteTargets.COMPANY_CREATE,
+  FrontendRouteTargets.SESSION_LIST,
 ];
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 const ROLE_CACHE_COOKIE = "role_cache";
 
+/**
+ * Checks if a current path matches any of the routes in the provided array
+ * Handles both static routes and dynamic routes with parameters
+ */
 const isPathMatchingRoutes = (
   currentPath: string,
-  routes: Array<string | ((params: { id: string }) => string)>,
+  routes: Array<FrontendRouteTargets>,
 ): boolean => {
   return routes.some((route) => {
-    if (typeof route === "string") {
-      return currentPath === route || currentPath.startsWith(route + "/");
+    const routePath = route.toString();
+
+    // Handle dynamic routes with parameters (e.g., /company/{companyId})
+    if (routePath.includes("{")) {
+      // Convert route pattern to regex pattern
+      const regexPattern = routePath
+        .replace(/{[^}]+}/g, "[^/]+") // Replace {param} with regex pattern
+        .replace(/\//g, "\\/"); // Escape forward slashes
+
+      const regex = new RegExp(`^${regexPattern}$`);
+      return regex.test(currentPath);
     }
-    return false;
+
+    // Handle static routes
+    return currentPath === routePath || currentPath.startsWith(routePath + "/");
   });
 };
 
@@ -135,11 +155,17 @@ const clearRoleCookie = (res: NextResponse) => {
 export default auth(async (req) => {
   const currentPath = req.nextUrl.pathname;
 
-  if (!publicRoutes.includes(currentPath) && !req.auth) {
+  // Check if the current path is in public routes
+  const isPublicRoute = isPathMatchingRoutes(currentPath, publicRoutes);
+
+  if (!isPublicRoute && !req.auth) {
     return NextResponse.redirect(new URL(FrontendRoutes.AUTH_SIGN_IN, req.url));
   }
 
-  if (unAuthRoutes.includes(currentPath) && req.auth) {
+  // Check if the current path is in unAuth routes
+  const isUnAuthRoute = isPathMatchingRoutes(currentPath, unAuthRoutes);
+
+  if (isUnAuthRoute && req.auth) {
     return NextResponse.redirect(new URL(FrontendRoutes.HOME, req.url));
   }
 

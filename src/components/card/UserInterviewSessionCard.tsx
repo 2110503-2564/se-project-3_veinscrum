@@ -36,13 +36,13 @@ export const UserInterviewSessionCard: React.FC<
 
   return (
     <InterviewSessionCardWithDropdown
-      title={interviewSession.company.name}
-      description={interviewSession.company.description}
+      title={interviewSession.jobListing.company.name}
+      description={interviewSession.jobListing.company.description}
       dropdownContent={dropdownContent}
     >
       <InterviewSessionCardInfo
         icon={PhoneIcon}
-        text={interviewSession.company.tel}
+        text={interviewSession.jobListing.company.tel}
       />
       <InterviewSessionCardInfo
         icon={CalendarIcon}

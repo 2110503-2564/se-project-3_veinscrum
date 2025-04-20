@@ -79,7 +79,9 @@ export default function EditJobPage() {
         description: "",
       });
       router.push(
-        FrontendRoutes.COMPANY_PROFILE({ companyId: job?.company ?? "" }),
+        FrontendRoutes.COMPANY_PROFILE({
+          companyId: job?.company.id ?? "",
+        }),
       );
     },
     onError: (error) => {

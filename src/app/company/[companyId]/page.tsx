@@ -57,6 +57,8 @@ export default function CompanyProfilePage() {
     );
   }
 
+  console.log(company.logo);
+
   return (
     <div className="mx-auto my-16 max-w-3xl space-y-8">
       <div className="rounded-xl bg-white px-6 py-10 shadow-md">
@@ -104,14 +106,7 @@ export default function CompanyProfilePage() {
             </p>
           ) : (
             jobs.map((job, idx) => (
-              <JobCard
-                key={idx}
-                id={job._id}
-                jobTitle={job.jobTitle}
-                companyName={company.name}
-                location={company.address}
-                tel={company.tel}
-              />
+              <JobCard key={idx} jobListing={job} company={company} />
             ))
           )}
         </div>

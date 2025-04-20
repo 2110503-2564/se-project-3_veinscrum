@@ -19,7 +19,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
 }) => (
   <div
     className={cn(
-      "hover:bg-accent flex h-68 w-64 cursor-pointer flex-col justify-between rounded-lg bg-white p-4 pb-6 shadow-md ring-gray-200 transition hover:ring",
+      "flex h-68 w-64 flex-col justify-between rounded-lg bg-white p-4 pb-6 shadow-md",
       className,
     )}
   >

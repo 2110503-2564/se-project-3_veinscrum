@@ -39,8 +39,8 @@ export const AdminSessionCard: React.FC<AdminSessionCardProps> = ({
 
   return (
     <InterviewSessionCardWithDropdown
-      title={interviewSession.company.name}
-      description={interviewSession.company.description}
+      title={interviewSession.jobListing.company.name}
+      description={interviewSession.jobListing.company.description}
       dropdownContent={dropdownContent}
     >
       <InterviewSessionCardInfo
