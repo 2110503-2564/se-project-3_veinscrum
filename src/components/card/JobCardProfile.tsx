@@ -88,24 +88,27 @@ export function JobCardProfile({
 
             {(requestedUser?.role === "admin" ||
               requestedUser?.role === "company") && (
-              <div>
-                <Link href={FrontendRoutes.JOB_LISTINGS_ID_EDIT({ jobId: id })}>
-                  <Button variant="outline" size="sm">
-                    Update Details
-                  </Button>
-                </Link>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  disabled={
+              <Link href={FrontendRoutes.JOB_LISTINGS_ID_EDIT({ jobId: id })}>
+                <Button variant="outline" size="sm">
+                  Update Details
+                </Button>
+              </Link>
+            )}
+            {(requestedUser?.role === "admin" ||
+              requestedUser?.role === "company") && (
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={
+                  !(
                     requestedUser.role === "admin" ||
                     requestedUser.role === "company"
-                  }
-                  onClick={() => onDeleteDialogOpen()}
-                >
-                  Delete Details
-                </Button>
-              </div>
+                  )
+                }
+                onClick={() => onDeleteDialogOpen()}
+              >
+                Delete Details
+              </Button>
             )}
           </div>
         </CardContent>
