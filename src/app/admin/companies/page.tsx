@@ -52,7 +52,7 @@ export default function AdminCompaniesPage() {
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
           {companies?.data &&
             companies?.data?.data?.map((company, idx) => (
-              <CompanyCard key={idx} company={company} variant="viewonly" />
+              <CompanyCard key={idx} company={company} />
             ))}
         </div>
       </div>
