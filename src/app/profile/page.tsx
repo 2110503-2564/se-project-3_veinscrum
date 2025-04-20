@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/shadcn/dropdown-menu";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -25,7 +25,6 @@ import { z } from "zod";
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
 
   const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
@@ -34,11 +33,15 @@ export default function ProfilePage() {
     select: (data) => data?.data?.data,
   });
 
-  const { data: company, isLoading: isCompanyLoading } = useQuery({
-    queryKey: [BackendRoutes.COMPANIES_ID({ companyId: user?.company || "" })],
+  const {
+    data: company,
+    isLoading: isCompanyLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [BackendRoutes.COMPANIES_ID({ companyId: user?.company ?? "" })],
     queryFn: async () =>
       await axios.get<GETCompanyResponse>(
-        BackendRoutes.COMPANIES_ID({ companyId: user?.company || "" }),
+        BackendRoutes.COMPANIES_ID({ companyId: user?.company ?? "" }),
       ),
     enabled: !!session?.token && !!user?.company,
     select: (data) => data?.data?.data,
@@ -59,11 +62,7 @@ export default function ProfilePage() {
     onSuccess: () => {
       toast.success("Company updated successfully", { id: "update-company" });
       setIsEditDialogOpen(false);
-      queryClient.invalidateQueries({
-        queryKey: [
-          BackendRoutes.COMPANIES_ID({ companyId: company?.id ?? "" }),
-        ],
-      });
+      refetch();
     },
   });
 
@@ -110,7 +109,7 @@ export default function ProfilePage() {
             <h1 className="text-2xl font-bold">{company?.name}</h1>
           </div>
 
-          <div className="grid grid-cols-3 gap-8">
+          <div className="space-y-8 gap-x-8 md:grid md:grid-cols-3">
             <div className="flex w-full justify-center">
               <Image
                 src={company?.logo || "/placeholder.png"}
@@ -127,24 +126,25 @@ export default function ProfilePage() {
                   <MapPin className="size-5 text-gray-600" />
                   {company?.address}
                 </p>
-
                 <p className="flex items-center gap-x-3">
                   <Mail className="size-5 text-gray-600" />
                   {user?.email}
                 </p>
-
                 <p className="flex items-center gap-x-3">
                   <Globe className="size-5 text-gray-600" />
                   {company?.website}
                 </p>
-
                 <p className="flex items-center gap-x-3">
                   <Phone className="size-5 text-gray-600" />
                   {company?.tel}
                 </p>
               </div>
 
-              <TextEditor markdown={company?.description} readOnly />
+              <TextEditor
+                key={company?.description}
+                markdown={company?.description}
+                readOnly
+              />
             </div>
           </div>
         </div>

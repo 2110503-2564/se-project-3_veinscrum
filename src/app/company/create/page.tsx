@@ -16,8 +16,9 @@ import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -46,9 +47,21 @@ export default function CreateCompanyPage() {
     },
   });
 
+  const { status } = useSession();
+
+  const { data: user } = useQuery({
+    queryKey: [BackendRoutes.AUTH_ME],
+    queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
+    enabled: status === "authenticated",
+    select: (data) => data?.data?.data,
+  });
+
   const { mutate: createCompany } = useMutation({
     mutationFn: async (data: z.infer<typeof createCompanySchema>) => {
-      return await axios.post(BackendRoutes.COMPANIES, data);
+      return await axios.post(BackendRoutes.COMPANIES, {
+        ...data,
+        owner: user?._id,
+      });
     },
     onMutate: () =>
       toast.loading("Creating Company", {
@@ -77,10 +90,7 @@ export default function CreateCompanyPage() {
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((data) => {
-            //console.log("Submitted values:", data);
-            createCompany(data);
-          })}
+          onSubmit={form.handleSubmit((e) => createCompany(e))}
         >
           <h1 className="text-center text-3xl font-bold">Create Company</h1>
           <FormField
