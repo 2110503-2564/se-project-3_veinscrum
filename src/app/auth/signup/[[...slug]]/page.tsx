@@ -62,14 +62,12 @@ export default function SignUpPage() {
     },
   });
 
-  console.log(params.slug);
+  const isCompany = params.slug?.includes("company");
 
   const { mutate: signUp } = useMutation({
     mutationFn: async (data: z.infer<typeof signUpFormSchema>) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword: _, ...rest } = data;
-
-      const isCompany = params.slug?.includes("company");
 
       return await axios.post(BackendRoutes.AUTH_REGISTER, {
         ...rest,
@@ -175,6 +173,20 @@ export default function SignUpPage() {
             <p>Already have an account?</p>
             <Button variant="link" asChild>
               <Link href={FrontendRoutes.AUTH_SIGN_IN}>Sign in</Link>
+            </Button>
+          </div>
+          <div className="text-muted-foreground flex items-center justify-center gap-x-2 text-sm">
+            <p>Are you a {!isCompany ? "company" : "individual"}?</p>
+            <Button variant="link" asChild>
+              <Link
+                href={
+                  isCompany
+                    ? FrontendRoutes.AUTH_SIGN_UP
+                    : FrontendRoutes.AUTH_SIGN_UP_COMPANY
+                }
+              >
+                Create {!isCompany ? "company" : "individual"} account
+              </Link>
             </Button>
           </div>
         </form>
