@@ -39,13 +39,9 @@ export default function AdminCompaniesPage() {
         </div>
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
           {jobListings?.data &&
-            jobListings?.data?.data?.map(
-              (job, idx) => (
-                console.log(job),
-                console.log(job.company),
-                (<JobCard key={idx} jobListing={job} company={job.company} />)
-              ),
-            )}
+            jobListings?.data?.data?.map((job, idx) => (
+              <JobCard key={idx} jobListing={job} company={job.company} />
+            ))}
         </div>
       </div>
 
