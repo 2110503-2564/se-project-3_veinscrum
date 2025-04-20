@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
-import { Globe, MapPin, Phone } from "lucide-react";
+import { Globe, MapPin, Phone, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -124,8 +124,10 @@ export default function CompanyProfilePage() {
           {canEdit && (
             <div className="flex justify-end">
               <div className="shrink-0">
-                <Button onClick={() => router.push(FrontendRoutes.JOB_LISTINGS_CREATE)}>
-                  Create +
+                <Button onClick={() => router.push(FrontendRoutes.JOB_LISTINGS_CREATE)}
+                  >
+                    <PlusIcon className="h-4 w-4" />
+                    Create
                 </Button>
               </div>
             </div>
