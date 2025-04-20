@@ -171,7 +171,7 @@ export default function JobDetailPage() {
           </div>
 
           <div className="space-y-1.5 rounded-md bg-gray-50 p-2 text-xs">
-            {location && (
+            {job.company.address && (
               <p className="flex items-center gap-x-2">
                 <MapPin className="h-3.5 w-3.5 text-gray-600" />
                 <span className="text-gray-600" data-testid="company-address">
