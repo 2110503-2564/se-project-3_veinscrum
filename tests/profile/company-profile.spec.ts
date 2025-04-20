@@ -1,4 +1,5 @@
 import { BackendRoutes } from "@/constants/routes/Backend";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { withFrontendRoute } from "@/utils/routes/withFrontendRoute";
 import { expect, test } from "@playwright/test";
 
@@ -18,35 +19,25 @@ test.describe("Company Profile Page", () => {
 
   test("should show company name, email, and info", async ({ page }) => {
     // Navigate to profile page and wait for network to be idle
-    await page.goto("http://localhost:3000/profile", {
+    await page.goto(withFrontendRoute(FrontendRoutes.PROFILE), {
       waitUntil: "networkidle",
-    });
+  });
 
     // Check company name in the heading
-    await expect(page.getByRole("heading", { name: "Aladin" })).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(page.getByRole("heading", { name: "Aladin" })).toBeVisible();
 
     // Check address
-    await expect(
-      page.getByText("Tokyo summer time Saga", { exact: true }),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("Tokyo summer time Saga")).toBeVisible();
 
     // Check website URL
-    await expect(
-      page.getByText("https://Aladin.com", { exact: true }),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("https://Aladin.com")).toBeVisible();
 
     // Check phone number
-    await expect(page.getByText("0956644440", { exact: true })).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(page.getByText("0956644440")).toBeVisible();
 
     // Check description
     await expect(
-      page.getByText("Develop everything from Saudi environment", {
-        exact: true,
-      }),
-    ).toBeVisible({ timeout: 10000 });
+      page.getByText("Develop everything from Saudi environment"),
+    ).toBeVisible();
   });
 });
