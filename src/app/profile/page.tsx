@@ -5,7 +5,7 @@ import {
   editCompanyProfileFormSchema,
 } from "@/components/dialog/EditCompanyProfileDialog";
 import{ DeleteCompanyProfileDialog }from "@/components/dialog/DeleteCompanyProfileDialog";
-
+import { JobCardProfile } from "@/components/card/JobCardProfile";
 import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
 import {
@@ -192,6 +192,35 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+      <div className="mx-auto my-10 max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-center w-full">Job Listings</h2>
+          <div className="shrink-0">
+            <Button onClick={() => router.push(FrontendRoutes.JOB_LISTINGS_CREATE)}>
+              Create +
+            </Button>
+          </div>
+        </div>
+        <div className="mx-auto max-w-3xl space-y-4">
+          {company?.jobListings?.length === 0 ? (
+            <p className="text-center text-gray-500">
+              No job listings available.
+            </p>
+          ) : (
+            company?.jobListings?.map((job, idx) => (
+              <div key={idx} className="relative mb-4">
+                <JobCardProfile
+                  id={job._id}
+                  jobTitle={job.jobTitle}
+                  companyName={company.name}
+                  location={company.address}
+                  tel={company.tel}
+                />
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </main>
   );
 }
