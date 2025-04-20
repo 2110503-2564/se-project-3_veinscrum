@@ -29,10 +29,7 @@ const signUpFormSchema = z
       .string()
       .email("Invalid email address")
       .nonempty("Email is required"),
-    tel: z
-      .string()
-      .nonempty("Telephone number is required")
-      .regex(/^[0-9]+$/, "Telephone number must be a number"),
+    tel: z.string().nonempty("Telephone number is required"),
     password: z
       .string()
       .nonempty("Password is required")
