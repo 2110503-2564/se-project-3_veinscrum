@@ -35,13 +35,17 @@ export default function AdminCompaniesPage() {
     <main className="mx-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="text-center text-4xl font-bold">All Job lishtings</h1>
+          <h1 className="text-center text-4xl font-bold">All Job Listings</h1>
         </div>
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
           {jobListings?.data &&
-            jobListings?.data?.data?.map((job, idx) => (
-              <JobCard key={idx} jobListing={job} company={job.company} />
-            ))}
+            jobListings?.data?.data?.map(
+              (job, idx) => (
+                console.log(job),
+                console.log(job.company),
+                (<JobCard key={idx} jobListing={job} company={job.company} />)
+              ),
+            )}
         </div>
       </div>
 
