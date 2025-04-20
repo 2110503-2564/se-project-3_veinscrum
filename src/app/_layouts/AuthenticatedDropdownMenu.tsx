@@ -31,11 +31,11 @@ export const AuthenticatedDropdownMenu: React.FC<
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {user.role === "company" && (
+        {(user.role === "company" && user.company === null) ? (
           <DropdownMenuItem asChild>
             <Link href={FrontendRoutes.COMPANY_CREATE}>Create Company</Link>
           </DropdownMenuItem>
-        )}
+        ): null} 
         <DropdownMenuItem asChild>
           <Link href={FrontendRoutes.PROFILE}>Profile</Link>
         </DropdownMenuItem>
