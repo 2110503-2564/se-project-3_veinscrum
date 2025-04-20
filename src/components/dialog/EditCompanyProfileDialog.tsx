@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/shadcn/button";
 import { ImageUploadInput } from "@/components/input/ImageUpload";
+import { Button } from "@/components/ui/shadcn/button";
 import {
   Dialog,
   DialogClose,
@@ -53,7 +53,7 @@ export const EditCompanyProfileDialog: React.FC<
   }, [company, form]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog modal open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Company Profile</DialogTitle>

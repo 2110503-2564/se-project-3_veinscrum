@@ -40,6 +40,17 @@ export default function AdminLayout({
           >
             <Link href={FrontendRoutes.ADMIN_COMPANY}>Companies</Link>
           </Button>
+          <Button
+            asChild
+            className={cn(
+              "flex w-full justify-start px-2.5",
+              pathname === FrontendRoutes.ADMIN_JOB_LISTINGS &&
+                "bg-accent text-accent-foreground",
+            )}
+            variant="ghost"
+          >
+            <Link href={FrontendRoutes.ADMIN_JOB_LISTINGS}>Job-listings</Link>
+          </Button>
         </div>
       </div>
       {children}

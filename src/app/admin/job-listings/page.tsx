@@ -1,7 +1,6 @@
 "use client";
 
-import { CompanyCard } from "@/components/card/CompanyCard";
-import { Button } from "@/components/ui/shadcn/button";
+import { JobCard } from "@/components/card/JobCard";
 import {
   Pagination,
   PaginationContent,
@@ -11,48 +10,37 @@ import {
   PaginationPrevious,
 } from "@/components/ui/shadcn/pagination";
 import { BackendRoutes } from "@/constants/routes/Backend";
-import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { usePagination } from "@/hooks/usePagination";
 import { axios } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
-import Link from "next/link";
 
 export default function AdminCompaniesPage() {
   const { page, setPage, getQuery } = usePagination({
-    initialLimit: 8,
+    initialLimit: 4,
   });
 
-  const companiesQuery = useQuery({
-    queryKey: [BackendRoutes.COMPANIES, getQuery()],
+  const jobListingsQuery = useQuery({
+    queryKey: [BackendRoutes.JOB_LISTINGS, getQuery()],
     queryFn: async () =>
-      await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES, {
+      await axios.get<GETAllJobListingsResponse>(BackendRoutes.JOB_LISTINGS, {
         params: getQuery(),
       }),
   });
 
-  const companies = companiesQuery?.data;
+  const jobListings = jobListingsQuery?.data;
 
-  const isCompaniesLoading = companiesQuery?.isLoading;
+  const isjobListingsLoading = jobListingsQuery?.isLoading;
 
   return (
     <main className="mx-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="text-center text-4xl font-bold">
-            All Company
-          </h1>
-          <Button asChild>
-            <Link href={FrontendRoutes.COMPANY_CREATE}>
-              <PlusIcon className="h-4 w-4" />
-              Add Company
-            </Link>
-          </Button>
+          <h1 className="text-center text-4xl font-bold">All Job lishtings</h1>
         </div>
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
-          {companies?.data &&
-            companies?.data?.data?.map((company, idx) => (
-              <CompanyCard key={idx} company={company} />
+          {jobListings?.data &&
+            jobListings?.data?.data?.map((job, idx) => (
+              <JobCard key={idx} jobListing={job} company={job.company} />
             ))}
         </div>
       </div>
@@ -61,11 +49,13 @@ export default function AdminCompaniesPage() {
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              disabled={!companies?.data?.pagination.prev || isCompaniesLoading}
+              disabled={
+                !jobListings?.data?.pagination.prev || isjobListingsLoading
+              }
               onClick={() => setPage(page - 1)}
             />
           </PaginationItem>
-          {companies?.data?.pagination.prev && !isCompaniesLoading && (
+          {jobListings?.data?.pagination.prev && !isjobListingsLoading && (
             <PaginationItem>
               <PaginationLink onClick={() => setPage(page - 1)}>
                 {page - 1}
@@ -75,7 +65,7 @@ export default function AdminCompaniesPage() {
           <PaginationItem>
             <PaginationLink isActive>{page}</PaginationLink>
           </PaginationItem>
-          {companies?.data?.pagination.next && !isCompaniesLoading && (
+          {jobListings?.data?.pagination.next && !isjobListingsLoading && (
             <PaginationItem>
               <PaginationLink onClick={() => setPage(page + 1)}>
                 {page + 1}
@@ -84,7 +74,9 @@ export default function AdminCompaniesPage() {
           )}
           <PaginationItem>
             <PaginationNext
-              disabled={!companies?.data?.pagination.next || isCompaniesLoading}
+              disabled={
+                !jobListings?.data?.pagination.next || isjobListingsLoading
+              }
               onClick={() => setPage(page + 1)}
             />
           </PaginationItem>

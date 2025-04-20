@@ -39,6 +39,7 @@ export default function CreateCompanyPage() {
     queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
     enabled: status == "authenticated",
     select: (data) => data.data.data,
+    staleTime: 0,
   });
 
   const form = useForm<z.infer<typeof createJobSchema>>({
@@ -66,9 +67,7 @@ export default function CreateCompanyPage() {
         id: "create-job",
         description: "",
       });
-      router.push(
-        FrontendRoutes.PROFILE,
-      );
+      router.push(FrontendRoutes.PROFILE);
     },
     onError: (error) => {
       toast.error("Failed to create Job", {

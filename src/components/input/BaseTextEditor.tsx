@@ -55,7 +55,7 @@ const BaseTextEditor = ({
   editorRef: React.ForwardedRef<MDXEditorMethods> | null;
 } & EditorProps) => (
   <MDXEditor
-    className="prose prose-headings:m-0 prose-p:m-0 prose-ol:m-0 prose-ul:m-0 prose-li:m-0 my-0 flex w-full max-w-full min-w-full flex-1 flex-col"
+    className="prose prose-headings:m-0 prose-p:m-0 prose-ol:m-0 prose-ul:m-0 prose-li:m-0 relative my-0 flex w-full max-w-full min-w-full flex-1 flex-col"
     onChange={onChange}
     ref={editorRef}
     markdown={markdown}

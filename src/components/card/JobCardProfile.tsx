@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { DeleteJobListingDialog } from "@/components/dialog/DeleteJobListingDialog";
 import { Card, CardContent } from "@/components/ui/shadcn/card";
+import { BackendRoutes } from "@/constants/routes/Backend";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
+import { axios } from "@/lib/axios";
+import { useMutation } from "@tanstack/react-query";
 import { Building2, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
-import { Button } from "../ui/shadcn/button";
-import { FrontendRoutes } from "@/constants/routes/Frontend";
-import { DeleteJobListingDialog } from "@/components/dialog/DeleteJobListingDialog";
-import { useMutation } from "@tanstack/react-query";
-import { axios } from "@/lib/axios";
-import { BackendRoutes } from "@/constants/routes/Backend";
+import { useState } from "react";
 import { toast } from "sonner";
+import { Button } from "../ui/shadcn/button";
 
 interface JobCardProps {
   id: string;
@@ -32,10 +32,8 @@ export function JobCardProfile({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { mutate: deleteJob, isPending } = useMutation({
-    mutationFn: async () => {
-      console.log(BackendRoutes.JOB_LISTINGS_ID({ id }));
-      await axios.delete(BackendRoutes.JOB_LISTINGS_ID({ id }));
-    },
+    mutationFn: async () =>
+      await axios.delete(BackendRoutes.JOB_LISTINGS_ID({ id })),
     onMutate: () => {
       toast.loading("Deleting job...", { id: "delete-job" });
     },
@@ -58,7 +56,10 @@ export function JobCardProfile({
         <CardContent className="flex flex-col gap-3 p-0">
           <div className="space-y-3">
             <div>
-              <h3 className="text-base font-semibold text-gray-900" data-testid="job-title">
+              <h3
+                className="text-base font-semibold text-gray-900"
+                data-testid="job-title"
+              >
                 {jobTitle}
               </h3>
               <div className="mt-1 flex items-center gap-1.5 text-gray-600">
@@ -90,7 +91,7 @@ export function JobCardProfile({
           </div>
 
           <div className="flex justify-end gap-4">
-            <Link href={`/job-listing/${id}`}>
+            <Link href={FrontendRoutes.JOB_LISTINGS_ID({ jobId: id })}>
               <Button
                 variant="default"
                 size="sm"
