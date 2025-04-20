@@ -4,6 +4,8 @@ import {
   EditCompanyProfileDialog,
   editCompanyProfileFormSchema,
 } from "@/components/dialog/EditCompanyProfileDialog";
+import{ DeleteCompanyProfileDialog }from "@/components/dialog/DeleteCompanyProfileDialog";
+
 import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
 import {
@@ -21,12 +23,15 @@ import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
-  const { data: user, isLoading: isUserLoading } = useQuery({
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const router = useRouter();
+  const { data: user, isLoading: isUserLoading , refetch: refetchUser } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
     queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
     enabled: !!session?.token,
@@ -36,7 +41,7 @@ export default function ProfilePage() {
   const {
     data: company,
     isLoading: isCompanyLoading,
-    refetch,
+    refetch: refetchCompany,
   } = useQuery({
     queryKey: [BackendRoutes.COMPANIES_ID({ companyId: user?.company ?? "" })],
     queryFn: async () =>
@@ -62,7 +67,26 @@ export default function ProfilePage() {
     onSuccess: () => {
       toast.success("Company updated successfully", { id: "update-company" });
       setIsEditDialogOpen(false);
-      refetch();
+      refetchCompany();
+    },
+  });
+
+  const { mutate: deleteCompany } = useMutation({
+    mutationFn: async () =>
+      await axios.delete(
+        BackendRoutes.COMPANIES_ID({ companyId: company?.id ?? "" }),
+      ),
+    onMutate: () => {
+      toast.loading("Deleting company...", { id: "delete-company" });
+    },
+    onError: () => {
+      toast.error("Failed to delete company", { id: "delete-company" });
+    },
+    onSuccess: async () => {
+      toast.success("Company deleted successfully", { id: "delete-company" });
+      setIsDeleteDialogOpen(false);
+      refetchCompany();
+      refetchUser();
     },
   });
 
@@ -82,7 +106,17 @@ export default function ProfilePage() {
       ) : (
         <div className="mx-auto max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
           <div className="mb-8 text-center">
-            <div className="mb-2 flex justify-end">
+            {!company ? (
+              <div className="mx-auto">
+                <h1 className="text-xl font-semibold">No Company Profile</h1>
+                <div className="flex flex-row justify-center items-center gap-4">
+                  <p>You havent created a company profile yet.</p>
+                  <Button onClick={() => router.push(FrontendRoutes.COMPANY_CREATE)}>
+                    Create Company Profile
+                  </Button>
+              </div>
+            </div>
+            ) : (<div className="mb-2 flex justify-end">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
@@ -93,7 +127,7 @@ export default function ProfilePage() {
                   <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                     Edit Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                  <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => setIsDeleteDialogOpen(true)}>
                     Delete Profile
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -105,7 +139,16 @@ export default function ProfilePage() {
                 isOpen={isEditDialogOpen}
                 setIsOpen={setIsEditDialogOpen}
               />
-            </div>
+              <DeleteCompanyProfileDialog
+                isOpen={isDeleteDialogOpen}
+                isPending={isPending}
+                onClose={() => setIsDeleteDialogOpen(false)}
+                onDelete={() => {
+                  deleteCompany();
+                  setIsDeleteDialogOpen(false);
+                }}
+              />
+            </div>)}
             <h1 className="text-2xl font-bold">{company?.name}</h1>
           </div>
 
