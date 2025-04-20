@@ -39,9 +39,7 @@ export default function AdminCompaniesPage() {
     <main className="mx-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="text-center text-4xl font-bold">
-            All Company
-          </h1>
+          <h1 className="text-center text-4xl font-bold">All Companies</h1>
           <Button asChild>
             <Link href={FrontendRoutes.COMPANY_CREATE}>
               <PlusIcon className="h-4 w-4" />
