@@ -108,6 +108,7 @@ export default function ProfilePage() {
           </div>
         </div>
       ) : (
+        <div>
         <div className="mx-auto max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
           <div className="mb-8 text-center">
             {!company ? (
@@ -195,8 +196,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      )}
-      <div className="mx-auto my-10 max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
+        <div className="mx-auto my-10 max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-center w-full">Job Listings</h2>
           <div className="shrink-0">
@@ -226,6 +226,8 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+      </div>
+      )}
     </main>
   );
 }
