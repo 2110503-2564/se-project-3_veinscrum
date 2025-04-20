@@ -51,7 +51,7 @@ export default function JobDetailPage() {
   });
 
   const [
-    { data: me, isLoading: isMeLoading, isError: isMeError, error: meError },
+    { data: me, isLoading: isMeLoading },
     {
       data: job,
       isLoading: isJobLoading,
