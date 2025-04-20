@@ -2,14 +2,29 @@
 
 import { JobCard } from "@/components/card/JobCard";
 import { TextEditor } from "@/components/input/TextEditor";
+import { Button } from "@/components/ui/shadcn/button";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 import { Globe, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
+import { useSession } from "next-auth/react";
 
 export default function CompanyProfilePage() {
+  const router = useRouter();
+
+  const { data: session } = useSession();
+
+  const { data: user } = useQuery({
+    queryKey: [BackendRoutes.AUTH_ME],
+    queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
+    enabled: !!session?.token,
+    select: (res) => res.data.data,
+  });
+
   const { companyId } = useParams<{ companyId: string }>();
 
   const {
@@ -29,6 +44,10 @@ export default function CompanyProfilePage() {
 
   const company = companyResponse;
   const jobs = company?.jobListings || [];
+
+  const isAdmin = user?.role === "admin";
+  const isOwner = user?.role === "company" && user.company === company?.id;
+  const canEdit = user && (isAdmin || isOwner);
 
   if (isLoading) {
     return (
@@ -58,7 +77,9 @@ export default function CompanyProfilePage() {
   }
 
   return (
-    <div className="mx-auto my-16 max-w-3xl space-y-8">
+    
+
+    <div className="mx-auto my-16 max-w-4xl space-y-8">
       <div className="rounded-xl bg-white px-6 py-10 shadow-md">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold">{company.name}</h1>
@@ -68,9 +89,9 @@ export default function CompanyProfilePage() {
           <Image
             src={company.logo || "/placeholder.png"}
             alt={company.name}
-            width={100}
-            height={100}
-            className="mx-auto size-36 rounded-md object-cover"
+            width={192}
+            height={192}
+            className="mx-auto rounded-md object-cover"
           />
 
           <div className="w-full space-y-4">
@@ -96,7 +117,21 @@ export default function CompanyProfilePage() {
       </div>
 
       <div className="rounded-xl bg-white px-6 py-10 shadow-md">
-        <h2 className="mb-8 text-center text-2xl font-bold">Job Listings</h2>
+        <div className="mb-8 grid grid-cols-3 items-center">
+          <div></div>
+          <h2 className=" text-center text-2xl font-bold">Job Listings</h2>
+
+          {canEdit && (
+            <div className="flex justify-end">
+              <div className="shrink-0">
+                <Button onClick={() => router.push(FrontendRoutes.JOB_LISTINGS_CREATE)}>
+                  Create +
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      
         <div className="mx-auto max-w-3xl space-y-4">
           {jobs.length === 0 ? (
             <p className="text-center text-gray-500">
