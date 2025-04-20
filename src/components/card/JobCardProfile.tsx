@@ -90,7 +90,7 @@ export function JobCardProfile({
           </div>
 
           <div className="flex justify-end gap-4">
-            <Link href={`/jobs/${id}`}>
+            <Link href={`/job-listing/${id}`}>
               <Button
                 variant="default"
                 size="sm"
