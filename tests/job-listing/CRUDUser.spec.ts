@@ -1,21 +1,9 @@
-import { FrontendRoutes } from "@/constants/routes/Frontend";
-import { withFrontendRoute } from "@/utils/routes/withFrontendRoute";
-import { faker } from "@faker-js/faker";
 import { expect, Page, test } from "@playwright/test";
 import { signIn } from "../utils/signIn";
 import { signUp } from "../utils/signUp";
 
 test.describe("Job Listing CRUD", () => {
   let page: Page;
-  const companyName = faker.company.name();
-  const address = faker.location.streetAddress();
-  const website = faker.internet.url();
-  const telephone = faker.phone.number({ style: "international" });
-  const description = faker.lorem.paragraph();
-
-  const companyId = "68027db06431ebb14df8026a";
-  const jobCount = 2;
-
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
 
@@ -28,10 +16,15 @@ test.describe("Job Listing CRUD", () => {
 
   test("US1-9: User View Job Listings on a Company Profile", async () => {
     // Go to the company profile page
-    await page.getByRole('link', { name: 'Companies' }).click();
+    const companyId = "68027db06431ebb14df8026a";
+    const jobCount = 2;
+    await page.getByRole("link", { name: "Companies" }).click();
     await expect(page).toHaveURL(/\/company$/);
 
-    const card = page.getByRole("heading", { name: "Domtao" }).locator("..").locator("..");
+    const card = page
+      .getByRole("heading", { name: "Domtao" })
+      .locator("..")
+      .locator("..");
     await card.getByText("View Company").waitFor({ state: "visible" });
     await card.getByRole("link", { name: "View Company" }).click();
 
@@ -40,8 +33,8 @@ test.describe("Job Listing CRUD", () => {
 
     // Job listings section
     await page
-        .getByRole('heading', { name: 'Job Listings', level: 2 })
-        .waitFor({ state: 'visible' });
+      .getByRole("heading", { name: "Job Listings", level: 2 })
+      .waitFor({ state: "visible" });
 
     const jobCards = page.getByTestId("job-card");
     await expect(jobCards).toHaveCount(jobCount);
@@ -51,7 +44,9 @@ test.describe("Job Listing CRUD", () => {
       await expect(card).toBeVisible();
       await card.getByRole("link", { name: "View Details" }).click();
 
-      await expect(page.getByRole('button', { name: 'Book Interview Session' })).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "Book Interview Session" }),
+      ).toBeVisible();
       await expect(page.getByTestId("job-title").first()).toBeVisible();
 
       await page.goBack();

@@ -34,6 +34,8 @@ test.describe("Company CRUD", () => {
 
     await page.getByRole("menuitem", { name: "Create Company" }).click();
 
+    await page.waitForURL(FrontendRoutes.COMPANY_CREATE);
+
     await expect(
       page.getByRole("heading", { name: "Create Company" }),
     ).toBeVisible();
@@ -63,6 +65,7 @@ test.describe("Company CRUD", () => {
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
+    await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
 
     await expect(
       page.getByRole("heading", { name: companyName }),
@@ -82,6 +85,7 @@ test.describe("Company CRUD", () => {
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
+    await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
 
     await expect(
       page.getByRole("heading", { name: companyName }),
@@ -145,9 +149,10 @@ test.describe("Company CRUD", () => {
     await expect(page.getByText(newDescription)).toBeVisible();
   });
 
-  test.afterAll("US1-4: Delete Company", async () => {
+  test("US1-4: Delete Company", async () => {
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
+    await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
 
     await page.getByTestId("company-profile-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Delete Profile" }).click();
