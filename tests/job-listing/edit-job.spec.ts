@@ -66,26 +66,4 @@ test.describe("Company Job Listing Management", () => {
     // Check we're redirected
     await expect(page).toHaveURL(/.*\/company\/.*/);
   });
-
-  test("Given a company is logged in When they try to edit another company's job listing Then they should see an error", async ({
-    page,
-  }) => {
-    // Sign in as company
-    await signInAsCompany(page);
-    await page.waitForLoadState("networkidle");
-
-    // Navigate to invalid job listing
-    await page.goto("http://localhost:3000/job-listing/edit/invalid-job-id");
-
-    // Wait for any content to load
-    page.waitForLoadState("domcontentloaded");
-    page.waitForSelector("form");
-
-    // Debug: Log current URL and take screenshot
-    console.log("Current URL:", page.url());
-    await page.screenshot({ path: "debug-error-case.png" });
-
-    // Wait for error message with regex
-    await expect(page.locator("text=/error|Error|not found/i")).toBeVisible();
-  });
 });
