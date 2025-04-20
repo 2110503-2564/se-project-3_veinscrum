@@ -87,3 +87,9 @@
     @apply cursor-pointer;
   }
 }
+
+@layer components {
+  .mdxeditor-popup-container {
+    z-index: 9999;
+  }
+}

@@ -124,7 +124,7 @@ export default function ProfilePage() {
             ) : (<div className="mb-2 flex justify-end">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button data-testid="company-profile-dropdown-menu-trigger" variant="ghost" size="icon">
                     <EllipsisIcon />
                   </Button>
                 </DropdownMenuTrigger>

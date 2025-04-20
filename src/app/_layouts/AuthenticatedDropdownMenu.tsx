@@ -25,17 +25,17 @@ export const AuthenticatedDropdownMenu: React.FC<
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="lg">
+        <Button data-testid="auth-dropdown-menu-trigger" variant="ghost" size="lg">
           <p>{user?.name}</p>
           <ChevronDownIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {(user.role === "company" && user.company === null) ? (
+        {user.role === "company" && user.company === null ? (
           <DropdownMenuItem asChild>
             <Link href={FrontendRoutes.COMPANY_CREATE}>Create Company</Link>
           </DropdownMenuItem>
-        ): null} 
+        ) : null}
         <DropdownMenuItem asChild>
           <Link href={FrontendRoutes.PROFILE}>Profile</Link>
         </DropdownMenuItem>
