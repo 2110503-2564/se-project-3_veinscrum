@@ -65,7 +65,7 @@ export const Navbar = async () => {
             </>
           ) : (
             <AuthenticatedDropdownMenu
-              name={user.data.name}
+              user={user.data}
               token={session?.token}
             />
           )}
