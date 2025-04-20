@@ -25,18 +25,18 @@ test.describe("Company Job Listing Management", () => {
     await Promise.all([
       page.goto(`http://localhost:3000/job-listing/edit/${JOB_ID}`),
       page.waitForLoadState("domcontentloaded"),
-      page.waitForSelector("form", { timeout: 15000 }), // ระบุชัดว่ารอ form ปรากฏ
+      page.waitForSelector("form"), // ระบุชัดว่ารอ form ปรากฏ
     ]);
 
     // Wait for form
-    await expect(page.locator("form")).toBeVisible({ timeout: 15000 });
+    await expect(page.locator("form")).toBeVisible();
 
     // Get form elements and wait for them
     const titleInput = page.locator("input[name='jobTitle']");
     const descriptionEditor = page.locator("[contenteditable='true']");
 
-    await expect(titleInput).toBeVisible({ timeout: 15000 });
-    await expect(descriptionEditor).toBeVisible({ timeout: 5000 });
+    await expect(titleInput).toBeVisible();
+    await expect(descriptionEditor).toBeVisible();
 
     // Update job details
     const newTitle = "Junior Software Engineer";
@@ -52,9 +52,6 @@ test.describe("Company Job Listing Management", () => {
     await page.keyboard.press("Control+A");
     await page.keyboard.press("Backspace");
     await page.keyboard.type(newDescription);
-
-    // Wait a bit for the editor to update
-    await page.waitForTimeout(1000);
 
     // Find and click the submit button
     const submitButton = page.locator('button[type="submit"]');
@@ -82,15 +79,13 @@ test.describe("Company Job Listing Management", () => {
 
     // Wait for any content to load
     page.waitForLoadState("domcontentloaded");
-    page.waitForSelector("form", { timeout: 15000 });
+    page.waitForSelector("form");
 
     // Debug: Log current URL and take screenshot
     console.log("Current URL:", page.url());
     await page.screenshot({ path: "debug-error-case.png" });
 
     // Wait for error message with regex
-    await expect(page.locator("text=/error|Error|not found/i")).toBeVisible({
-      timeout: 15000,
-    });
+    await expect(page.locator("text=/error|Error|not found/i")).toBeVisible();
   });
 });
