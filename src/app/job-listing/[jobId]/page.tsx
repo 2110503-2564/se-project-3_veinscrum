@@ -89,7 +89,7 @@ export default function JobDetailPage() {
         BackendRoutes.SESSIONS,
         {
           jobListing: jobId,
-          companyId: job?.company,
+          company: job?.company,
           date: data.date,
         },
       ),
@@ -201,12 +201,10 @@ export default function JobDetailPage() {
         </div>
       </div>
 
-      {status === "authenticated" && (
+      {status === "authenticated" && !(isMeLoading || me?.role !== "user") && (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button className="w-full" disabled={me?.role !== "user"}>
-              Book Interview Session
-            </Button>
+            <Button className="w-full">Book Interview Session</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
