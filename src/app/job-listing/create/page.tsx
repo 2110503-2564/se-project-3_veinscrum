@@ -67,7 +67,7 @@ export default function CreateCompanyPage() {
         description: "",
       });
       router.push(
-        FrontendRoutes.COMPANY_PROFILE({ companyId: me?.company ?? "" }),
+        FrontendRoutes.PROFILE,
       );
     },
     onError: (error) => {

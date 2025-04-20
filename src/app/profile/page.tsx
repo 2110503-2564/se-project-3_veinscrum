@@ -30,6 +30,7 @@ export default function ProfilePage() {
   const { data: session, status } = useSession();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
   const router = useRouter();
   const { data: user, isLoading: isUserLoading , refetch: refetchUser } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
@@ -37,7 +38,6 @@ export default function ProfilePage() {
     enabled: !!session?.token,
     select: (data) => data?.data?.data,
   });
-
   const {
     data: company,
     isLoading: isCompanyLoading,
@@ -89,6 +89,10 @@ export default function ProfilePage() {
       refetchUser();
     },
   });
+
+  const handleDeleteJob = () => {
+    refetchCompany();
+  };
 
   if (isUserLoading || isCompanyLoading || status === "loading") return null;
 
@@ -215,6 +219,7 @@ export default function ProfilePage() {
                   companyName={company.name}
                   location={company.address}
                   tel={company.tel}
+                  onDelete={handleDeleteJob}
                 />
               </div>
             ))
