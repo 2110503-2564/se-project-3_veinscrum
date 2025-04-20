@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/shadcn/button";
+import { ImageUploadInput } from "@/components/input/ImageUpload";
 import {
   Dialog,
   DialogClose,
@@ -20,6 +21,7 @@ import { Form, FormField, FormItem, FormLabel } from "../ui/shadcn/form";
 
 export const editCompanyProfileFormSchema = z.object({
   name: z.string().nonempty("Company name is required"),
+  logo: z.string().optional(),
   address: z.string().nonempty("Address is required"),
   website: z
     .string()
@@ -77,7 +79,21 @@ export const EditCompanyProfileDialog: React.FC<
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={form.control}
+              name="logo"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel htmlFor="logo" className="text-sm font-medium">
+                    Logo
+                  </FormLabel>
+                  <ImageUploadInput
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="address"
