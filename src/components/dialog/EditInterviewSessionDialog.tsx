@@ -17,19 +17,11 @@ import {
   FormMessage,
 } from "@/components/ui/shadcn/form";
 import { Input } from "@/components/ui/shadcn/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/shadcn/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const editInterviewSessionFormSchema = z.object({
-  company: z.string().nonempty(),
   date: z.date(),
 });
 
@@ -39,27 +31,22 @@ export type EditInterviewSessionFormSchema = z.infer<
 
 interface EditInterviewSessionDialogProps {
   interviewSession: InterviewSession;
-  companies?: Array<Company>;
   isOpen: boolean;
   isPending: boolean;
-  isLoading: boolean;
   onUpdate: (data: { _id: string } & EditInterviewSessionFormSchema) => void;
   onClose: () => void;
 }
 
 export function EditInterviewSessionDialog({
   interviewSession,
-  companies,
   isOpen,
   isPending,
-  isLoading,
   onUpdate,
   onClose,
 }: EditInterviewSessionDialogProps) {
   const form = useForm<z.infer<typeof editInterviewSessionFormSchema>>({
     resolver: zodResolver(editInterviewSessionFormSchema),
     defaultValues: {
-      company: interviewSession.company.id,
       date: new Date(interviewSession.date),
     },
   });
@@ -80,60 +67,30 @@ export function EditInterviewSessionDialog({
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <FormField
-                control={form.control}
-                name="company"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">Company</FormLabel>
-                    <FormControl>
-                      <div className="col-span-3">
-                        {isLoading ? (
-                          <Input
-                            value={interviewSession.company.name}
-                            disabled
-                            className="w-full"
-                          />
-                        ) : (
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select a company" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {companies &&
-                                companies?.map((company) => (
-                                  <SelectItem
-                                    key={company.id}
-                                    value={company.id.toString()}
-                                  >
-                                    {company.name}
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              <FormItem className="grid grid-cols-4 items-center gap-4">
+                <FormLabel className="text-right">Company</FormLabel>
+                <FormControl>
+                  <div className="col-span-3">
+                    <Input
+                      value={interviewSession.jobListing.company.name}
+                      disabled
+                      className="w-full"
+                    />
+                  </div>
+                </FormControl>
+              </FormItem>
 
-              <FormField
-                control={form.control}
-                name="company"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-4 items-center gap-4">
-                    <FormLabel className="text-right">User</FormLabel>
-                    <FormControl className="col-span-3">
-                      <Input value={interviewSession.user.name} disabled />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormItem className="grid grid-cols-4 items-center gap-4">
+                <FormLabel className="text-right">User</FormLabel>
+                <FormControl className="col-span-3">
+                  <Input
+                    value={interviewSession.user.name}
+                    disabled
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
 
               <FormField
                 control={form.control}

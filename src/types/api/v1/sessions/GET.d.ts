@@ -1,6 +1,6 @@
 interface InterviewSession {
   _id: string;
-  company: Company;
+  jobListing: JobListing;
   user: User;
   date: string;
 }

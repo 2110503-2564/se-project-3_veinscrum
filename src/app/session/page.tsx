@@ -52,22 +52,13 @@ export default function UserInterviewSessionsPage() {
           ),
         enabled: isUserDataReady,
       },
-      {
-        queryKey: [BackendRoutes.COMPANIES],
-        queryFn: async () =>
-          (await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES))
-            .data,
-        enabled: !interviewSessionToUpdate,
-      },
     ],
   });
 
-  const [interviewSessionsQuery, companiesQuery] = queries;
+  const [interviewSessionsQuery] = queries;
 
   const interviewSessions = interviewSessionsQuery?.data;
-  const companies = companiesQuery?.data;
   const isInterviewSessionLoading = interviewSessionsQuery?.isLoading;
-  const isCompaniesLoading = companiesQuery?.isLoading;
 
   // Refresh data helper function
   const refreshInterviewSessionData = () => {
@@ -192,10 +183,8 @@ export default function UserInterviewSessionsPage() {
       {interviewSessionToUpdate ? (
         <EditInterviewSessionDialog
           interviewSession={interviewSessionToUpdate}
-          companies={companies?.data}
           isOpen={!!interviewSessionToUpdate}
           isPending={isInterviewSessionUpdating}
-          isLoading={isCompaniesLoading}
           onClose={() => setInterviewSessionToUpdate(null)}
           onUpdate={(data) => updateInterviewSession(data)}
         />
