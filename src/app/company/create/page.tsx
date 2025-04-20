@@ -30,7 +30,6 @@ const createCompanySchema = z.object({
   address: z.string().nonempty("Address is required"),
   website: z.string().nonempty("Website is required"),
   description: z.string().nonempty("Description is required"),
-  owner: z.string().nonempty("Owner is required"),
   tel: z.string().nonempty("Telephone number is required"),
 });
 
@@ -43,28 +42,26 @@ export default function CreateCompanyPage() {
       logo: "",
       address: "",
       website: "",
-      owner: "",
       description: "",
       tel: "",
     },
   });
 
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
-  const { data: user, isLoading: isUserLoading } = useQuery({
+  const { data: user } = useQuery({
     queryKey: [BackendRoutes.AUTH_ME],
-    queryFn: async () => {
-      const response = await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME);
-      form.reset({ owner: response.data.data._id });
-      return response;
-    },
-    enabled: !!session?.token,
+    queryFn: async () => await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
+    enabled: status === "authenticated",
     select: (data) => data?.data?.data,
   });
 
   const { mutate: createCompany } = useMutation({
     mutationFn: async (data: z.infer<typeof createCompanySchema>) => {
-      return await axios.post(BackendRoutes.COMPANIES, data);
+      return await axios.post(BackendRoutes.COMPANIES, {
+        ...data,
+        owner: user?._id,
+      });
     },
     onMutate: () =>
       toast.loading("Creating Company", {
@@ -93,10 +90,7 @@ export default function CreateCompanyPage() {
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((data) => {
-            //console.log("Submitted values:", data);
-            createCompany(data);
-          })}
+          onSubmit={form.handleSubmit((e) => createCompany(e))}
         >
           <h1 className="text-center text-3xl font-bold">Create Company</h1>
           <FormField

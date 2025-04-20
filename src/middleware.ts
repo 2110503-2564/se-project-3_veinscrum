@@ -22,7 +22,6 @@ const adminRoutes = [
 ];
 
 const userRoutes = [
-  FrontendRoutes.COMPANY_CREATE,
   FrontendRoutes.SESSION_LIST,
   FrontendRoutes.SESSION_CREATE,
   FrontendRoutes.SESSION_CREATE_ID,

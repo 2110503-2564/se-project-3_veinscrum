@@ -110,8 +110,8 @@ export default function ProfilePage() {
             <h1 className="text-2xl font-bold">{company?.name}</h1>
           </div>
 
-          <div className="flex flex-col gap-8 md:grid md:grid-cols-3">
-            <div className="flex h-[192px] w-full items-center justify-center">
+          <div className="space-y-8 gap-x-8 md:grid md:grid-cols-3">
+            <div className="flex w-full justify-center">
               <Image
                 src={company?.logo || "/placeholder.png"}
                 alt={company?.name || "Company Logo"}
