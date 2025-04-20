@@ -15,22 +15,27 @@ import { ChevronDownIcon } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 interface AuthenticatedDropdownMenuProps {
-  name: string;
+  user: User;
   token?: string;
 }
 
 export const AuthenticatedDropdownMenu: React.FC<
   AuthenticatedDropdownMenuProps
-> = ({ name, token }) => {
+> = ({ user, token }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="lg">
-          <p>{name}</p>
+          <p>{user?.name}</p>
           <ChevronDownIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
+        {user.role === "company" && (
+          <DropdownMenuItem asChild>
+            <Link href={FrontendRoutes.COMPANY_CREATE}>Create Company</Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <Link href={FrontendRoutes.PROFILE}>Profile</Link>
         </DropdownMenuItem>
