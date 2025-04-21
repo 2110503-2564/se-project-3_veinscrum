@@ -1,36 +1,85 @@
 "use client";
 
-import { JobCard } from "@/components/card/JobCard";
+import { JobCardProfile } from "@/components/card/JobCardProfile";
 import { TextEditor } from "@/components/input/TextEditor";
+import { Button } from "@/components/ui/shadcn/button";
 import { BackendRoutes } from "@/constants/routes/Backend";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
-import { useQuery } from "@tanstack/react-query";
-import { Globe, MapPin, Phone } from "lucide-react";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
+import { Globe, MapPin, Phone, PlusIcon } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function CompanyProfilePage() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { status } = useSession();
   const { companyId } = useParams<{ companyId: string }>();
 
-  const {
-    data: companyResponse,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["company", companyId],
-    queryFn: async () =>
-      await axios.get<GETCompanyResponse>(
-        BackendRoutes.COMPANIES_ID({ companyId }),
-      ),
-    enabled: !!companyId,
-    select: (data) => data?.data?.data,
+  const [isDeleteJobListingDialogOpen, setIsDeleteJobListingDialogOpen] =
+    useState(false);
+
+  const [
+    { data: me },
+    {
+      data: company,
+      isLoading: isCompanyLoading,
+      isError: isCompanyError,
+      error: companyError,
+    },
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: [BackendRoutes.AUTH_ME],
+        queryFn: async () =>
+          await axios.get<GETMeResponse>(BackendRoutes.AUTH_ME),
+        enabled: status === "authenticated",
+        select: (data: AxiosResponse<GETMeResponse>) => data.data.data,
+      },
+      {
+        queryKey: [BackendRoutes.COMPANIES_ID({ companyId })],
+        queryFn: async () =>
+          await axios.get<GETCompanyResponse>(
+            BackendRoutes.COMPANIES_ID({ companyId }),
+          ),
+        enabled: !!companyId,
+        select: (data: AxiosResponse<GETCompanyResponse>) => data?.data?.data,
+      },
+    ],
   });
 
-  const company = companyResponse;
+  // Refresh data helper function
+  const refreshCompany = () => {
+    queryClient.invalidateQueries({
+      queryKey: [BackendRoutes.COMPANIES_ID({ companyId })],
+    });
+  };
+
+  const { mutate: deleteJobListing, isPending: isDeleteJobListingPending } =
+    useMutation({
+      mutationFn: async (data: { id: string }) =>
+        await axios.delete(BackendRoutes.JOB_LISTINGS_ID({ id: data.id })),
+      onMutate: () => {
+        toast.loading("Deleting job...", { id: "delete-job" });
+      },
+      onError: () => {
+        toast.error("Failed to delete job", { id: "delete-job" });
+      },
+      onSuccess: () => {
+        toast.success("Job deleted successfully", { id: "delete-job" });
+        refreshCompany();
+        setIsDeleteJobListingDialogOpen(false);
+      },
+    });
+
   const jobs = company?.jobListings || [];
 
-  if (isLoading) {
+  if (isCompanyLoading) {
     return (
       <div className="flex min-h-[200px] items-center justify-center">
         <p className="text-gray-500">Loading company details...</p>
@@ -38,12 +87,12 @@ export default function CompanyProfilePage() {
     );
   }
 
-  if (isError) {
+  if (isCompanyError) {
     return (
       <div className="flex min-h-[200px] items-center justify-center">
         <p className="text-red-500">
           Error loading company details:{" "}
-          {(error as Error)?.message || "Unknown error"}
+          {(companyError as Error)?.message || "Unknown error"}
         </p>
       </div>
     );
@@ -58,7 +107,7 @@ export default function CompanyProfilePage() {
   }
 
   return (
-    <div className="mx-auto my-16 max-w-3xl space-y-8">
+    <div className="mx-auto my-16 max-w-4xl space-y-8">
       <div className="rounded-xl bg-white px-6 py-10 shadow-md">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold">{company.name}</h1>
@@ -68,9 +117,9 @@ export default function CompanyProfilePage() {
           <Image
             src={company.logo || "/placeholder.png"}
             alt={company.name}
-            width={100}
-            height={100}
-            className="mx-auto size-36 rounded-md object-cover"
+            width={192}
+            height={192}
+            className="mx-auto rounded-md object-cover"
           />
 
           <div className="w-full space-y-4">
@@ -96,7 +145,26 @@ export default function CompanyProfilePage() {
       </div>
 
       <div className="rounded-xl bg-white px-6 py-10 shadow-md">
-        <h2 className="mb-8 text-center text-2xl font-bold">Job Listings</h2>
+        <div className="mb-8 grid grid-cols-3 items-center">
+          <div></div>
+          <h2 className="text-center text-2xl font-bold">Job Listings</h2>
+
+          {me?.role === "company" && (
+            <div className="flex justify-end">
+              <div className="shrink-0">
+                <Button
+                  onClick={() =>
+                    router.push(FrontendRoutes.JOB_LISTINGS_CREATE)
+                  }
+                >
+                  <PlusIcon className="h-4 w-4" />
+                  Create
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="mx-auto max-w-3xl space-y-4">
           {jobs.length === 0 ? (
             <p className="text-center text-gray-500">
@@ -104,7 +172,24 @@ export default function CompanyProfilePage() {
             </p>
           ) : (
             jobs.map((job, idx) => (
-              <JobCard key={idx} jobListing={job} company={company} />
+              <JobCardProfile
+                key={idx}
+                id={job._id}
+                jobTitle={job.jobTitle}
+                companyName={company.name}
+                location={company.address}
+                tel={company.tel}
+                requestedUser={me}
+                isDeleteDialogOpen={isDeleteJobListingDialogOpen}
+                isDeletePending={isDeleteJobListingPending}
+                onDelete={(jobListingId) =>
+                  deleteJobListing({ id: jobListingId })
+                }
+                onDeleteDialogClose={() => {
+                  setIsDeleteJobListingDialogOpen(false);
+                }}
+                onDeleteDialogOpen={() => setIsDeleteJobListingDialogOpen(true)}
+              />
             ))
           )}
         </div>

@@ -1,15 +1,8 @@
-"use client";
-
 import { DeleteJobListingDialog } from "@/components/dialog/DeleteJobListingDialog";
 import { Card, CardContent } from "@/components/ui/shadcn/card";
-import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
-import { axios } from "@/lib/axios";
-import { useMutation } from "@tanstack/react-query";
 import { Building2, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "../ui/shadcn/button";
 
 interface JobCardProps {
@@ -18,7 +11,12 @@ interface JobCardProps {
   companyName: string;
   location?: string;
   tel?: string;
-  onDelete: (id: string) => void;
+  requestedUser?: User;
+  isDeleteDialogOpen: boolean;
+  isDeletePending: boolean;
+  onDelete: (jobListingId: string) => void;
+  onDeleteDialogOpen: () => void;
+  onDeleteDialogClose: () => void;
 }
 
 export function JobCardProfile({
@@ -27,26 +25,13 @@ export function JobCardProfile({
   companyName,
   location,
   tel,
+  requestedUser,
+  isDeleteDialogOpen,
+  isDeletePending,
   onDelete,
+  onDeleteDialogOpen,
+  onDeleteDialogClose,
 }: JobCardProps) {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const { mutate: deleteJob, isPending } = useMutation({
-    mutationFn: async () =>
-      await axios.delete(BackendRoutes.JOB_LISTINGS_ID({ id })),
-    onMutate: () => {
-      toast.loading("Deleting job...", { id: "delete-job" });
-    },
-    onError: () => {
-      toast.error("Failed to delete job", { id: "delete-job" });
-    },
-    onSuccess: () => {
-      toast.success("Job deleted successfully", { id: "delete-job" });
-      setIsDeleteDialogOpen(false);
-      onDelete(id);
-    },
-  });
-
   return (
     <>
       <Card
@@ -100,30 +85,40 @@ export function JobCardProfile({
                 View Details
               </Button>
             </Link>
-            <Link href={FrontendRoutes.JOB_LISTINGS_ID_EDIT({ jobId: id })}>
-              <Button variant="outline" size="sm">
-                Update Details
+
+            {(requestedUser?.role === "admin" ||
+              requestedUser?.role === "company") && (
+              <Link href={FrontendRoutes.JOB_LISTINGS_ID_EDIT({ jobId: id })}>
+                <Button variant="outline" size="sm">
+                  Update Details
+                </Button>
+              </Link>
+            )}
+            {(requestedUser?.role === "admin" ||
+              requestedUser?.role === "company") && (
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={
+                  !(
+                    requestedUser.role === "admin" ||
+                    requestedUser.role === "company"
+                  )
+                }
+                onClick={() => onDeleteDialogOpen()}
+              >
+                Delete Details
               </Button>
-            </Link>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
-              Delete Details
-            </Button>
+            )}
           </div>
         </CardContent>
       </Card>
 
       <DeleteJobListingDialog
         isOpen={isDeleteDialogOpen}
-        isPending={isPending}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onDelete={() => {
-          deleteJob();
-          setIsDeleteDialogOpen(false);
-        }}
+        isPending={isDeletePending}
+        onClose={() => onDeleteDialogClose()}
+        onDelete={() => onDelete(id)}
       />
     </>
   );

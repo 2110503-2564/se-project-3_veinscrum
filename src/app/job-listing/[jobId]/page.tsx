@@ -41,10 +41,13 @@ const createSessionFormSchema = z.object({
 });
 
 export default function JobDetailPage() {
-  const { status } = useSession();
   const router = useRouter();
+  const { status } = useSession();
   const { jobId } = useParams<{ jobId: string }>();
-  const [isOpen, setIsOpen] = useState(false);
+  const [
+    isCreateInterviewSessionDialogOpen,
+    setIsCreateInterviewSessionDialogOpen,
+  ] = useState(false);
 
   const form = useForm<z.infer<typeof createSessionFormSchema>>({
     resolver: zodResolver(createSessionFormSchema),
@@ -114,7 +117,6 @@ export default function JobDetailPage() {
       });
     },
   });
-
   if (isJobLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -202,7 +204,10 @@ export default function JobDetailPage() {
       </div>
 
       {status === "authenticated" && !(isMeLoading || me?.role !== "user") && (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog
+          open={isCreateInterviewSessionDialogOpen}
+          onOpenChange={setIsCreateInterviewSessionDialogOpen}
+        >
           <DialogTrigger asChild>
             <Button className="w-full">Book Interview Session</Button>
           </DialogTrigger>
@@ -218,7 +223,7 @@ export default function JobDetailPage() {
                 className="space-y-4"
                 onSubmit={form.handleSubmit((e) => {
                   createInterviewSession(e);
-                  setIsOpen(false);
+                  setIsCreateInterviewSessionDialogOpen(false);
                 })}
               >
                 <FormField

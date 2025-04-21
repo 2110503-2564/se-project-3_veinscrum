@@ -1,7 +1,6 @@
 "use client";
 
 import { CompanyCard } from "@/components/card/CompanyCard";
-import { Button } from "@/components/ui/shadcn/button";
 import {
   Pagination,
   PaginationContent,
@@ -11,12 +10,9 @@ import {
   PaginationPrevious,
 } from "@/components/ui/shadcn/pagination";
 import { BackendRoutes } from "@/constants/routes/Backend";
-import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { usePagination } from "@/hooks/usePagination";
 import { axios } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
-import Link from "next/link";
 
 export default function AdminCompaniesPage() {
   const { page, setPage, getQuery } = usePagination({
@@ -40,12 +36,12 @@ export default function AdminCompaniesPage() {
       <div>
         <div className="flex items-center justify-between">
           <h1 className="text-center text-4xl font-bold">All Companies</h1>
-          <Button asChild>
-            <Link href={FrontendRoutes.COMPANY_CREATE}>
-              <PlusIcon className="h-4 w-4" />
-              Add Company
-            </Link>
-          </Button>
+          {/* <Button asChild> */}
+          {/*   <Link href={FrontendRoutes.COMPANY_CREATE}> */}
+          {/*     <PlusIcon className="h-4 w-4" /> */}
+          {/*     Add Company */}
+          {/*   </Link> */}
+          {/* </Button> */}
         </div>
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
           {companies?.data &&
