@@ -159,7 +159,7 @@ export default function JobDetailPage() {
         <div className="w-full space-y-3 pt-0 sm:pt-5">
           <div>
             <h3
-              className="text-2xl font-semibold text-gray-900"
+              className="text-2xl font-bold text-gray-900"
               data-testid="job-title"
             >
               {job.jobTitle}
