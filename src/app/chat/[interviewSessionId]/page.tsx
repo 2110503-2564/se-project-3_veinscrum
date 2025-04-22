@@ -24,19 +24,6 @@ import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { z } from "zod";
 
-// === Socket Types ===
-interface ServerToClientEvents {
-  "chat-message": (message: Message) => void;
-  "chat-updated": (message: Message) => void;
-  "chat-history": (messages: Array<Message>) => void;
-  "chat-deleted": (data: { messageId: string }) => void;
-  "chat-error": (data: { error: string }) => void;
-}
-
-interface ClientToServerEvents {
-  "chat-message": (message: string) => void;
-}
-
 export default function Chat() {
   const { interviewSessionId } = useParams<{ interviewSessionId: string }>();
   const { data: session, status } = useSession();
