@@ -103,10 +103,23 @@ export default function AdminSessionsPage() {
     },
   });
 
-  const refreshInterviewSessionData = () => {
-    queryClient.invalidateQueries({
+  const refreshInterviewSessionData = async () => {
+    await queryClient.invalidateQueries({
       queryKey: [BackendRoutes.SESSIONS],
     });
+    
+    // Check if current page is now empty (except for page 1)
+    if (page > 1) {
+      const currentData = await axios.get<GETAllInterviewSessionsResponse>(
+        BackendRoutes.SESSIONS,
+        { params: getQuery() }
+      );
+      
+      // If the current page has no data after deletion, go to previous page
+      if (currentData?.data?.data?.length === 0) {
+        setPage(page - 1);
+      }
+    }
   };
 
   return (
