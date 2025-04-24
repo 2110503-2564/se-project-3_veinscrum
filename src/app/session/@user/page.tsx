@@ -16,12 +16,14 @@ import {
 } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function UserInterviewSessionsPage() {
   const queryClient = useQueryClient();
   const { status } = useSession();
+  const router = useRouter();
   const [interviewSessionToDelete, setInterviewSessionToDelete] =
     useState<Nullable<InterviewSession>>(null);
   const [interviewSessionToUpdate, setInterviewSessionToUpdate] =
@@ -146,7 +148,7 @@ export default function UserInterviewSessionsPage() {
       </div>
     );
   }
-  if (status === 'loading') return null;
+  if (status === "loading") return null;
 
   return (
     <main className="mx-auto mt-16 space-y-8">
@@ -164,6 +166,7 @@ export default function UserInterviewSessionsPage() {
               interviewSession={interviewSession}
               onDelete={() => setInterviewSessionToDelete(interviewSession)}
               onEdit={() => setInterviewSessionToUpdate(interviewSession)}
+              onChat={() => router.push(`/chat/${interviewSession._id}`)}
             />
           ))
         )}

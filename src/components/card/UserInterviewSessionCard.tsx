@@ -10,17 +10,21 @@ import { InterviewSessionCardWithDropdown } from "./InterviewSessionCardWithDrop
 
 interface UserInterviewSessionCardProps {
   interviewSession: InterviewSession;
+  onChat?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
 export const UserInterviewSessionCard: React.FC<
   UserInterviewSessionCardProps
-> = ({ interviewSession, onEdit, onDelete }) => {
+> = ({ interviewSession, onChat, onEdit, onDelete }) => {
   const dropdownContent = (
     <DropdownMenuContent>
       <DropdownMenuLabel>Interview Session</DropdownMenuLabel>
       <DropdownMenuSeparator />
+      <DropdownMenuItem disabled={!onChat} onClick={onChat}>
+        Chat
+      </DropdownMenuItem>
       <DropdownMenuItem disabled={!onEdit} onClick={onEdit}>
         Edit Session
       </DropdownMenuItem>
