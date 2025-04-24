@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/shadcn/dropdown-menu";
 import { BackendRoutes } from "@/constants/routes/Backend";
+import { env } from "@/env/client";
 import { axios } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -54,7 +55,9 @@ export default function Chat() {
   const setupSocket = () => {
     if (status !== "authenticated" || !session?.token) return;
 
-    const socket = io("http://localhost:5050", {
+    console.log(env.NEXT_PUBLIC_WS_BASE_URL);
+
+    const socket = io(env.NEXT_PUBLIC_WS_BASE_URL, {
       auth: { token: session.token },
       query: { interviewSession: interviewSessionId },
     });
