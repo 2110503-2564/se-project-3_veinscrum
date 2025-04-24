@@ -168,7 +168,7 @@ export default function Chat() {
       >
         <div
           className={cn(
-            "max-w-[70%] space-y-1 rounded-xl px-4 py-3 text-sm shadow",
+            "max-w-[70%] space-y-1 rounded-xl px-4 py-3 text-sm break-all shadow",
             isMe
               ? "rounded-br-none bg-blue-100 text-gray-800"
               : "rounded-bl-none bg-gray-100 text-gray-800",
