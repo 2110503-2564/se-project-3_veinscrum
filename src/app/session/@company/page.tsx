@@ -36,8 +36,6 @@ export default function CompanySessionPage() {
     enabled: isCompanyDataReady,
   });
 
-  console.log(sessionData);
-
   const groupJobListing = new Map<string, Array<User>>();
 
   sessionData?.forEach((session) => {
@@ -48,17 +46,24 @@ export default function CompanySessionPage() {
     }
     groupJobListing.get(jobTitle)!.push(user);
   });
+  
+  const noData = !isSessionLoading && groupJobListing.size === 0;
 
   return (
     <main className="mx-auto mt-16 max-w-3xl px-4">
       <h1 className="mb-8 text-center text-4xl font-bold">
-        My Scheduled Sessions
+        Flagged Users by Job Title
       </h1>
 
       {isSessionLoading && <p>Loading sessions...</p>}
-      {sessionError && <p>Error loading sessions.</p>}
+      {sessionError && <p>Error loading sessions.</p>}  
+      {noData && (
+        <p className="text-center text-lg text-gray-500">
+          No flagged users found for any job title.
+        </p>
+      )}
 
-      <FlagUserList groupedData={groupJobListing} />
+      {!noData && <FlagUserList groupedData={groupJobListing} />}
     </main>
   );
 }
