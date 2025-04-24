@@ -5,6 +5,7 @@ import {
   EditChatMessageDialog,
   editChatMessageFormSchema,
 } from "@/components/dialog/EdiChatMessageDialog";
+import { Button } from "@/components/ui/shadcn/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +18,7 @@ import { axios } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { EllipsisIcon } from "lucide-react";
+import { EllipsisIcon, Star } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -33,6 +34,8 @@ export default function Chat() {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  //use user id to check is user in flag list then delete this below line.
+  const [flagUser, setFlagUser] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,6 +53,10 @@ export default function Chat() {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const toggleStar = () => {
+    setFlagUser(!flagUser);
   };
 
   const setupSocket = () => {
@@ -220,7 +227,26 @@ export default function Chat() {
 
   return (
     <div className="mx-auto max-w-xl p-6">
-      <h2 className="mb-4 text-2xl font-semibold">💬 Chat</h2>
+      <div className="grid grid-cols-2 items-center gap-5">
+        <h2 className="text-left text-2xl font-semibold">💬 Chat</h2>
+
+        <div className="flex justify-end">
+          {me?.role === "company" ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => toggleStar()}
+              title="Flag this user"
+            >
+              {flagUser ? (
+                <Star className="fill-yellow-400 text-yellow-400" />
+              ) : (
+                <Star className="text-gray-400" />
+              )}
+            </Button>
+          ) : null}
+        </div>
+      </div>
 
       <div className="h-96 space-y-2 overflow-y-scroll rounded-lg border bg-white p-4 shadow-sm">
         {messages.map(renderMessage)}
