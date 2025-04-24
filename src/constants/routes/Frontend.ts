@@ -9,6 +9,8 @@ export enum FrontendRouteTargets {
 
   PROFILE = "/profile",
 
+  CHAT_SESSION = "chat/{sessionId}",
+
   COMPANY_LIST = "/company",
   COMPANY_PROFILE = "/company/{companyId}",
   COMPANY_CREATE = "/company/create",
