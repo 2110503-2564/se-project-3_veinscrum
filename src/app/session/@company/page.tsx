@@ -3,18 +3,10 @@
 import { FlagUserList } from "@/components/card/FlagUserList";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
-import { User } from "@/types";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
-interface JobListingGroup {
-  jobTitle: string;
-  jobListingId: string;
-  users: Array<User>;
-}
-
 export default function CompanySessionPage() {
-  const queryClient = useQueryClient();
   const { status } = useSession();
 
   const {
@@ -44,37 +36,18 @@ export default function CompanySessionPage() {
     enabled: isCompanyDataReady,
   });
 
-  const groupedJobListings = Array.isArray(sessionData)
-    ? sessionData.reduce(
-        (acc: Array<JobListingGroup>, session: InterviewSession) => {
-          const jobTitle = session.jobListing?.jobTitle || "Unknown Job";
-          const jobListingId = session.jobListing?._id || "";
-          const user: User = {
-            id: session.user._id,
-            name: session.user.name,
-            email: session.user.email,
-            tel: session.user.tel,
-          };
+  const groupJobListing = new Map<string, Array<InterviewSession>>();
 
-          const existingGroup = acc.find(
-            (group: JobListingGroup) => group.jobListingId === jobListingId,
-          );
-          if (existingGroup) {
-            existingGroup.users.push(user);
-          } else {
-            acc.push({
-              jobTitle,
-              jobListingId,
-              users: [user],
-            });
-          }
-          return acc;
-        },
-        [] as Array<JobListingGroup>,
-      )
-    : [];
+  sessionData?.forEach((session) => {
+    const JobListingId = session.jobListing._id;
 
-  const noData = !isSessionLoading && groupedJobListings.length === 0;
+    if (!groupJobListing.has(JobListingId)) {
+      groupJobListing.set(JobListingId, []);
+    }
+    groupJobListing.get(JobListingId)!.push(session);
+  });
+
+  const noData = !isSessionLoading && groupJobListing.size === 0;
 
   return (
     <main className="mx-auto mt-16 max-w-3xl px-4">
@@ -90,7 +63,7 @@ export default function CompanySessionPage() {
         </p>
       )}
 
-      {!noData && <FlagUserList groupedData={groupedJobListings} />}
+      {!noData && <FlagUserList groupedData={groupJobListing} />}
     </main>
   );
 }
