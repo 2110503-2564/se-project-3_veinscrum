@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/shadcn/form";
 import { Input } from "@/components/ui/shadcn/input";
 import { BackendRoutes } from "@/constants/routes/Backend";
-import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { MDXEditorMethods } from "@mdxeditor/editor";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -31,18 +32,25 @@ const editJobSchema = z.object({
 });
 
 export default function EditJobPage() {
+  const queryClient = useQueryClient();
   const params = useParams<{ jobId: string }>();
   const { status } = useSession();
   const router = useRouter();
+  const textEditorRef = useRef<MDXEditorMethods>(null);
 
   const form = useForm<z.infer<typeof editJobSchema>>({
     resolver: zodResolver(editJobSchema),
+    defaultValues: {
+      image: "",
+      jobTitle: "",
+      description: "",
+    },
   });
 
   const {
-    data: job,
-    isLoading: jobLoading,
-    isError: jobError,
+    data: jobListing,
+    isLoading: isJobListingLoading,
+    isError: isJobListingError,
   } = useQuery({
     queryKey: [BackendRoutes.JOB_LISTINGS_ID({ id: params.jobId })],
     queryFn: async () => {
@@ -56,17 +64,19 @@ export default function EditJobPage() {
         description: result.data.data.description,
       });
 
+      textEditorRef.current?.setMarkdown(result.data.data.description);
+
       return result;
     },
     enabled: status == "authenticated",
     select: (data) => data.data.data,
   });
 
-  const { mutate: editJob } = useMutation({
+  const { mutate: editJobListing } = useMutation({
     mutationFn: async (data: z.infer<typeof editJobSchema>) =>
       axios.put(BackendRoutes.JOB_LISTINGS_ID({ id: params.jobId }), {
         ...data,
-        company: job?.company,
+        company: jobListing?.company,
       }),
     onMutate: () =>
       toast.loading("Editing Job", {
@@ -78,11 +88,13 @@ export default function EditJobPage() {
         id: "edit-job",
         description: "",
       });
-      router.push(
-        FrontendRoutes.COMPANY_PROFILE({
-          companyId: job?.company.id ?? "",
-        }),
-      );
+
+      queryClient.invalidateQueries({
+        queryKey: [BackendRoutes.JOB_LISTINGS_ID({ id: params.jobId })],
+      });
+
+      // consider this
+      router.back();
     },
     onError: (error) => {
       toast.error("Failed to edit Job", {
@@ -94,20 +106,20 @@ export default function EditJobPage() {
     },
   });
 
-  if (jobLoading) return <div>Loading...</div>;
-  if (jobError) return <div>Error loading job</div>;
+  if (isJobListingError) return <div>Error loading job</div>;
 
   return (
     <Form {...form}>
       <main className="mx-auto mt-16">
         <form
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
-          onSubmit={form.handleSubmit((e) => editJob(e))}
+          onSubmit={form.handleSubmit((e) => editJobListing(e))}
         >
           <h1 className="text-center text-3xl font-bold">Edit Job</h1>
           <FormField
             control={form.control}
             name="jobTitle"
+            disabled={isJobListingLoading || !jobListing}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Job Title</FormLabel>
@@ -124,6 +136,7 @@ export default function EditJobPage() {
           <FormField
             control={form.control}
             name="image"
+            disabled={isJobListingLoading || !jobListing}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Job Image</FormLabel>
@@ -140,21 +153,26 @@ export default function EditJobPage() {
           <FormField
             control={form.control}
             name="description"
+            disabled={isJobListingLoading || !jobListing}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <TextEditor {...field} />
+                  <TextEditor
+                    markdown={field.value}
+                    onChange={field.onChange}
+                    ref={textEditorRef}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <Button
-            data-testid="job-listing-edit-submit-button"
             type="submit"
             className="w-full"
             size="lg"
+            disabled={isJobListingLoading || !jobListing}
           >
             Update
           </Button>

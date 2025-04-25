@@ -22,7 +22,7 @@ import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueries } from "@tanstack/react-query";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse, isAxiosError } from "axios";
 import { Building2, MapPin, Phone } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -41,6 +41,7 @@ const createSessionFormSchema = z.object({
 });
 
 export default function JobDetailPage() {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { status } = useSession();
   const { jobId } = useParams<{ jobId: string }>();
@@ -106,6 +107,11 @@ export default function JobDetailPage() {
         id: "create-session",
         description: "",
       });
+
+      queryClient.invalidateQueries({
+        queryKey: [BackendRoutes.JOB_LISTINGS_ID({ id: jobId })],
+      });
+
       router.push(FrontendRoutes.SESSION_LIST);
     },
     onError: (error) => {
