@@ -3,8 +3,36 @@
 import { FlagUserList } from "@/components/card/FlagUserList";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
+import { User } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
+
+interface BackendUser {
+  _id: string;
+  name: string;
+  email: string;
+  tel: string;
+}
+
+interface InterviewSession {
+  jobListing: {
+    _id: string;
+    jobTitle: string;
+  };
+  user: BackendUser;
+}
+
+interface GETInterviewSessionByCompany {
+  data: {
+    data: Array<InterviewSession>;
+  };
+}
+
+interface JobListingGroup {
+  jobTitle: string;
+  jobListingId: string;
+  users: Array<User>;
+}
 
 export default function CompanySessionPage() {
   const { status } = useSession();
@@ -36,18 +64,37 @@ export default function CompanySessionPage() {
     enabled: isCompanyDataReady,
   });
 
-  const groupJobListing = new Map<string, Array<User>>();
+  const groupedJobListings = Array.isArray(sessionData)
+    ? sessionData.reduce(
+        (acc: Array<JobListingGroup>, session: InterviewSession) => {
+          const jobTitle = session.jobListing?.jobTitle || "Unknown Job";
+          const jobListingId = session.jobListing?._id || "";
+          const user: User = {
+            id: session.user._id,
+            name: session.user.name,
+            email: session.user.email,
+            tel: session.user.tel,
+          };
 
-  sessionData?.forEach((session) => {
-    const jobTitle = session.jobListing?.jobTitle || "Unknown Job";
-    const user = session.user;
-    if (!groupJobListing.has(jobTitle)) {
-      groupJobListing.set(jobTitle, []);
-    }
-    groupJobListing.get(jobTitle)!.push(user);
-  });
-  
-  const noData = !isSessionLoading && groupJobListing.size === 0;
+          const existingGroup = acc.find(
+            (group: JobListingGroup) => group.jobListingId === jobListingId,
+          );
+          if (existingGroup) {
+            existingGroup.users.push(user);
+          } else {
+            acc.push({
+              jobTitle,
+              jobListingId,
+              users: [user],
+            });
+          }
+          return acc;
+        },
+        [] as Array<JobListingGroup>,
+      )
+    : [];
+
+  const noData = !isSessionLoading && groupedJobListings.length === 0;
 
   return (
     <main className="mx-auto mt-16 max-w-3xl px-4">
@@ -56,14 +103,14 @@ export default function CompanySessionPage() {
       </h1>
 
       {isSessionLoading && <p>Loading sessions...</p>}
-      {sessionError && <p>Error loading sessions.</p>}  
+      {sessionError && <p>Error loading sessions.</p>}
       {noData && (
         <p className="text-center text-lg text-gray-500">
           No flagged users found for any job title.
         </p>
       )}
 
-      {!noData && <FlagUserList groupedData={groupJobListing} />}
+      {!noData && <FlagUserList groupedData={groupedJobListings} />}
     </main>
   );
 }
