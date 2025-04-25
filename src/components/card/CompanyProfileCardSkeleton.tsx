@@ -1,4 +1,3 @@
-import { GlobeIcon, MailIcon, MapPinIcon, PhoneIcon } from "lucide-react";
 import { Skeleton } from "../ui/shadcn/skeleton";
 
 interface CompanyProfileCardSkeleton {
@@ -17,19 +16,19 @@ export const CompanyProfileCardSkeleton: React.FC<
       <div className="col-span-2 w-full space-y-4">
         <div className="space-y-2 rounded-lg bg-gray-100 p-4 text-sm">
           <div className="flex items-center gap-x-3">
-            <MapPinIcon className="size-5 text-gray-600" />
+            <Skeleton className="h-5 w-5 rounded-md bg-gray-200" />
             <Skeleton className="h-5 w-full rounded-md bg-gray-200" />
           </div>
           <div className="flex items-center gap-x-3">
-            <MailIcon className="size-5 text-gray-600" />
+            <Skeleton className="h-5 w-5 rounded-md bg-gray-200" />
             <Skeleton className="h-5 w-full rounded-md bg-gray-200" />
           </div>
           <div className="flex items-center gap-x-3">
-            <GlobeIcon className="size-5 text-gray-600" />
+            <Skeleton className="h-5 w-5 rounded-md bg-gray-200" />
             <Skeleton className="h-5 w-full rounded-md bg-gray-200" />
           </div>
           <div className="flex items-center gap-x-3">
-            <PhoneIcon className="size-5 text-gray-600" />
+            <Skeleton className="h-5 w-5 rounded-md bg-gray-200" />
             <Skeleton className="h-5 w-full rounded-md bg-gray-200" />
           </div>
         </div>
