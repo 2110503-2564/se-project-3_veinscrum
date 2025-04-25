@@ -7,6 +7,7 @@ import {
 import { CalendarIcon, PhoneIcon } from "lucide-react";
 import { InterviewSessionCardInfo } from "./InterviewSessionCardInfo";
 import { InterviewSessionCardWithDropdown } from "./InterviewSessionCardWithDropdown";
+import { Button } from "../ui/shadcn/button";
 
 interface UserInterviewSessionCardProps {
   interviewSession: InterviewSession;
@@ -21,9 +22,9 @@ export const UserInterviewSessionCard: React.FC<
   const dropdownContent = (
     <DropdownMenuContent>
       <DropdownMenuLabel>Interview Session</DropdownMenuLabel>
-      <DropdownMenuItem variant="default" disabled={!onChat} onClick={onChat}>
+      {/* <DropdownMenuItem variant="default" disabled={!onChat} onClick={onChat}>
         Chat
-      </DropdownMenuItem>
+      </DropdownMenuItem> */}
       <DropdownMenuSeparator />
       <DropdownMenuItem disabled={!onEdit} onClick={onEdit}>
         Edit Session
@@ -43,21 +44,28 @@ export const UserInterviewSessionCard: React.FC<
       title={interviewSession.jobListing.company.name}
       description={interviewSession.jobListing.company.description}
       dropdownContent={dropdownContent}
+      topRightElement={
+        <div className="flex justify-end gap-2">
+          <Button className="bg-black text-white hover:bg-zinc-800 hover:text-white" variant="outline" size="sm" onClick={onChat}>
+            Start chat
+          </Button>
+        </div>
+      }
     >
-      <InterviewSessionCardInfo
-        icon={PhoneIcon}
-        text={interviewSession.jobListing.company.tel}
-      />
-      <InterviewSessionCardInfo
-        icon={CalendarIcon}
-        text={new Date(interviewSession.date).toLocaleString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      />
+    <InterviewSessionCardInfo
+      icon={PhoneIcon}
+      text={interviewSession.jobListing.company.tel}
+    />
+    <InterviewSessionCardInfo
+      icon={CalendarIcon}
+      text={new Date(interviewSession.date).toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    />
     </InterviewSessionCardWithDropdown>
   );
 };
