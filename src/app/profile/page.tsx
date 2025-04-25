@@ -1,12 +1,13 @@
 "use client";
 
+import { CompanyProfileCard } from "@/components/card/CompanyProfileCard";
+import { CompanyProfileCardSkeleton } from "@/components/card/CompanyProfileCardSkeleton";
 import { JobCardProfile } from "@/components/card/JobCardProfile";
 import { DeleteCompanyProfileDialog } from "@/components/dialog/DeleteCompanyProfileDialog";
 import {
   EditCompanyProfileDialog,
   editCompanyProfileFormSchema,
 } from "@/components/dialog/EditCompanyProfileDialog";
-import { TextEditor } from "@/components/input/TextEditor";
 import { Button } from "@/components/ui/shadcn/button";
 import {
   DropdownMenu,
@@ -14,13 +15,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/shadcn/dropdown-menu";
+import { Skeleton } from "@/components/ui/shadcn/skeleton";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { EllipsisIcon, Globe, Mail, MapPin, Phone } from "lucide-react";
+import { EllipsisIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -113,7 +114,7 @@ export default function ProfilePage() {
       },
     });
 
-  if (isMeLoading || isCompanyLoading || status === "loading") return null;
+  if (isMeLoading || status === "loading") return null;
 
   return (
     <main className="mx-auto mt-16">
@@ -129,8 +130,16 @@ export default function ProfilePage() {
       ) : (
         <div>
           <div className="mx-auto max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
-            <div className="mb-8 text-center">
-              {!company ? (
+            <div className="mb-8 flex justify-between">
+              <div className="mx-auto">
+                {isCompanyLoading ? (
+                  <Skeleton className="h-8 w-52" />
+                ) : (
+                  <h1 className="w-full text-2xl font-bold">{company?.name}</h1>
+                )}
+              </div>
+
+              {!me.company ? (
                 <div className="mx-auto">
                   <h1
                     data-testid="company-profile-no-company-profile-title"
@@ -195,64 +204,13 @@ export default function ProfilePage() {
                   />
                 </div>
               )}
-              <h1
-                data-testid="company-profile-name"
-                className="text-2xl font-bold"
-              >
-                {company?.name}
-              </h1>
             </div>
 
-            <div className="space-y-8 gap-x-8 md:grid md:grid-cols-3">
-              <div className="flex w-full justify-center">
-                <Image
-                  src={company?.logo || "/placeholder.png"}
-                  alt={company?.name || "Company Logo"}
-                  width={192}
-                  height={192}
-                  className="rounded-md object-cover"
-                />
-              </div>
-
-              <div className="col-span-2 w-full space-y-4">
-                <div className="space-y-2 rounded-lg bg-gray-100 p-4 text-sm">
-                  <p
-                    data-testid="company-profile-address"
-                    className="flex items-center gap-x-3"
-                  >
-                    <MapPin className="size-5 text-gray-600" />
-                    {company?.address}
-                  </p>
-                  <p
-                    data-testid="company-profile-email"
-                    className="flex items-center gap-x-3"
-                  >
-                    <Mail className="size-5 text-gray-600" />
-                    {me?.email}
-                  </p>
-                  <p
-                    data-testid="company-profile-website"
-                    className="flex items-center gap-x-3"
-                  >
-                    <Globe className="size-5 text-gray-600" />
-                    {company?.website}
-                  </p>
-                  <p
-                    data-testid="company-profile-telephone"
-                    className="flex items-center gap-x-3"
-                  >
-                    <Phone className="size-5 text-gray-600" />
-                    {company?.tel}
-                  </p>
-                </div>
-
-                <TextEditor
-                  key={company?.description}
-                  value={company?.description}
-                  readOnly
-                />
-              </div>
-            </div>
+            {isCompanyLoading ? (
+              <CompanyProfileCardSkeleton />
+            ) : (
+              <CompanyProfileCard me={me} company={company} />
+            )}
           </div>
           <div className="mx-auto my-10 max-w-4xl rounded-xl bg-white px-6 py-10 shadow-md">
             <div className="mb-8 flex items-center justify-between">
@@ -270,38 +228,41 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="mx-auto max-w-3xl space-y-4">
-              {company?.jobListings?.length === 0 ? (
-                <p
-                  data-testid="company-profile-no-job-listings"
-                  className="text-center text-gray-500"
-                >
-                  No job listings available.
-                </p>
+              {!isCompanyLoading ? (
+                company?.jobListings?.length === 0 ? (
+                  <p className="text-center text-gray-500">
+                    No job listings available.
+                  </p>
+                ) : (
+                  company?.jobListings?.map((job, idx) => (
+                    <div key={idx} className="relative mb-4">
+                      <JobCardProfile
+                        key={idx}
+                        id={job._id}
+                        jobTitle={job.jobTitle}
+                        companyName={company.name}
+                        location={company.address}
+                        tel={company.tel}
+                        requestedUser={me}
+                        isDeleteDialogOpen={isDeleteJobListingDialogOpen}
+                        isDeletePending={isDeleteJobListingPending}
+                        onDelete={(jobListingId) =>
+                          deleteJobListing({ id: jobListingId })
+                        }
+                        onDeleteDialogClose={() =>
+                          setIsDeleteJobListingDialogOpen(false)
+                        }
+                        onDeleteDialogOpen={() =>
+                          setIsDeleteJobListingDialogOpen(true)
+                        }
+                      />
+                    </div>
+                  ))
+                )
               ) : (
-                company?.jobListings?.map((job, idx) => (
-                  <div key={idx} className="relative mb-4">
-                    <JobCardProfile
-                      key={idx}
-                      id={job._id}
-                      jobTitle={job.jobTitle}
-                      companyName={company.name}
-                      location={company.address}
-                      tel={company.tel}
-                      requestedUser={me}
-                      isDeleteDialogOpen={isDeleteJobListingDialogOpen}
-                      isDeletePending={isDeleteJobListingPending}
-                      onDelete={(jobListingId) =>
-                        deleteJobListing({ id: jobListingId })
-                      }
-                      onDeleteDialogClose={() =>
-                        setIsDeleteJobListingDialogOpen(false)
-                      }
-                      onDeleteDialogOpen={() =>
-                        setIsDeleteJobListingDialogOpen(true)
-                      }
-                    />
-                  </div>
-                ))
+                <p className="text-center text-gray-500">
+                  Loading job listings.
+                </p>
               )}
             </div>
           </div>
