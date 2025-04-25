@@ -34,8 +34,7 @@ export default function Chat() {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  //use user id to check is user in flag list then delete this below line.
-  const [flagUser, setFlagUser] = useState<boolean>(false);
+  const [flagId, setFlagId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -51,12 +50,85 @@ export default function Chat() {
     select: (res) => res?.data?.data,
   });
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const { data: interviewSession, isLoading: isLoadingSession } = useQuery({
+    queryKey: ["interview-session", interviewSessionId],
+    queryFn: async () => {
+      console.log("Fetching interview session:", interviewSessionId);
+      const response = await axios.get(
+        BackendRoutes.SESSIONS_ID({ id: interviewSessionId }),
+      );
+      console.log("Interview session response:", response.data);
+      return response;
+    },
+    enabled: status === "authenticated",
+    select: (res) => res?.data?.data,
+  });
+
+  // Debug logs
+  useEffect(() => {
+    console.log("Current user role:", me?.role);
+    console.log("Interview session:", interviewSession);
+    console.log("Auth status:", status);
+  }, [me?.role, interviewSession, status]);
+
+  const { mutate: createFlag } = useMutation({
+    mutationFn: async () => {
+      console.log("Creating flag with:", {
+        user: interviewSession?.user?._id,
+        jobListing: interviewSession?.jobListing?._id,
+      });
+      const response = await axios.post(BackendRoutes.FLAGS, {
+        user: interviewSession?.user?._id,
+        jobListing: interviewSession?.jobListing?._id,
+      });
+      console.log("Create flag response:", response.data);
+      return response.data.data;
+    },
+    onSuccess: (data) => {
+      setFlagId(data._id);
+      toast.success("User flagged successfully");
+    },
+    onError: (error) => {
+      console.error("Error creating flag:", error);
+      toast.error(
+        isAxiosError(error)
+          ? error.response?.data?.error || "Failed to flag user"
+          : "Failed to flag user",
+      );
+    },
+  });
+
+  const { mutate: deleteFlag } = useMutation({
+    mutationFn: async () => {
+      if (!flagId) return;
+      console.log("Deleting flag:", flagId);
+      await axios.delete(BackendRoutes.FLAGS_ID({ id: flagId }));
+    },
+    onSuccess: () => {
+      setFlagId(null);
+      toast.success("User unflagged successfully");
+    },
+    onError: (error) => {
+      console.error("Error deleting flag:", error);
+      toast.error(
+        isAxiosError(error)
+          ? error.response?.data?.error || "Failed to unflag user"
+          : "Failed to unflag user",
+      );
+    },
+  });
 
   const toggleStar = () => {
-    setFlagUser(!flagUser);
+    console.log("Toggle star clicked. Current flagId:", flagId);
+    if (flagId) {
+      deleteFlag();
+    } else {
+      createFlag();
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const setupSocket = () => {
@@ -139,6 +211,26 @@ export default function Chat() {
 
   useEffect(scrollToBottom, [messages]);
   useEffect(setupSocket, [status, session?.token, interviewSessionId]);
+
+  // Check if user is already flagged
+  useEffect(() => {
+    if (status === "authenticated" && interviewSession) {
+      axios
+        .get(BackendRoutes.FLAGS, {
+          params: {
+            user: interviewSession.user._id,
+            jobListing: interviewSession.jobListing._id,
+          },
+        })
+        .then((response) => {
+          const flags = response.data.data;
+          if (flags && flags.length > 0) {
+            setFlagId(flags[0]._id);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [status, interviewSession]);
 
   const sendMessage = () => {
     const msg = inputRef.current?.value;
@@ -231,20 +323,29 @@ export default function Chat() {
         <h2 className="text-left text-2xl font-semibold">💬 Chat</h2>
 
         <div className="flex justify-end">
-          {me?.role === "company" ? (
+          {/* Debug info */}
+          <div className="mr-2 text-xs text-gray-500">
+            Role: {me?.role}, Has user: {interviewSession?.user ? "yes" : "no"}
+            {isLoadingSession && " (Loading...)"}
+          </div>
+
+          {me?.role === "company" && interviewSession?.user && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => toggleStar()}
-              title="Flag this user"
+              onClick={toggleStar}
+              disabled={isLoadingSession}
+              title={flagId ? "Unflag this user" : "Flag this user"}
             >
-              {flagUser ? (
+              {isLoadingSession ? (
+                <div className="animate-spin">⌛</div>
+              ) : flagId ? (
                 <Star className="fill-yellow-400 text-yellow-400" />
               ) : (
                 <Star className="text-gray-400" />
               )}
             </Button>
-          ) : null}
+          )}
         </div>
       </div>
 
