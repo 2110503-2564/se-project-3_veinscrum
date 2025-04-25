@@ -36,7 +36,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
         <InterviewSessionCardInfo icon={Phone} text={company.tel} />
       </div>
       <Button asChild className="mt-4 w-full">
-        <Link href={FrontendRoutes.COMPANY_PROFILE({ companyId: company.id })}>
+        <Link href={FrontendRoutes.COMPANY_PROFILE({ companyId: company._id })}>
           View Company
         </Link>
       </Button>

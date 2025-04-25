@@ -45,7 +45,7 @@ export default function CompaniesPage() {
                 <CompanyCardSkeleton key={i} />
               ))
             : companies?.data.map((company) => (
-                <CompanyCard key={company.id} company={company} />
+                <CompanyCard key={company._id} company={company} />
               ))}
         </div>
       </div>

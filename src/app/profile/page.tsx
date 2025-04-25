@@ -62,7 +62,7 @@ export default function ProfilePage() {
     useMutation({
       mutationFn: async (data: z.infer<typeof editCompanyProfileFormSchema>) =>
         await axios.put(
-          BackendRoutes.COMPANIES_ID({ companyId: company?.id ?? "" }),
+          BackendRoutes.COMPANIES_ID({ companyId: company?._id ?? "" }),
           data,
         ),
       onMutate: () => {
@@ -82,7 +82,7 @@ export default function ProfilePage() {
     useMutation({
       mutationFn: async () =>
         await axios.delete(
-          BackendRoutes.COMPANIES_ID({ companyId: company?.id ?? "" }),
+          BackendRoutes.COMPANIES_ID({ companyId: company?._id ?? "" }),
         ),
       onMutate: () => {
         toast.loading("Deleting company...", { id: "delete-company" });
