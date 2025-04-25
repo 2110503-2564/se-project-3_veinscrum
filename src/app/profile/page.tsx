@@ -241,6 +241,7 @@ export default function ProfilePage() {
                         id={job._id}
                         jobTitle={job.jobTitle}
                         companyName={company.name}
+                        companyId={job.company._id}
                         location={company.address}
                         tel={company.tel}
                         requestedUser={me}

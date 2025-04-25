@@ -1,5 +1,6 @@
 import { GlobeIcon, MailIcon, MapPinIcon, PhoneIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { TextEditor } from "../input/TextEditor";
 
 interface CompanyProfileCard {
@@ -34,10 +35,14 @@ export const CompanyProfileCard: React.FC<CompanyProfileCard> = ({
             <MailIcon className="size-5 text-gray-600" />
             {me?.email}
           </p>
-          <p className="flex items-center gap-x-3">
-            <GlobeIcon className="size-5 text-gray-600" />
-            {company?.website}
-          </p>
+          <div>
+            <Link href={company?.website ?? ""} className="hover:underline">
+              <p className="flex items-center gap-x-3">
+                <GlobeIcon className="size-5 text-gray-600" />
+                {company?.website}
+              </p>
+            </Link>
+          </div>
           <p className="flex items-center gap-x-3">
             <PhoneIcon className="size-5 text-gray-600" />
             {company?.tel}

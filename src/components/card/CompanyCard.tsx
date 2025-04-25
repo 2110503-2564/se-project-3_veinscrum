@@ -32,7 +32,11 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
     <div>
       <div className="space-y-1">
         <InterviewSessionCardInfo icon={MapPin} text={company.address} />
-        <InterviewSessionCardInfo icon={Globe} text={company.website} />
+        <div>
+          <Link href={company.website} className="hover:underline">
+            <InterviewSessionCardInfo icon={Globe} text={company.website} />
+          </Link>
+        </div>
         <InterviewSessionCardInfo icon={Phone} text={company.tel} />
       </div>
       <Button asChild className="mt-4 w-full">

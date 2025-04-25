@@ -132,6 +132,7 @@ export default function AdminJobListingsPage() {
                 id={job._id}
                 jobTitle={job.jobTitle}
                 companyName={job.company.name}
+                companyId={job.company._id}
                 location={job.company.address}
                 tel={job.company.tel}
                 requestedUser={me}

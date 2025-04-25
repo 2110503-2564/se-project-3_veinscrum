@@ -9,6 +9,7 @@ interface JobCardProps {
   id: string;
   jobTitle: string;
   companyName: string;
+  companyId: string;
   location?: string;
   tel?: string;
   requestedUser?: User;
@@ -23,6 +24,7 @@ export function JobCardProfile({
   id,
   jobTitle,
   companyName,
+  companyId,
   location,
   tel,
   requestedUser,
@@ -49,9 +51,16 @@ export function JobCardProfile({
               </h3>
               <div className="mt-1 flex items-center gap-1.5 text-gray-600">
                 <Building2 className="h-3.5 w-3.5" />
-                <span className="text-xs" data-testid="company-name">
-                  {companyName}
-                </span>
+                <Link
+                  href={FrontendRoutes.COMPANY_PROFILE({
+                    companyId: companyId,
+                  })}
+                  className="hover:underline"
+                >
+                  <span className="text-xs" data-testid="company-name">
+                    {companyName}
+                  </span>
+                </Link>
               </div>
             </div>
 
