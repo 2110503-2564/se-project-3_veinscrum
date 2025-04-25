@@ -4,29 +4,8 @@ import { FlagUserList } from "@/components/card/FlagUserList";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
 import { User } from "@/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-
-interface BackendUser {
-  _id: string;
-  name: string;
-  email: string;
-  tel: string;
-}
-
-interface InterviewSession {
-  jobListing: {
-    _id: string;
-    jobTitle: string;
-  };
-  user: BackendUser;
-}
-
-interface GETInterviewSessionByCompany {
-  data: {
-    data: Array<InterviewSession>;
-  };
-}
 
 interface JobListingGroup {
   jobTitle: string;
@@ -35,6 +14,7 @@ interface JobListingGroup {
 }
 
 export default function CompanySessionPage() {
+  const queryClient = useQueryClient();
   const { status } = useSession();
 
   const {
