@@ -8,6 +8,7 @@ import { Building2, CalendarIcon, PhoneIcon } from "lucide-react";
 import { Button } from "../ui/shadcn/button";
 import { InterviewSessionCardInfo } from "./InterviewSessionCardInfo";
 import { InterviewSessionCardWithDropdown } from "./InterviewSessionCardWithDropdown";
+import { Button } from "../ui/shadcn/button";
 
 interface UserInterviewSessionCardProps {
   interviewSession: InterviewSession;
@@ -22,9 +23,9 @@ export const UserInterviewSessionCard: React.FC<
   const dropdownContent = (
     <DropdownMenuContent>
       <DropdownMenuLabel>Interview Session</DropdownMenuLabel>
-      <DropdownMenuItem variant="default" disabled={!onChat} onClick={onChat}>
+      {/* <DropdownMenuItem variant="default" disabled={!onChat} onClick={onChat}>
         Chat
-      </DropdownMenuItem>
+      </DropdownMenuItem> */}
       <DropdownMenuSeparator />
       <DropdownMenuItem disabled={!onChat} onClick={onChat}>
         Chat
