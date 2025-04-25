@@ -22,7 +22,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export default function UserInterviewSessionsPage() {
-   const router = useRouter();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { status } = useSession();
   const [interviewSessionToDelete, setInterviewSessionToDelete] =
@@ -166,7 +166,13 @@ export default function UserInterviewSessionsPage() {
               interviewSession={interviewSession}
               onDelete={() => setInterviewSessionToDelete(interviewSession)}
               onEdit={() => setInterviewSessionToUpdate(interviewSession)}
-              onChat={()=> router.push(FrontendRoutes.CHAT_SESSION({sessionId: interviewSession._id}))}
+              onChat={() =>
+                router.push(
+                  FrontendRoutes.CHAT_SESSION({
+                    sessionId: interviewSession._id,
+                  }),
+                )
+              }
             />
           ))
         )}
