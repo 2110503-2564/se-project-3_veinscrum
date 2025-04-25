@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminSessionCard } from "@/components/card/AdminInterviewSessionCard";
+import { InterviewSessionCardSkeleton } from "@/components/card/InterviewSessionCardSkeleton";
 import { DeleteInterviewSessionDialog } from "@/components/dialog/DeleteInterviewSessionDialog";
 import {
   EditInterviewSessionDialog,
@@ -107,14 +108,14 @@ export default function AdminSessionsPage() {
     await queryClient.invalidateQueries({
       queryKey: [BackendRoutes.SESSIONS],
     });
-    
+
     // Check if current page is now empty (except for page 1)
     if (page > 1) {
       const currentData = await axios.get<GETAllInterviewSessionsResponse>(
         BackendRoutes.SESSIONS,
-        { params: getQuery() }
+        { params: getQuery() },
       );
-      
+
       // If the current page has no data after deletion, go to previous page
       if (currentData?.data?.data?.length === 0) {
         setPage(page - 1);
@@ -127,15 +128,28 @@ export default function AdminSessionsPage() {
       <div>
         <h1 className="text-left text-4xl font-bold">All Scheduled Sessions</h1>
         <div className="mt-4 space-y-2.5">
-          {sessions?.data &&
-            sessions?.data?.data?.map((session, idx) => (
-              <AdminSessionCard
-                key={idx}
-                interviewSession={session}
-                onDelete={() => setInterviewSessionToDelete(session)}
-                onEdit={() => setInterviewSessionToUpdate(session)}
-              />
-            ))}
+          {!isSessionsLoading
+            ? sessions?.data &&
+              sessions?.data?.data?.map((session, idx) => (
+                <AdminSessionCard
+                  key={idx}
+                  interviewSession={session}
+                  onDelete={() => setInterviewSessionToDelete(session)}
+                  onEdit={() => setInterviewSessionToUpdate(session)}
+                />
+              ))
+            : Array.from({ length: 4 }).map((_, idx) => (
+                <InterviewSessionCardSkeleton key={idx} infoNumbers={4} />
+              ))}
+          {/* {sessions?.data && */}
+          {/*   sessions?.data?.data?.map((session, idx) => ( */}
+          {/*     <AdminSessionCard */}
+          {/*       key={idx} */}
+          {/*       interviewSession={session} */}
+          {/*       onDelete={() => setInterviewSessionToDelete(session)} */}
+          {/*       onEdit={() => setInterviewSessionToUpdate(session)} */}
+          {/*     /> */}
+          {/*   ))} */}
         </div>
       </div>
 
