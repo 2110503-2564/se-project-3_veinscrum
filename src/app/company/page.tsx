@@ -1,6 +1,7 @@
 "use client";
 
 import { CompanyCard } from "@/components/card/CompanyCard";
+import { SkeletonCompanyCard } from "@/components/card/CompanyCardSkeleton";
 import {
   Pagination,
   PaginationContent,
@@ -29,9 +30,9 @@ export default function CompaniesPage() {
       await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES, {
         params: getQuery(),
       }),
+    select: (data) => data.data,
   });
 
-  if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Failed to load companies.</p>;
 
   return (
@@ -39,21 +40,24 @@ export default function CompaniesPage() {
       <div className="space-y-16">
         <h1 className="text-center text-3xl font-bold">Explore Companies</h1>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
-          {companies?.data.data &&
-            companies?.data.data.map((company, idx) => (
-              <CompanyCard key={idx} company={company} />
-            ))}
+          {isLoading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <SkeletonCompanyCard key={i} />
+              ))
+            : companies?.data.map((company) => (
+                <CompanyCard key={company.id} company={company} />
+              ))}
         </div>
       </div>
       <Pagination>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              disabled={!companies?.data?.pagination.prev || isLoading}
+              disabled={!companies?.pagination.prev || isLoading}
               onClick={() => setPage(page - 1)}
             />
           </PaginationItem>
-          {companies?.data?.pagination.prev && !isLoading && (
+          {companies?.pagination.prev && !isLoading && (
             <PaginationItem>
               <PaginationLink onClick={() => setPage(page - 1)}>
                 {page - 1}
@@ -63,7 +67,7 @@ export default function CompaniesPage() {
           <PaginationItem>
             <PaginationLink isActive>{page}</PaginationLink>
           </PaginationItem>
-          {companies?.data?.pagination.next && !isLoading && (
+          {companies?.pagination.next && !isLoading && (
             <PaginationItem>
               <PaginationLink onClick={() => setPage(page + 1)}>
                 {page + 1}
@@ -72,7 +76,7 @@ export default function CompaniesPage() {
           )}
           <PaginationItem>
             <PaginationNext
-              disabled={!companies?.data?.pagination.next || isLoading}
+              disabled={!companies?.pagination.next || isLoading}
               onClick={() => setPage(page + 1)}
             />
           </PaginationItem>
