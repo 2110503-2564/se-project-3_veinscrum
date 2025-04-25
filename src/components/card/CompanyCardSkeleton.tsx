@@ -5,7 +5,7 @@ interface SkeletonCompanyCardProps {
   className?: string;
 }
 
-export const SkeletonCompanyCard: React.FC<SkeletonCompanyCardProps> = ({
+export const CompanyCardSkeleton: React.FC<SkeletonCompanyCardProps> = ({
   className,
 }) => (
   <div

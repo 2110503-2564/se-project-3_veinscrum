@@ -1,7 +1,7 @@
 "use client";
 
 import { CompanyCard } from "@/components/card/CompanyCard";
-import { SkeletonCompanyCard } from "@/components/card/CompanyCardSkeleton";
+import { CompanyCardSkeleton } from "@/components/card/CompanyCardSkeleton";
 import {
   Pagination,
   PaginationContent,
@@ -42,7 +42,7 @@ export default function CompaniesPage() {
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
           {isLoading
             ? Array.from({ length: 8 }).map((_, i) => (
-                <SkeletonCompanyCard key={i} />
+                <CompanyCardSkeleton key={i} />
               ))
             : companies?.data.map((company) => (
                 <CompanyCard key={company.id} company={company} />
