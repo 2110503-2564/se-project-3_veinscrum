@@ -129,12 +129,8 @@ export default function AdminJobListingsPage() {
             jobListings.data.map((job, idx) => (
               <JobCardProfile
                 key={idx}
-                id={job._id}
-                jobTitle={job.jobTitle}
-                companyName={job.company.name}
-                companyId={job.company._id}
-                location={job.company.address}
-                tel={job.company.tel}
+                jobListing={job}
+                company={job.company}
                 requestedUser={me}
                 isDeleteDialogOpen={
                   isDeleteJobListingDialogOpen && selectedJobId === job._id

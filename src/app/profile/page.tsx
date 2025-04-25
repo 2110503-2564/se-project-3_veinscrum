@@ -238,12 +238,8 @@ export default function ProfilePage() {
                     <div key={idx} className="relative mb-4">
                       <JobCardProfile
                         key={idx}
-                        id={job._id}
-                        jobTitle={job.jobTitle}
-                        companyName={company.name}
-                        companyId={job.company._id}
-                        location={company.address}
-                        tel={company.tel}
+                        jobListing={job}
+                        company={company}
                         requestedUser={me}
                         isDeleteDialogOpen={isDeleteJobListingDialogOpen}
                         isDeletePending={isDeleteJobListingPending}

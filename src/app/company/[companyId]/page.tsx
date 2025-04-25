@@ -108,12 +108,12 @@ export default function CompanyProfilePage() {
 
   return (
     <div className="mx-auto my-16 max-w-4xl space-y-8">
-      <div className="rounded-xl bg-white px-6 py-10 shadow-md">
+      <div className="space-y-4 rounded-xl bg-white px-6 py-10 shadow-md">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold">{company.name}</h1>
         </div>
 
-        <div className="flex items-center gap-8 max-md:flex-col">
+        <div className="flex items-start gap-5 max-md:flex-col">
           <Image
             src={company.logo || "/placeholder.png"}
             alt={company.name}
@@ -152,7 +152,7 @@ export default function CompanyProfilePage() {
         <div className="mb-8 grid grid-cols-3 items-center">
           <h2 className="text-center text-2xl font-bold">Job Listings</h2>
 
-          {me?.role === "company" && (
+          {me?._id === company.owner && (
             <div className="flex justify-end">
               <div className="shrink-0">
                 <Button
@@ -180,12 +180,8 @@ export default function CompanyProfilePage() {
             jobs.map((job, idx) => (
               <JobCardProfile
                 key={idx}
-                id={job._id}
-                jobTitle={job.jobTitle}
-                companyName={company.name}
-                companyId={company._id}
-                location={company.address}
-                tel={company.tel}
+                jobListing={job}
+                company={company}
                 requestedUser={me}
                 isDeleteDialogOpen={isDeleteJobListingDialogOpen}
                 isDeletePending={isDeleteJobListingPending}

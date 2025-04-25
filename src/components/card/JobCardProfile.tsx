@@ -6,12 +6,8 @@ import Link from "next/link";
 import { Button } from "../ui/shadcn/button";
 
 interface JobCardProps {
-  id: string;
-  jobTitle: string;
-  companyName: string;
-  companyId: string;
-  location?: string;
-  tel?: string;
+  jobListing: JobListing;
+  company: Company;
   requestedUser?: User;
   isDeleteDialogOpen: boolean;
   isDeletePending: boolean;
@@ -21,12 +17,8 @@ interface JobCardProps {
 }
 
 export function JobCardProfile({
-  id,
-  jobTitle,
-  companyName,
-  companyId,
-  location,
-  tel,
+  jobListing,
+  company,
   requestedUser,
   isDeleteDialogOpen,
   isDeletePending,
@@ -47,45 +39,43 @@ export function JobCardProfile({
                 className="text-base font-semibold text-gray-900"
                 data-testid="job-title"
               >
-                {jobTitle}
+                {jobListing.jobTitle}
               </h3>
               <div className="mt-1 flex items-center gap-1.5 text-gray-600">
                 <Building2 className="h-3.5 w-3.5" />
                 <Link
                   href={FrontendRoutes.COMPANY_PROFILE({
-                    companyId: companyId,
+                    companyId: company._id,
                   })}
                   className="hover:underline"
                 >
                   <span className="text-xs" data-testid="company-name">
-                    {companyName}
+                    {company.name}
                   </span>
                 </Link>
               </div>
             </div>
 
             <div className="space-y-1.5 rounded-md bg-gray-50 p-2 text-xs">
-              {location && (
-                <p className="flex items-center gap-x-2">
-                  <MapPin className="h-3.5 w-3.5 text-gray-600" />
-                  <span className="text-gray-600" data-testid="company-address">
-                    {location}
-                  </span>
-                </p>
-              )}
-              {tel && (
-                <p className="flex items-center gap-x-2">
-                  <Phone className="h-3.5 w-3.5 text-gray-600" />
-                  <span className="text-gray-600" data-testid="company-tel">
-                    {tel}
-                  </span>
-                </p>
-              )}
+              <p className="flex items-center gap-x-2">
+                <MapPin className="h-3.5 w-3.5 text-gray-600" />
+                <span className="text-gray-600" data-testid="company-address">
+                  {company.address}
+                </span>
+              </p>
+              <p className="flex items-center gap-x-2">
+                <Phone className="h-3.5 w-3.5 text-gray-600" />
+                <span className="text-gray-600" data-testid="company-tel">
+                  {company.tel}
+                </span>
+              </p>
             </div>
           </div>
 
           <div className="flex justify-end gap-4">
-            <Link href={FrontendRoutes.JOB_LISTINGS_ID({ jobId: id })}>
+            <Link
+              href={FrontendRoutes.JOB_LISTINGS_ID({ jobId: jobListing._id })}
+            >
               <Button
                 variant="default"
                 size="sm"
@@ -96,15 +86,19 @@ export function JobCardProfile({
             </Link>
 
             {(requestedUser?.role === "admin" ||
-              requestedUser?.role === "company") && (
-              <Link href={FrontendRoutes.JOB_LISTINGS_ID_EDIT({ jobId: id })}>
+              requestedUser?._id === company.owner) && (
+              <Link
+                href={FrontendRoutes.JOB_LISTINGS_ID_EDIT({
+                  jobId: jobListing._id,
+                })}
+              >
                 <Button variant="outline" size="sm">
                   Update Details
                 </Button>
               </Link>
             )}
             {(requestedUser?.role === "admin" ||
-              requestedUser?.role === "company") && (
+              requestedUser?._id === company.owner) && (
               <Button
                 data-testid="job-card-delete-button"
                 variant="destructive"
@@ -112,7 +106,7 @@ export function JobCardProfile({
                 disabled={
                   !(
                     requestedUser.role === "admin" ||
-                    requestedUser.role === "company"
+                    requestedUser?._id === company.owner
                   )
                 }
                 onClick={() => onDeleteDialogOpen()}
@@ -128,7 +122,7 @@ export function JobCardProfile({
         isOpen={isDeleteDialogOpen}
         isPending={isDeletePending}
         onClose={() => onDeleteDialogClose()}
-        onDelete={() => onDelete(id)}
+        onDelete={() => onDelete(jobListing._id)}
       />
     </>
   );
