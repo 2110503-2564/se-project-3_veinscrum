@@ -325,7 +325,7 @@ export default function Chat() {
         <div className="flex justify-end">
           {/* Debug info */}
           <div className="mr-2 text-xs text-gray-500">
-            Role: {me?.role}, Has user: {interviewSession?.user ? "yes" : "no"}
+            {/* Role: {me?.role}, Has user: {interviewSession?.user ? "yes" : "no"} */}
             {isLoadingSession && " (Loading...)"}
           </div>
 

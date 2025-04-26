@@ -20,6 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/shadcn/dropdown-menu";
 import { InterviewSessionCardInfo } from "./InterviewSessionCardInfo";
+import { useRouter } from "next/navigation";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 
 interface FlagUserCardProps {
   interviewSessions: Array<InterviewSession>;
@@ -28,6 +30,7 @@ interface FlagUserCardProps {
 export const FlagUserCard: React.FC<FlagUserCardProps> = ({
   interviewSessions,
 }) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const jobListing = interviewSessions[0].jobListing;
 
@@ -133,7 +136,7 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                           <DropdownMenuContent align="end" className="w-32">
                             <DropdownMenuItem
                               onSelect={() =>
-                                alert(`Chat with ${interviewSession.user.name}`)
+                                router.push(FrontendRoutes.CHAT_SESSION({sessionId:interviewSession._id}))
                               }
                               className="text-sm"
                             >
