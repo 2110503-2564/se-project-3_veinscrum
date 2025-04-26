@@ -12,13 +12,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/shadcn/dropdown-menu";
+import { Input } from "@/components/ui/shadcn/input";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { env } from "@/env/client";
 import { axios } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { EllipsisIcon, StarIcon } from "lucide-react";
+import {
+  Building,
+  EllipsisIcon,
+  MessagesSquare,
+  Star,
+  User,
+  Wrench,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -248,16 +256,16 @@ export default function Chat() {
 
     const roleStyles =
       {
-        admin: "text-red-500 font-semibold",
-        company: "text-indigo-500 font-semibold",
-        user: "text-blue-500 font-semibold",
+        admin: "text-nigga-500 font-semibold",
+        company: "text-black-500 font-semibold",
+        user: "text-black-500 font-semibold",
       }[msg.sender.role] ?? "text-gray-500";
 
     const roleEmoji =
       {
-        admin: "🛠️",
-        company: "🏢",
-        user: "🙋",
+        admin: <Wrench className="h-4 w-4" />,
+        company: <Building className="h-4 w-4" />,
+        user: <User className="h-4 w-4" />,
       }[msg.sender.role] ?? "";
 
     return (
@@ -269,14 +277,17 @@ export default function Chat() {
           className={cn(
             "max-w-[70%] space-y-1 rounded-xl px-4 py-3 text-sm break-all shadow",
             isMe
-              ? "rounded-br-none bg-blue-100 text-gray-800"
+              ? "rounded-br-none bg-gray-100 text-gray-800"
               : "rounded-bl-none bg-gray-100 text-gray-800",
           )}
         >
           <div className="flex justify-between gap-3">
             <div className="flex gap-1">
               <p
-                className={cn(roleStyles, "text-md font-extrabold capitalize")}
+                className={cn(
+                  roleStyles,
+                  "text-md flex gap-1 font-extrabold capitalize",
+                )}
               >
                 {roleEmoji} {msg.sender.role}
               </p>
@@ -320,7 +331,9 @@ export default function Chat() {
   return (
     <div className="mx-auto max-w-xl p-6">
       <div className="grid grid-cols-2 items-center gap-5">
-        <h2 className="text-left text-2xl font-semibold">💬 Chat</h2>
+        <h2 className="flex gap-1 text-left text-2xl font-semibold">
+          <MessagesSquare className="h-8 w-8" /> Chat
+        </h2>
 
         <div className="flex justify-end">
           {/* Debug info */}
@@ -340,9 +353,9 @@ export default function Chat() {
               {isLoadingSession ? (
                 <div className="animate-spin">⌛</div>
               ) : flagId ? (
-                <StarIcon className="fill-yellow-400 text-yellow-400" />
+                <Star className="fill-yellow-400 text-yellow-400" />
               ) : (
-                <StarIcon className="text-gray-400" />
+                <Star className="text-gray-400" />
               )}
             </Button>
           )}
@@ -361,15 +374,21 @@ export default function Chat() {
         }}
         className="mt-4 flex gap-2"
       >
-        <input
+        <Input
           ref={inputRef}
           type="text"
           placeholder="Type a message..."
-          className="flex-grow rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          className="flex-grow"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              console.log("Sending message:", inputRef.current?.value);
+            }
+          }}
         />
+
         <button
           type="submit"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+          className="rounded-lg bg-black px-4 py-2 text-white transition hover:bg-gray-800"
         >
           Send
         </button>
