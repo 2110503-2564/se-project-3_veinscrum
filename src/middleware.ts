@@ -36,7 +36,6 @@ const companyRoutes = [
   FrontendRouteTargets.CHAT_SESSION,
   FrontendRouteTargets.COMPANY_CREATE,
   FrontendRouteTargets.SESSION_LIST,
-
 ];
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
