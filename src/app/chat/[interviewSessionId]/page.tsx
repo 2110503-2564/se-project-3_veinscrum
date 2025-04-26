@@ -158,10 +158,19 @@ export default function Chat() {
       ),
     onMutate: () =>
       toast.loading("Updating message...", { id: "update-chat-message" }),
-    onSuccess: () => {
+    onSuccess: (_res, variables) => {
       toast.success("Message updated", { id: "update-chat-message" });
       setIsEditOpen(false);
       setSelectedMessage(null);
+
+      // 🛠 Update the message immediately
+      setMessages((prevMessages) =>
+        prevMessages.map((m) =>
+          m._id === variables.messageId
+            ? { ...m, content: variables.content }
+            : m,
+        ),
+      );
     },
     onError: (error) => {
       toast.error("Failed to update message", {
