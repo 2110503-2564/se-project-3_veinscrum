@@ -8,15 +8,10 @@ import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  CalendarIcon,
-  EllipsisIcon,
-  MailIcon,
-  PhoneIcon,
-  StarIcon,
-} from "lucide-react";
+import { CalendarIcon, EllipsisIcon, MailIcon, PhoneIcon } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
+import { FlagButton } from "../input/FlagButton";
 import { Button } from "../ui/CustomButton";
 import {
   DropdownMenu,
@@ -113,10 +108,8 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                   className="border-input flex w-full justify-between rounded-sm border-1 p-4 shadow-sm"
                 >
                   <div className="w-full space-y-2">
-                    <div className="flex w-full items-center gap-2">
-                      {isFlagged && (
-                        <StarIcon className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      )}
+                    <div className="flex w-full items-center gap-1">
+                      <FlagButton starred={isFlagged} setStarred={() => {}} />
                       <div className="flex w-full items-center justify-between">
                         <h1
                           className={cn(
@@ -129,7 +122,11 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button disabled={isUnflagging} variant="ghost">
+                            <Button
+                              disabled={isUnflagging}
+                              variant="ghost"
+                              className="h-fit rounded-full p-1"
+                            >
                               <EllipsisIcon className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -159,7 +156,7 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                       </div>
                     </div>
 
-                    <div className="space-y-1 text-sm text-gray-600">
+                    <div className="ml-2 space-y-1 text-sm text-gray-600">
                       <InterviewSessionCardInfo
                         icon={MailIcon}
                         text={interviewSession.user.email}
