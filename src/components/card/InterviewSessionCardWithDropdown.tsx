@@ -4,6 +4,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/shadcn/dropdown-menu";
 import { EllipsisIcon } from "lucide-react";
+import React from "react";
 
 interface InterviewSessionCardWithDropdownProps {
   title: string;
