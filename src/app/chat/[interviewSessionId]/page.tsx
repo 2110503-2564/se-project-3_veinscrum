@@ -21,11 +21,15 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import {
   Building,
-  EllipsisIcon,
+  BuildingIcon,
+  EllipsisVerticalIcon,
   MessagesSquare,
   Star,
+  StarIcon,
   User,
+  UserIcon,
   Wrench,
+  WrenchIcon,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
@@ -175,7 +179,6 @@ export default function Chat() {
       setIsEditOpen(false);
       setSelectedMessage(null);
 
-      // 🛠 Update the message immediately
       setMessages((prevMessages) =>
         prevMessages.map((m) =>
           m._id === variables.messageId
@@ -250,53 +253,49 @@ export default function Chat() {
     }
   };
 
+  const roleStylesMap = {
+    admin: "text-nigga-500 font-semibold",
+    company: "text-black-500 font-semibold",
+    user: "text-black-500 font-semibold",
+  } as const;
+
+  const roleEmojis = {
+    admin: <WrenchIcon className="h-4 w-4" />,
+    company: <BuildingIcon className="h-4 w-4" />,
+    user: <UserIcon className="h-4 w-4" />,
+  } as const;
+
   const renderMessage = (msg: Message, index: number) => {
     const isMe = String(msg.sender._id) === String(me?._id);
+    const previousSenderId = index > 0 ? messages[index - 1].sender._id : null;
+    const isDifferent = msg.sender._id !== previousSenderId;
 
-    const roleStyles =
-      {
-        admin: "text-nigga-500 font-semibold",
-        company: "text-black-500 font-semibold",
-        user: "text-black-500 font-semibold",
-      }[msg.sender.role] ?? "text-gray-500";
-
-    const roleEmoji =
-      {
-        admin: <Wrench className="h-4 w-4" />,
-        company: <Building className="h-4 w-4" />,
-        user: <User className="h-4 w-4" />,
-      }[msg.sender.role] ?? "";
+    const roleStyle = roleStylesMap[msg.sender.role] ?? "text-gray-500";
+    const roleEmoji = roleEmojis[msg.sender.role];
 
     return (
       <div
-        key={index}
-        className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+        key={msg._id}
+        className={cn("flex", isMe ? "justify-end" : "justify-start")}
       >
         <div
-          className={cn(
-            "max-w-[70%] space-y-1 rounded-xl px-4 py-3 text-sm break-all shadow",
-            isMe
-              ? "rounded-br-none bg-gray-100 text-gray-800"
-              : "rounded-bl-none bg-gray-100 text-gray-800",
-          )}
+          className={cn("flex flex-col", isMe ? "items-end" : "items-start")}
         >
-          <div className="flex justify-between gap-3">
-            <div className="flex gap-1">
-              <p
-                className={cn(
-                  roleStyles,
-                  "text-md flex gap-1 font-extrabold capitalize",
-                )}
-              >
-                {roleEmoji} {msg.sender.role}
-              </p>
-              <p className={cn(roleStyles, "mb-1")}>{msg.sender.name}</p>
+          {isDifferent && (
+            <div className="mb-1 flex items-center gap-1">
+              <span className={roleStyle}>{roleEmoji}</span>
+              <span className={cn(roleStyle, "text-sm font-bold capitalize")}>
+                {msg.sender.name}
+              </span>
             </div>
+          )}
+
+          <div className="group flex items-center gap-1">
             {isMe && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-0">
-                    <EllipsisIcon size={16} />
+                  <button className="invisible rounded p-1 transition group-hover:visible hover:bg-gray-200">
+                    <EllipsisVerticalIcon size={16} className="text-gray-500" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -309,7 +308,7 @@ export default function Chat() {
                     Edit Message
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="text-red-600 focus:text-red-600"
+                    className="text-red-600"
                     onClick={() => {
                       setSelectedMessage(msg);
                       setIsDeleteOpen(true);
@@ -320,48 +319,58 @@ export default function Chat() {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
+
+            <div
+              className={cn(
+                "max-w-xs rounded-xl p-3 text-sm break-words shadow",
+                isMe
+                  ? "rounded-br-none bg-black text-white"
+                  : "rounded-bl-none bg-gray-100 text-gray-900",
+              )}
+            >
+              {msg.content}
+            </div>
           </div>
-          <p>{msg.content}</p>
         </div>
       </div>
     );
   };
-
   return (
-    <div className="mx-auto max-w-xl p-6">
-      <div className="grid grid-cols-2 items-center gap-5">
-        <h2 className="flex gap-1 text-left text-2xl font-semibold">
-          <MessagesSquare className="h-8 w-8" /> Chat
+    <div
+      className={cn(
+        "mx-auto flex flex-col p-6",
+        "h-[calc(100vh-80px)] max-w-3xl",
+      )}
+    >
+      {/* 80px is example navbar height */}
+      <div className={cn("mb-2 flex items-center justify-between")}>
+        <h2 className={cn("flex items-center gap-2 text-2xl font-semibold")}>
+          <MessagesSquare className="h-8 w-8" />
+          Chat
         </h2>
 
-        <div className="flex justify-end">
-          {/* Debug info */}
-          <div className="mr-2 text-xs text-gray-500">
-            {/* Role: {me?.role}, Has user: {interviewSession?.user ? "yes" : "no"} */}
-            {isLoadingSession && " (Loading...)"}
-          </div>
-
-          {me?.role === "company" && interviewSession?.user && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleStar}
-              disabled={isLoadingSession}
-              title={flagId ? "Unflag this user" : "Flag this user"}
-            >
-              {isLoadingSession ? (
-                <div className="animate-spin">⌛</div>
-              ) : flagId ? (
-                <Star className="fill-yellow-400 text-yellow-400" />
-              ) : (
-                <Star className="text-gray-400" />
-              )}
-            </Button>
-          )}
-        </div>
+        {me?.role === "company" && interviewSession?.user && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleStar}
+            disabled={isLoadingSession}
+          >
+            {flagId ? (
+              <StarIcon className="fill-yellow-400 text-yellow-400" />
+            ) : (
+              <StarIcon className="text-gray-400" />
+            )}
+          </Button>
+        )}
       </div>
 
-      <div className="h-96 space-y-2 overflow-y-scroll rounded-lg border bg-white p-4 shadow-sm">
+      <div
+        className={cn(
+          "flex-1 overflow-y-auto rounded-lg border bg-white shadow-inner",
+          "space-y-2 p-4 px-8 pt-8",
+        )}
+      >
         {messages.map(renderMessage)}
         <div ref={messagesEndRef} />
       </div>
@@ -371,23 +380,20 @@ export default function Chat() {
           e.preventDefault();
           sendMessage();
         }}
-        className="mt-4 flex gap-2"
+        className={cn("mt-4 flex gap-2")}
       >
         <Input
           ref={inputRef}
           type="text"
           placeholder="Type a message..."
           className="flex-grow"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              console.log("Sending message:", inputRef.current?.value);
-            }
-          }}
         />
-
         <button
           type="submit"
-          className="rounded-lg bg-black px-4 py-2 text-white transition hover:bg-gray-800"
+          className={cn(
+            "rounded-lg bg-black px-4 py-2 text-white",
+            "hover:bg-gray-800",
+          )}
         >
           Send
         </button>
@@ -395,8 +401,8 @@ export default function Chat() {
 
       {selectedMessage && (
         <EditChatMessageDialog
-          message={selectedMessage}
           isPending={isUpdating}
+          message={selectedMessage}
           isOpen={isEditOpen}
           setIsOpen={setIsEditOpen}
           onUpdate={(data) =>
