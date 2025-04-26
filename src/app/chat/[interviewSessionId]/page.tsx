@@ -138,11 +138,15 @@ export default function Chat() {
     socket.on("chat-deleted", ({ messageId }) =>
       setMessages((prev) => prev.filter((m) => m._id !== messageId)),
     );
-
     socket.on("chat-history", (msgs) => setMessages(msgs));
     socket.on("chat-error", ({ error }) => {
       toast.error("Chat error", { id: "chat-error", description: error });
     });
+
+    return () => {
+      console.log("Disconnecting socket...");
+      socket.disconnect();
+    };
   };
 
   const { mutate: updateChatMessage, isPending: isUpdating } = useMutation({
@@ -200,7 +204,7 @@ export default function Chat() {
   useEffect(() => {
     if (status !== "authenticated" || me?.role !== "company") return;
 
-    if (status == "authenticated" && interviewSession) {
+    if (interviewSession) {
       axios
         .get(BackendRoutes.FLAGS, {
           params: {
@@ -216,7 +220,7 @@ export default function Chat() {
         })
         .catch(console.error);
     }
-  }, [status, interviewSession]);
+  }, [status, interviewSession, me?.role]);
 
   const sendMessage = () => {
     const msg = inputRef.current?.value;
