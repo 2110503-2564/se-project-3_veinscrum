@@ -167,7 +167,6 @@ export default function Chat() {
       setIsEditOpen(false);
       setSelectedMessage(null);
 
-      // 🛠 Update the message immediately
       setMessages((prevMessages) =>
         prevMessages.map((m) =>
           m._id === variables.messageId
@@ -209,7 +208,6 @@ export default function Chat() {
   useEffect(scrollToBottom, [messages]);
   useEffect(setupSocket, [status, session?.token, interviewSessionId]);
 
-  // Check if user is already flagged
   useEffect(() => {
     if (status !== "authenticated" || me?.role !== "company") return;
 
@@ -226,7 +224,6 @@ export default function Chat() {
             user: { _id: string };
           }>;
 
-          // หา flag ที่ user._id ตรงกับ interviewSession.user._id
           const matchedFlag = flags.find(
             (flag) =>
               String(flag.user._id) === String(interviewSession.user._id),
@@ -331,9 +328,7 @@ export default function Chat() {
         <h2 className="text-left text-2xl font-semibold">💬 Chat</h2>
 
         <div className="flex justify-end">
-          {/* Debug info */}
           <div className="mr-2 text-xs text-gray-500">
-            {/* Role: {me?.role}, Has user: {interviewSession?.user ? "yes" : "no"} */}
             {isLoadingSession && " (Loading...)"}
           </div>
 
