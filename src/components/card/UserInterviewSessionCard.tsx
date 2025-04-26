@@ -5,22 +5,26 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/shadcn/dropdown-menu";
 import { CalendarIcon, PhoneIcon } from "lucide-react";
+import { Button } from "../ui/shadcn/button";
 import { InterviewSessionCardInfo } from "./InterviewSessionCardInfo";
 import { InterviewSessionCardWithDropdown } from "./InterviewSessionCardWithDropdown";
 
 interface UserInterviewSessionCardProps {
   interviewSession: InterviewSession;
-  onChat?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onChat?: () => void;
 }
 
 export const UserInterviewSessionCard: React.FC<
   UserInterviewSessionCardProps
-> = ({ interviewSession, onChat, onEdit, onDelete }) => {
+> = ({ interviewSession, onEdit, onDelete, onChat }) => {
   const dropdownContent = (
     <DropdownMenuContent>
       <DropdownMenuLabel>Interview Session</DropdownMenuLabel>
+      {/* <DropdownMenuItem variant="default" disabled={!onChat} onClick={onChat}>
+        Chat
+      </DropdownMenuItem> */}
       <DropdownMenuSeparator />
       <DropdownMenuItem disabled={!onChat} onClick={onChat}>
         Chat
@@ -43,6 +47,18 @@ export const UserInterviewSessionCard: React.FC<
       title={interviewSession.jobListing.company.name}
       description={interviewSession.jobListing.company.description}
       dropdownContent={dropdownContent}
+      topRightElement={
+        <div className="flex justify-end gap-2">
+          <Button
+            className="bg-black text-white hover:bg-zinc-800 hover:text-white"
+            variant="outline"
+            size="sm"
+            onClick={onChat}
+          >
+            Start chat
+          </Button>
+        </div>
+      }
     >
       <InterviewSessionCardInfo
         icon={PhoneIcon}

@@ -7,6 +7,7 @@ import {
   EditInterviewSessionFormSchema,
 } from "@/components/dialog/EditInterviewSessionDialog";
 import { BackendRoutes } from "@/constants/routes/Backend";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import {
   useMutation,
@@ -21,9 +22,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export default function UserInterviewSessionsPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { status } = useSession();
-  const router = useRouter();
   const [interviewSessionToDelete, setInterviewSessionToDelete] =
     useState<Nullable<InterviewSession>>(null);
   const [interviewSessionToUpdate, setInterviewSessionToUpdate] =
@@ -166,7 +167,14 @@ export default function UserInterviewSessionsPage() {
               interviewSession={interviewSession}
               onDelete={() => setInterviewSessionToDelete(interviewSession)}
               onEdit={() => setInterviewSessionToUpdate(interviewSession)}
-              onChat={() => router.push(`/chat/${interviewSession._id}`)}
+             
+              onChat={() =>
+                router.push(
+                  FrontendRoutes.CHAT_SESSION({
+                    sessionId: interviewSession._id,
+                  }),
+                )
+              }
             />
           ))
         )}

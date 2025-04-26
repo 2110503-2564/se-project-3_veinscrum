@@ -18,6 +18,7 @@ export enum BackendRouteTargets {
   ADMIN_COMPANY = "/admin/companies",
   JOB_LISTINGS = "/job-listings",
   JOB_LISTINGS_ID = "/job-listings/{id}",
+  CHAT_ID_ID = "/chats/{interviewSessionId}/{messageId}",
   FLAGS = "/flags",
   FLAGS_ID = "/flags/{id}",
 }
