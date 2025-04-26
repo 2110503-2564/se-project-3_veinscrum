@@ -1,16 +1,15 @@
+import { InterviewSessionWithFlag } from "@/app/session/@company/page";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/shadcn/accordion";
-import { BackendRoutes } from "@/constants/routes/Backend";
-import { axios } from "@/lib/axios";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { cn } from "@/lib/utils";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarIcon, EllipsisIcon, MailIcon, PhoneIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
-import { toast } from "sonner";
 import { FlagButton } from "../input/FlagButton";
 import { Button } from "../ui/CustomButton";
 import {
@@ -20,67 +19,20 @@ import {
   DropdownMenuTrigger,
 } from "../ui/shadcn/dropdown-menu";
 import { InterviewSessionCardInfo } from "./InterviewSessionCardInfo";
-import { useRouter } from "next/navigation";
-import { FrontendRoutes } from "@/constants/routes/Frontend";
 
 interface FlagUserCardProps {
-  interviewSessions: Array<InterviewSession>;
+  interviewSessions: Array<InterviewSessionWithFlag>;
+  isToggleStartPending: boolean;
+  toggleStar: (data: { user: string; jobListing: string }, flag?: Flag) => void;
 }
 
 export const FlagUserCard: React.FC<FlagUserCardProps> = ({
   interviewSessions,
+  isToggleStartPending,
+  toggleStar,
 }) => {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const jobListing = interviewSessions[0].jobListing;
-
-  // Fetch flags for this job listing
-  const { data: flags } = useQuery({
-    queryKey: [BackendRoutes.FLAGS, jobListing._id],
-    queryFn: async () => {
-      const response = await axios.get<GETFlagsByJobListingResponse>(
-        BackendRoutes.JOB_LISTINGS_ID_FLAGS({ id: jobListing._id }),
-      );
-
-      console.log("Fetched flags:", {
-        jobListing: jobListing._id,
-        flags: response.data.data,
-      });
-
-      return response.data.data;
-    },
-  });
-
-  const { mutate: unflagUser, isPending: isUnflagging } = useMutation({
-    mutationFn: async (userId: string) => {
-      // Find the flag ID for this user and job listing
-      const flag = flags?.find((f) => {
-        const userMatch = String(f.user) === String(userId);
-        const jobMatch = String(f.jobListing) === String(jobListing._id);
-        return userMatch && jobMatch;
-      });
-
-      console.log("Found flag:", flag);
-
-      if (!flag) {
-        throw new Error("Flag not found");
-      }
-      await axios.delete(BackendRoutes.FLAGS_ID({ id: flag._id }));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [BackendRoutes.COMPANIES_ID_SESSIONS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [BackendRoutes.FLAGS],
-      });
-      toast.success("User unflagged successfully");
-    },
-    onError: (error) => {
-      console.error("Failed to unflag user:", error);
-      toast.error("Failed to unflag user. Please try again.");
-    },
-  });
 
   return (
     <Accordion type="single" collapsible>
@@ -97,14 +49,8 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
         </AccordionTrigger>
 
         <AccordionContent className="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden border-t border-gray-100 px-6 py-4">
-          {" "}
           <div className="space-y-4">
             {interviewSessions.map((interviewSession, idx) => {
-              const userFlag = flags?.find(
-                (f) => String(f.user) === String(interviewSession.user._id),
-              );
-              const isFlagged = !!userFlag;
-
               return (
                 <div
                   key={idx}
@@ -112,12 +58,24 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                 >
                   <div className="w-full space-y-2">
                     <div className="flex w-full items-center gap-1">
-                      <FlagButton starred={isFlagged} setStarred={() => {}} />
+                      <FlagButton
+                        starred={interviewSession.flag ? true : false}
+                        disabled={isToggleStartPending}
+                        setStarred={() =>
+                          toggleStar(
+                            {
+                              user: interviewSession.user._id,
+                              jobListing: jobListing._id,
+                            },
+                            interviewSession.flag,
+                          )
+                        }
+                      />
                       <div className="flex w-full items-center justify-between">
                         <h1
                           className={cn(
                             "text-md font-bold",
-                            isFlagged && "text-yellow-600",
+                            interviewSession.flag && "text-yellow-600",
                           )}
                         >
                           {interviewSession.user.name}
@@ -126,7 +84,7 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
-                              disabled={isUnflagging}
+                              disabled={isToggleStartPending}
                               variant="ghost"
                               className="h-fit rounded-full p-1"
                             >
@@ -136,24 +94,28 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                           <DropdownMenuContent align="end" className="w-32">
                             <DropdownMenuItem
                               onSelect={() =>
-                                router.push(FrontendRoutes.CHAT_SESSION({sessionId:interviewSession._id}))
+                                router.push(
+                                  FrontendRoutes.CHAT_SESSION({
+                                    sessionId: interviewSession._id,
+                                  }),
+                                )
                               }
                               className="text-sm"
                             >
                               Chat
                             </DropdownMenuItem>
-                            {isFlagged && (
-                              <DropdownMenuItem
-                                onSelect={() => {
-                                  unflagUser(interviewSession.user._id);
-                                }}
-                                disabled={isUnflagging}
-                                variant="destructive"
-                                className="text-sm text-red-600"
-                              >
-                                {isUnflagging ? "Unflagging..." : "Unflag"}
-                              </DropdownMenuItem>
-                            )}
+                            {/* {isFlagged && ( */}
+                            {/*   <DropdownMenuItem */}
+                            {/*     onSelect={() => { */}
+                            {/*       unflagUser(interviewSession.user._id); */}
+                            {/*     }} */}
+                            {/*     disabled={isUnflagging} */}
+                            {/*     variant="destructive" */}
+                            {/*     className="text-sm text-red-600" */}
+                            {/*   > */}
+                            {/*     {isUnflagging ? "Unflagging..." : "Unflag"} */}
+                            {/*   </DropdownMenuItem> */}
+                            {/* )} */}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>

@@ -18,7 +18,7 @@ import { axios } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { EllipsisIcon, Star } from "lucide-react";
+import { EllipsisIcon, StarIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -340,9 +340,9 @@ export default function Chat() {
               {isLoadingSession ? (
                 <div className="animate-spin">⌛</div>
               ) : flagId ? (
-                <Star className="fill-yellow-400 text-yellow-400" />
+                <StarIcon className="fill-yellow-400 text-yellow-400" />
               ) : (
-                <Star className="text-gray-400" />
+                <StarIcon className="text-gray-400" />
               )}
             </Button>
           )}
