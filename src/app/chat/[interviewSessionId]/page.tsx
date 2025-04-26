@@ -202,10 +202,19 @@ export default function Chat() {
       axios.delete(BackendRoutes.CHAT_ID_ID({ interviewSessionId, messageId })),
     onMutate: () =>
       toast.loading("Deleting message...", { id: "delete-chat-message" }),
-    onSuccess: () => {
+    onSuccess: (_res, variables) => {
       toast.success("Message deleted", { id: "delete-chat-message" });
+
       setIsDeleteOpen(false);
       setSelectedMessage(null);
+
+      // ลบข้อความออกจาก state
+      setMessages((prevMessages) =>
+        prevMessages.filter((m) => m._id !== variables.messageId),
+      );
+
+      // scroll ลงล่างสุด
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     },
     onError: (error) => {
       toast.error("Failed to delete message", {
