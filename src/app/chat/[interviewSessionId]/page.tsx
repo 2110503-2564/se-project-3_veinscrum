@@ -61,35 +61,22 @@ export default function Chat() {
   const { data: interviewSession, isLoading: isLoadingSession } = useQuery({
     queryKey: ["interview-session", interviewSessionId],
     queryFn: async () => {
-      console.log("Fetching interview session:", interviewSessionId);
       const response = await axios.get(
         BackendRoutes.SESSIONS_ID({ id: interviewSessionId }),
       );
-      console.log("Interview session response:", response.data);
       return response;
     },
     enabled: status === "authenticated",
     select: (res) => res?.data?.data,
   });
 
-  // Debug logs
-  useEffect(() => {
-    console.log("Current user role:", me?.role);
-    console.log("Interview session:", interviewSession);
-    console.log("Auth status:", status);
-  }, [me?.role, interviewSession, status]);
-
   const { mutate: createFlag } = useMutation({
     mutationFn: async () => {
-      console.log("Creating flag with:", {
-        user: interviewSession?.user?._id,
-        jobListing: interviewSession?.jobListing?._id,
-      });
       const response = await axios.post(BackendRoutes.FLAGS, {
         user: interviewSession?.user?._id,
         jobListing: interviewSession?.jobListing?._id,
       });
-      console.log("Create flag response:", response.data);
+
       return response.data.data;
     },
     onSuccess: (data) => {
@@ -109,7 +96,7 @@ export default function Chat() {
   const { mutate: deleteFlag } = useMutation({
     mutationFn: async () => {
       if (!flagId) return;
-      console.log("Deleting flag:", flagId);
+
       await axios.delete(BackendRoutes.FLAGS_ID({ id: flagId }));
     },
     onSuccess: () => {
@@ -127,7 +114,6 @@ export default function Chat() {
   });
 
   const toggleStar = () => {
-    console.log("Toggle star clicked. Current flagId:", flagId);
     if (flagId) {
       deleteFlag();
     } else {
@@ -141,8 +127,6 @@ export default function Chat() {
 
   const setupSocket = () => {
     if (status !== "authenticated" || !session?.token) return;
-
-    console.log(env.NEXT_PUBLIC_WS_BASE_URL);
 
     const socket = io(env.NEXT_PUBLIC_WS_BASE_URL, {
       auth: { token: session.token },
@@ -162,11 +146,15 @@ export default function Chat() {
     socket.on("chat-deleted", ({ messageId }) =>
       setMessages((prev) => prev.filter((m) => m._id !== messageId)),
     );
-
     socket.on("chat-history", (msgs) => setMessages(msgs));
     socket.on("chat-error", ({ error }) => {
       toast.error("Chat error", { id: "chat-error", description: error });
     });
+
+    return () => {
+      console.log("Disconnecting socket...");
+      socket.disconnect();
+    };
   };
 
   const { mutate: updateChatMessage, isPending: isUpdating } = useMutation({
@@ -182,10 +170,19 @@ export default function Chat() {
       ),
     onMutate: () =>
       toast.loading("Updating message...", { id: "update-chat-message" }),
-    onSuccess: () => {
+    onSuccess: (_res, variables) => {
       toast.success("Message updated", { id: "update-chat-message" });
       setIsEditOpen(false);
       setSelectedMessage(null);
+
+      // 🛠 Update the message immediately
+      setMessages((prevMessages) =>
+        prevMessages.map((m) =>
+          m._id === variables.messageId
+            ? { ...m, content: variables.content }
+            : m,
+        ),
+      );
     },
     onError: (error) => {
       toast.error("Failed to update message", {
@@ -222,7 +219,9 @@ export default function Chat() {
 
   // Check if user is already flagged
   useEffect(() => {
-    if (status === "authenticated" && interviewSession) {
+    if (status !== "authenticated" || me?.role !== "company") return;
+
+    if (interviewSession) {
       axios
         .get(BackendRoutes.FLAGS, {
           params: {
@@ -238,7 +237,7 @@ export default function Chat() {
         })
         .catch(console.error);
     }
-  }, [status, interviewSession]);
+  }, [status, interviewSession, me?.role]);
 
   const sendMessage = () => {
     const msg = inputRef.current?.value;
