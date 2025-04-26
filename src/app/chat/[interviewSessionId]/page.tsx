@@ -220,22 +220,29 @@ export default function Chat() {
   useEffect(scrollToBottom, [messages]);
   useEffect(setupSocket, [status, session?.token, interviewSessionId]);
 
-  // Check if user is already flagged
   useEffect(() => {
     if (status !== "authenticated" || me?.role !== "company") return;
 
     if (interviewSession) {
       axios
-        .get(BackendRoutes.FLAGS, {
-          params: {
-            user: interviewSession.user._id,
-            jobListing: interviewSession.jobListing._id,
-          },
-        })
+        .get(
+          BackendRoutes.JOB_LISTINGS_ID_FLAGS({
+            id: interviewSession.jobListing._id,
+          }),
+        )
         .then((response) => {
-          const flags = response.data.data;
-          if (flags && flags.length > 0) {
-            setFlagId(flags[0]._id);
+          const flags = response.data.data as Array<{
+            _id: string;
+            user: { _id: string };
+          }>;
+
+          const matchedFlag = flags.find(
+            (flag) =>
+              String(flag.user._id) === String(interviewSession.user._id),
+          );
+
+          if (matchedFlag) {
+            setFlagId(matchedFlag._id);
           }
         })
         .catch(console.error);
