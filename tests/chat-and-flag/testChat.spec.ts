@@ -5,7 +5,6 @@ import { faker } from "@faker-js/faker";
 import { expect, Page, test } from "@playwright/test";
 import { signIn } from "../utils/signIn";
 import { signUp } from "../utils/signUp";
-import { use } from "react";
 
 test.describe("Chat ", () => {
   let companyPage: Page;
@@ -216,7 +215,7 @@ test.describe("Chat ", () => {
 
   test.describe.configure({ mode: "serial" });
 
-  test("US2-1.1: Users send messages to company", async ({ browser }) => {
+  test("US2-1A: Users send messages to company", async () => {
     // User sends a message to the company
     await userPage
       .getByPlaceholder("Type a message...")
@@ -233,7 +232,7 @@ test.describe("Chat ", () => {
     ).toBeVisible();
   });
 
-  test("US2-1.2: Refresh page should see full history", async ({ browser }) => {
+  test("US2-1B: Refresh page should see full history", async () => {
     // User sends a message to the company
     await userPage
       .getByPlaceholder("Type a message...")
@@ -254,7 +253,7 @@ test.describe("Chat ", () => {
     await expect(companyPage.getByText("sup bro, how are you?")).toBeVisible();
   });
 
-  test("US2-2.1: Users edit messages", async ({ browser }) => {
+  test("US2-2A: Users edit messages", async () => {
     // User sends a message to the company
     await userPage.getByPlaceholder("Type a message...").fill("ggez");
     await userPage.getByRole("button", { name: "Send" }).click();
@@ -290,7 +289,7 @@ test.describe("Chat ", () => {
     await expect(companyPage.getByText("Sorry bro")).toBeVisible();
   });
 
-  test("US2-2.2: Editing a message without changing", async ({ browser }) => {
+  test("US2-2B: Editing a message without changing", async () => {
     // User sends a message to the company
     await userPage.getByPlaceholder("Type a message...").fill("notedit");
     await userPage.getByRole("button", { name: "Send" }).click();
@@ -325,7 +324,7 @@ test.describe("Chat ", () => {
     await expect(companyPage.getByText("notedit")).toBeVisible();
   });
 
-  test("US2-3.1: Users delete messages", async ({ browser }) => {
+  test("US2-3A: Users delete messages", async () => {
     // User sends a message to the company
     await userPage
       .getByPlaceholder("Type a message...")
@@ -363,7 +362,7 @@ test.describe("Chat ", () => {
     ).not.toBeVisible();
   });
 
-  test("US2-3.2: Not logged in user clicking Delete", async ({ browser }) => {
+  test("US2-3B: Not logged in user clicking Delete", async () => {
     // User sends a message to the company
     await userPage
       .getByPlaceholder("Type a message...")
@@ -405,7 +404,7 @@ test.describe("Chat ", () => {
     await expect(userPage.getByText("not logged")).toBeVisible();
   });
 
-  test("US2-4.1: Company send messages to user", async ({ browser }) => {
+  test("US2-4A: Company send messages to user", async () => {
     // Company sends a message to the user
     await companyPage
       .getByPlaceholder("Type a message...")
@@ -418,7 +417,7 @@ test.describe("Chat ", () => {
     await expect(userPage.getByText("Hello, I am Big Boss.")).toBeVisible();
   });
 
-  test("US2-4.2: Company sending empty message", async ({ browser }) => {
+  test("US2-4B: Company sending empty message", async () => {
     // Company sends an empty message to the user
     await companyPage.getByRole("button", { name: "Send" }).click();
     await companyPage.waitForLoadState("networkidle");
@@ -432,7 +431,7 @@ test.describe("Chat ", () => {
     ).not.toBeVisible();
   });
 
-  test("US2-5.1: Company edit messages", async ({ browser }) => {
+  test("US2-5A: Company edit messages", async () => {
     // User sends a message to the company
     await companyPage
       .getByPlaceholder("Type a message...")
@@ -474,7 +473,7 @@ test.describe("Chat ", () => {
     ).toBeVisible();
   });
 
-  test("US2-5.2: Company editing a message without change", async ({ browser }) => {
+  test("US2-5B: Company editing a message without change", async () => {
     // Company sends a message to the company
     await companyPage.getByPlaceholder("Type a message...").fill("company not edit");
     await companyPage.getByRole("button", { name: "Send" }).click();
@@ -509,7 +508,7 @@ test.describe("Chat ", () => {
     await expect(userPage.getByText("company not edit")).toBeVisible();
   });
 
-  test("US2-6.1: Company delete messages", async ({ browser }) => {
+  test("US2-6A: Company delete messages", async () => {
     // Company sends a message to the user
     await companyPage
       .getByPlaceholder("Type a message...")
@@ -553,7 +552,7 @@ test.describe("Chat ", () => {
     ).not.toBeVisible();
   });
 
-  test("US2-6.2: Company not logged in clicking Delete", async ({ browser }) => {
+  test("US2-6B: Company not logged in clicking Delete", async () => {
     // Company sends a message to the company
     await companyPage
       .getByPlaceholder("Type a message...")

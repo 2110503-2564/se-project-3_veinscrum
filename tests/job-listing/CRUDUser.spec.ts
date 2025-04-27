@@ -62,6 +62,7 @@ test.describe("Job Listing CRUD", () => {
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(description);
+    await page.waitForTimeout(1000);
     await page.getByRole("button", { name: "Create" }).click();
 
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
@@ -113,7 +114,7 @@ test.describe("Job Listing CRUD", () => {
     });
   });
 
-  test("US1-9: User View Job Listings on a Company Profile", async () => {
+  test("US1-9A: User View Job Listings on a Company Profile", async () => {
     if (!jobId) {
       throw new Error("Job ID is not set");
     }

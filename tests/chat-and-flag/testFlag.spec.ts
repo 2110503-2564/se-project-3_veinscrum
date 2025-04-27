@@ -193,7 +193,7 @@ test.describe("Flag", () => {
   
     test.describe.configure({ mode: "serial" });
   
-    test("US2-7.1: Flag a user", async ({ browser }) => {
+    test("US2-7A: Flag a user", async () => {
       // Flag a user
       await companyPage.getByText(new RegExp(jobTitle, "i")).click();
   
@@ -218,7 +218,7 @@ test.describe("Flag", () => {
       await expect(titleLocator).toHaveClass(/text-yellow-600/);
     });
 
-    test("US2-7.2: Flag but not login as company", async ({ browser }) => {
+    test("US2-7B: Flag but not login as company", async () => {
       await notLoginPage.goto(withFrontendRoute(FrontendRoutes.HOME));
       await expect(notLoginPage.getByRole('link', { name: 'My Session' })).not.toBeVisible();
 
@@ -230,7 +230,7 @@ test.describe("Flag", () => {
 
     });
   
-    test("US2-8.1: Unflag a user", async ({ browser }) => {
+    test("US2-8A: Unflag a user", async () => {
       // Flag a user
       
       await companyPage.getByText(new RegExp(jobTitle, "i")).click();
@@ -281,7 +281,7 @@ test.describe("Flag", () => {
       await expect(titleLocatorAfterUnflag).not.toHaveClass(/text-yellow-600/);
     });
 
-    test("US2-8.2: Unflag but not login as company", async ({ browser }) => {
+    test("US2-8B: Unflag but not login as company", async () => {
       await notLoginPage.goto(withFrontendRoute(FrontendRoutes.HOME));
       await expect(notLoginPage.getByRole('link', { name: 'My Session' })).not.toBeVisible();
 
