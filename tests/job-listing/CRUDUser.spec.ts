@@ -125,4 +125,50 @@ test.describe("Job Listing CRUD", () => {
 
     await expect(page.getByRole("heading", { name: jobTitle })).toBeVisible();
   });
+  test("US1-9: User View Job Listings on Company Profile When None Exist", async () => {
+    const context = await page.context().browser()?.newContext();
+    if (!context) throw new Error("Could not create browser context");
+
+    const newPage = await context.newPage();
+
+    const { email: emptyCompanyEmail, password: emptyCompanyPassword } =
+      await signUp(newPage, "company");
+    await signIn(newPage, {
+      email: emptyCompanyEmail,
+      password: emptyCompanyPassword,
+    });
+
+    await newPage.getByTestId("auth-dropdown-menu-trigger").click();
+    await newPage.getByRole("menuitem", { name: "Create Company" }).click();
+    await newPage.waitForURL(withFrontendRoute(FrontendRoutes.COMPANY_CREATE));
+
+    const companyNameWithoutJobs = faker.company.name();
+    const address = faker.location.streetAddress();
+    const website = faker.internet.url();
+    const telephone = faker.phone.number({ style: "international" });
+    const description = faker.lorem.paragraph();
+
+    await newPage
+      .getByRole("textbox", { name: "Company Name" })
+      .fill(companyNameWithoutJobs);
+    await newPage.getByRole("textbox", { name: "Address" }).fill(address);
+    await newPage.getByRole("textbox", { name: "Website" }).fill(website);
+    await newPage.getByRole("textbox", { name: "Telephone" }).fill(telephone);
+    await newPage
+      .getByRole("textbox", { name: "editable markdown" })
+      .fill(description);
+    await newPage.getByRole("button", { name: "Create" }).click();
+
+    await newPage.waitForLoadState("networkidle");
+    const companyProfileUrl = newPage.url();
+
+    await newPage.getByTestId("auth-dropdown-menu-trigger").click();
+    await newPage.getByRole("menuitem", { name: "Logout" }).click();
+    await newPage.close();
+
+    await page.goto(companyProfileUrl);
+    await page.waitForLoadState("domcontentloaded");
+
+    await expect(page.getByTestId("job-listing-card")).toHaveCount(0);
+  });
 });
