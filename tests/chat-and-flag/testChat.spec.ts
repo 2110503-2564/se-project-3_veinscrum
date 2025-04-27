@@ -114,7 +114,8 @@ test.describe("Chat ", () => {
     await companyPage
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
-
+    await companyPage.waitForTimeout(1000);
+    
     const responsePromise = companyPage.waitForResponse(
       (response) =>
         response.url().includes(BackendRoutes.JOB_LISTINGS) &&

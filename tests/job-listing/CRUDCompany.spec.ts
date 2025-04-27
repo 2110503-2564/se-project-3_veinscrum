@@ -8,6 +8,7 @@ import { signUp } from "../utils/signUp";
 
 test.describe("Job Listing CRUD", () => {
   let page: Page;
+  let notLoginPage: Page;
   let jobId: string | undefined;
 
   const jobTitle = faker.person.jobTitle();
@@ -23,10 +24,17 @@ test.describe("Job Listing CRUD", () => {
 
   test.beforeAll(async ({ browser }) => {
     const context = await browser.newContext();
+    const notLogincontext = await browser.newContext();
+
     page = await context.newPage();
+    notLoginPage = await notLogincontext.newPage();
 
     const { email, password } = await signUp(page, "company");
     await signIn(page, {
+      email,
+      password,
+    });
+    await signIn(notLoginPage, {
       email,
       password,
     });
@@ -63,7 +71,7 @@ test.describe("Job Listing CRUD", () => {
     await page.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
   });
 
-  test("US1-5: Create Job Listing by Company", async () => {
+  test("US1-5A: Create Job Listing by Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
 
     await expect(
@@ -78,7 +86,7 @@ test.describe("Job Listing CRUD", () => {
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
-
+    await page.waitForTimeout(1000);
     const responsePromise = page.waitForResponse(
       (response) =>
         response.url().includes(BackendRoutes.JOB_LISTINGS) &&
@@ -94,7 +102,7 @@ test.describe("Job Listing CRUD", () => {
 
     jobId = response.data._id;
   });
-  test("US1-5: Create Job Listing by Company(fail)", async () => {
+  test("US1-5B: Create Job Listing by Company(fail)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
 
     await expect(
@@ -114,7 +122,7 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByText("Job Title is required")).toBeVisible();
   });
 
-  test("US1-6: View Job Listing by Company", async () => {
+  test("US1-6A: View Job Listing by Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
@@ -126,7 +134,29 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByText(jobTitle)).toBeVisible();
   });
 
-  test("US1-7: Edit Job Listing by Company", async () => {
+  test("US1-6B: View Job Listing by Company (fail)", async () => {
+    await notLoginPage.goto(withFrontendRoute(FrontendRoutes.HOME));
+
+    await notLoginPage.getByTestId('auth-dropdown-menu-trigger').click();
+    await notLoginPage.getByRole('menuitem', { name: 'Profile' }).click();
+    await notLoginPage.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
+    await notLoginPage.waitForLoadState("domcontentloaded");
+
+    await expect(notLoginPage.getByText(jobTitle)).toBeVisible();
+
+    await notLoginPage.getByTestId('auth-dropdown-menu-trigger').click();
+    await notLoginPage.getByRole('menuitem', { name: 'Logout' }).click();
+    await notLoginPage.waitForURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
+
+    await notLoginPage.getByRole('link', { name: 'Online Job Fair Registration' }).click();
+
+    await notLoginPage.goto(withFrontendRoute(FrontendRoutes.PROFILE));
+
+    await expect(notLoginPage.getByRole("heading", { name: "Sign in" }),
+    ).toBeVisible();
+  });
+
+  test("US1-7A: Edit Job Listing by Company", async () => {
     const newJobTitle = faker.person.jobTitle();
     const newJobDescription = faker.lorem.paragraph();
 
@@ -167,7 +197,7 @@ test.describe("Job Listing CRUD", () => {
     await submitButton.click();
   });
 
-  test("US1-7: Edit Job Listing by Company(fail)", async () => {
+  test("US1-7B: Edit Job Listing by Company(fail)", async () => {
     const newJobDescription = faker.lorem.paragraph();
 
     if (!jobId) {
@@ -207,7 +237,7 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByText("Job Title is required")).toBeVisible();
   });
 
-  test("US1-8: delete Job Listing by Company", async () => {
+  test("US1-8A: delete Job Listing by Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
@@ -217,6 +247,20 @@ test.describe("Job Listing CRUD", () => {
 
     await page.getByRole("button", { name: "Delete Details" }).click();
     await page.getByRole("button", { name: "Delete" }).click();
+    await expect(page.getByText("No job listings available.")).toBeVisible();
+  });
+
+  test("US1-8B: delete Job Listing by Company", async () => {
+    await page.goto(withFrontendRoute(FrontendRoutes.HOME));
+
+    await page.getByTestId("auth-dropdown-menu-trigger").click();
+    await page.getByRole("menuitem", { name: "Profile" }).click();
+
+    await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
+    await page.waitForLoadState("domcontentloaded");
+
+    await expect(page.getByRole("button", { name: "Delete Details" })).not.toBeVisible();
+    await expect(page.getByRole("button", { name: "Delete" })).not.toBeVisible();
     await expect(page.getByText("No job listings available.")).toBeVisible();
   });
 });
