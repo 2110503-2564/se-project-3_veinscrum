@@ -205,7 +205,7 @@ test.describe("Chat ", () => {
 
   test.describe.configure({ mode: "serial" });
 
-  test("US2-1: Users send messages to company", async ({ browser }) => {
+  test("US2-1.1: Users send messages to company", async ({ browser }) => {
     // User sends a message to the company
     await userPage
       .getByPlaceholder("Type a message...")
@@ -219,6 +219,35 @@ test.describe("Chat ", () => {
     ).toBeVisible();
     await expect(
       companyPage.getByText("Hello, I am interested in this job."),
+    ).toBeVisible();
+  });
+
+  test("US2-1.2: Refresh page should see full history", async ({ browser }) => {
+    // User sends a message to the company
+    await userPage
+      .getByPlaceholder("Type a message...")
+      .fill("sup bro, how are you?");
+    await userPage.getByRole("button", { name: "Send" }).click();
+    await userPage.waitForLoadState("networkidle");
+
+    // Verify the message is sent
+    await expect(
+      userPage.getByText("sup bro, how are you?"),
+    ).toBeVisible();
+    await expect(
+      companyPage.getByText("sup bro, how are you?"),
+    ).toBeVisible();
+
+    // User refresh the page
+    await userPage.reload();
+    await userPage.waitForLoadState("networkidle");
+
+    // Verify the message is still there
+    await expect(
+      userPage.getByText("sup bro, how are you?"),
+    ).toBeVisible();
+    await expect(
+      companyPage.getByText("sup bro, how are you?"),
     ).toBeVisible();
   });
 
@@ -260,9 +289,13 @@ test.describe("Chat ", () => {
       .fill("free robux click here");
     await userPage.getByRole("button", { name: "Send" }).click();
     await userPage.waitForLoadState("networkidle");
-    await expect(userPage.getByText("free robux click here")).toBeVisible();
 
-    // User edits the message
+    // Verify the message is sent
+    await expect(userPage.getByText("free robux click here")).toBeVisible();
+    await companyPage.reload();
+    await expect(companyPage.getByText("free robux click here")).toBeVisible();
+
+    // find the message container
     const messageContainer = userPage
       .locator("div.group", { hasText: /^free robux click here$/ })
       .first();
@@ -279,7 +312,7 @@ test.describe("Chat ", () => {
     await userPage.getByRole("button", { name: "Delete" }).click();
     await userPage.waitForLoadState("networkidle");
 
-    // Verify the message is updated
+    // Verify the message is deleted
     await expect(userPage.getByText("free robux click here")).not.toBeVisible();
     await companyPage.reload();
     await expect(
@@ -346,23 +379,43 @@ test.describe("Chat ", () => {
     // Company sends a message to the user
     await companyPage
       .getByPlaceholder("Type a message...")
-      .fill(
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      );
+      .fill("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     await companyPage.getByRole("button", { name: "Send" }).click();
     await companyPage.waitForLoadState("networkidle");
 
     // Verify the message is sent
     await expect(
-      companyPage.getByText(
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      ),
+      companyPage.getByText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
     ).toBeVisible();
     await userPage.reload();
     await expect(
-      userPage.getByText(
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      ),
+      userPage.getByText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
     ).toBeVisible();
+
+    // find the message container
+    const messageContainer = userPage
+      .locator("div.group", { hasText: /^aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa$/ })
+      .first();
+
+    // Use mouse to hover the dropdown menu
+    const box = await messageContainer.boundingBox();
+    if (box) {
+      await userPage.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    }
+    const dropdownTrigger = messageContainer.locator("button").first();
+    await dropdownTrigger.click();
+
+    await userPage.getByRole("menuitem", { name: "Delete Message" }).click();
+    await userPage.getByRole("button", { name: "Delete" }).click();
+    await userPage.waitForLoadState("networkidle");
+
+    // Verify the message is deleted
+    await expect(
+      companyPage.getByText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+    ).not.toBeVisible();
+    await userPage.reload();
+    await expect(
+      userPage.getByText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+    ).not.toBeVisible();
   });
 });
