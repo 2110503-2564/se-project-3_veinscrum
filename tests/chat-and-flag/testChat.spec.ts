@@ -114,8 +114,8 @@ test.describe("Chat ", () => {
     await companyPage
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
-    await companyPage.waitForTimeout(1000);
-    
+    await companyPage.waitForTimeout(2000);
+
     const responsePromise = companyPage.waitForResponse(
       (response) =>
         response.url().includes(BackendRoutes.JOB_LISTINGS) &&
@@ -135,6 +135,8 @@ test.describe("Chat ", () => {
       input.value = companyIdFromApi;
       input.dispatchEvent(new Event("input", { bubbles: true }));
     }, companyId);
+
+    await companyPage.waitForTimeout(2000);
 
     await companyPage.getByRole("button", { name: "Create" }).click();
 

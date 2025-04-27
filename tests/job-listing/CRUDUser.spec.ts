@@ -62,7 +62,7 @@ test.describe("Job Listing CRUD", () => {
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(description);
-    await page.waitForTimeout(1000);
+
     await page.getByRole("button", { name: "Create" }).click();
 
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
@@ -79,7 +79,7 @@ test.describe("Job Listing CRUD", () => {
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
 
     const responsePromise = page.waitForResponse(
       (response) =>
@@ -87,7 +87,7 @@ test.describe("Job Listing CRUD", () => {
         response.status() === 201,
     );
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
 
     await page.getByRole("button", { name: "Create" }).click();
 
@@ -97,7 +97,7 @@ test.describe("Job Listing CRUD", () => {
 
     jobId = response.data._id;
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Logout" }).click();
@@ -126,7 +126,7 @@ test.describe("Job Listing CRUD", () => {
 
     await expect(page.getByRole("heading", { name: jobTitle })).toBeVisible();
   });
-  
+
   test("US1-9B: User View Job Listings on Company Profile When None Exist", async () => {
     const context = await page.context().browser()?.newContext();
     if (!context) throw new Error("Could not create browser context");

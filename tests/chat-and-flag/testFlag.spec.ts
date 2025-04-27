@@ -111,7 +111,7 @@ test.describe("Flag", () => {
       await companyPage
         .getByRole("textbox", { name: "editable markdown" })
         .fill(jobDescription);
-      await companyPage.waitForTimeout(1000);
+      await companyPage.waitForTimeout(2000);
 
       const responsePromise = companyPage.waitForResponse(
         (response) =>
@@ -132,7 +132,8 @@ test.describe("Flag", () => {
         input.value = companyIdFromApi;
         input.dispatchEvent(new Event("input", { bubbles: true }));
       }, companyId);
-  
+      await companyPage.waitForTimeout(2000);
+      
       await companyPage.getByRole("button", { name: "Create" }).click();
   
       const response = (await (await responsePromise).json()) as {

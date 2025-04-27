@@ -88,14 +88,15 @@ test.describe("Job Listing CRUD", () => {
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
+    
     const responsePromise = page.waitForResponse(
       (response) =>
         response.url().includes(BackendRoutes.JOB_LISTINGS) &&
         response.status() === 201,
     );
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     await page.getByRole("button", { name: "Create" }).click();
 
     const response = (await (await responsePromise).json()) as {
@@ -119,7 +120,7 @@ test.describe("Job Listing CRUD", () => {
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     await page.getByRole("button", { name: "Create" }).click();
 
     await expect(page.getByText("Job Title is required")).toBeVisible();
