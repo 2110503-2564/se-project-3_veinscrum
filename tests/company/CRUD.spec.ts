@@ -104,7 +104,7 @@ test.describe("US1-1: Create Company Profile", () => {
   });
 });
 
-test.describe("View Company Profile", () => {
+test.describe("US1-2: View Company Profile", () => {
   let page: Page;
   const companyName = faker.company.name();
   const address = faker.location.streetAddress();
@@ -413,6 +413,7 @@ test.describe("US1-3: Update Company Profile", () => {
     await expect(page.getByText(newDescription)).toBeVisible();
   });
 });
+
 test.describe("US1-4 : Delete Company Profile", () => {
   let page: Page;
   const companyName = faker.company.name();
