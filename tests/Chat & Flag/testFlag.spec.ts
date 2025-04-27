@@ -9,6 +9,7 @@ import { signUp } from "../utils/signUp";
 test.describe("Flag", () => {
     let companyPage: Page;
     let userPage: Page;
+    let notLoginPage: Page;
     let jobId: string | undefined;
   
     let userEmailTemp: string;
@@ -26,9 +27,11 @@ test.describe("Flag", () => {
       // Create a new browser context for the company and user
       const companyContext = await browser.newContext();
       const userContext = await browser.newContext();
+      const anoymousetext = await browser.newContext();
   
       companyPage = await companyContext.newPage();
       userPage = await userContext.newPage();
+      notLoginPage = await anoymousetext.newPage();
   
       // Sign in as a company
       const { email: companyEmail, password: companyPassword } = await signUp(
@@ -190,7 +193,7 @@ test.describe("Flag", () => {
   
     test.describe.configure({ mode: "serial" });
   
-    test("US2-7: Flag a user", async ({ browser }) => {
+    test("US2-7.1: Flag a user", async ({ browser }) => {
       // Flag a user
       await companyPage.getByText(new RegExp(jobTitle, "i")).click();
   
@@ -214,9 +217,22 @@ test.describe("Flag", () => {
       const titleLocator = userRowAfter.getByRole("heading");
       await expect(titleLocator).toHaveClass(/text-yellow-600/);
     });
+
+    test("US2-7.2: Flag but not login as company", async ({ browser }) => {
+      await notLoginPage.goto(withFrontendRoute(FrontendRoutes.HOME));
+      await expect(notLoginPage.getByRole('link', { name: 'My Session' })).not.toBeVisible();
+
+      await notLoginPage.goto(withFrontendRoute(FrontendRoutes.SESSION_LIST));
+      await notLoginPage.waitForLoadState("networkidle");
+
+      await expect(notLoginPage.getByRole("heading", { name: "Sign in" }),
+    ).toBeVisible();
+
+    });
   
-    test("US2-8: Unflag a user", async ({ browser }) => {
+    test("US2-8.1: Unflag a user", async ({ browser }) => {
       // Flag a user
+      
       await companyPage.getByText(new RegExp(jobTitle, "i")).click();
   
       const emailLocator = companyPage.getByText(userEmailTemp);
@@ -263,6 +279,18 @@ test.describe("Flag", () => {
       const titleLocatorAfterUnflag = userRowAfterUnflag.getByRole("heading");
   
       await expect(titleLocatorAfterUnflag).not.toHaveClass(/text-yellow-600/);
+    });
+
+    test("US2-8.2: Unflag but not login as company", async ({ browser }) => {
+      await notLoginPage.goto(withFrontendRoute(FrontendRoutes.HOME));
+      await expect(notLoginPage.getByRole('link', { name: 'My Session' })).not.toBeVisible();
+
+      await notLoginPage.goto(withFrontendRoute(FrontendRoutes.SESSION_LIST));
+      await notLoginPage.waitForLoadState("networkidle");
+
+      await expect(notLoginPage.getByRole("heading", { name: "Sign in" }),
+    ).toBeVisible();
+
     });
   });
   

@@ -393,21 +393,21 @@ test.describe("Chat ", () => {
     ).toBeVisible();
 
     // find the message container
-    const messageContainer = userPage
+    const messageContainer = companyPage
       .locator("div.group", { hasText: /^aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa$/ })
       .first();
 
     // Use mouse to hover the dropdown menu
     const box = await messageContainer.boundingBox();
     if (box) {
-      await userPage.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await companyPage.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     }
     const dropdownTrigger = messageContainer.locator("button").first();
     await dropdownTrigger.click();
 
-    await userPage.getByRole("menuitem", { name: "Delete Message" }).click();
-    await userPage.getByRole("button", { name: "Delete" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await companyPage.getByRole("menuitem", { name: "Delete Message" }).click();
+    await companyPage.getByRole("button", { name: "Delete" }).click();
+    await companyPage.waitForLoadState("networkidle");
 
     // Verify the message is deleted
     await expect(
