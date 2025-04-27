@@ -30,10 +30,12 @@ test.describe("Job Listing CRUD", () => {
     notLoginPage = await notLogincontext.newPage();
 
     const { email, password } = await signUp(page, "company");
+
     await signIn(page, {
       email,
       password,
     });
+
     await signIn(notLoginPage, {
       email,
       password,
@@ -102,6 +104,7 @@ test.describe("Job Listing CRUD", () => {
 
     jobId = response.data._id;
   });
+
   test("US1-5B: Create Job Listing by Company(fail)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
 
@@ -263,4 +266,5 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByRole("button", { name: "Delete" })).not.toBeVisible();
     await expect(page.getByText("No job listings available.")).toBeVisible();
   });
+
 });
