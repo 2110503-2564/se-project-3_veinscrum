@@ -85,6 +85,8 @@ test.describe("Job Listing CRUD", () => {
         response.status() === 201,
     );
 
+    await page.waitForTimeout(1000);
+
     await page.getByRole("button", { name: "Create" }).click();
 
     const response = (await (await responsePromise).json()) as {
@@ -92,6 +94,8 @@ test.describe("Job Listing CRUD", () => {
     };
 
     jobId = response.data._id;
+
+    await page.waitForTimeout(1000);
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Logout" }).click();

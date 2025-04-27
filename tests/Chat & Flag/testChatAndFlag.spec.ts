@@ -364,6 +364,36 @@ test.describe("Chat ", () => {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       ),
     ).toBeVisible();
+
+    // User edits the message
+    const messageContainer = companyPage
+      .locator("div.group", { hasText: /^aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa$/ })
+      .first();
+
+    // Use mouse to hover the dropdown menu
+    const box = await messageContainer.boundingBox();
+    if (box) {
+      await companyPage.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    }
+    const dropdownTrigger = messageContainer.locator("button").first();
+    await dropdownTrigger.click();
+
+    await companyPage.getByRole("menuitem", { name: "Delete Message" }).click();
+    await companyPage.getByRole("button", { name: "Delete" }).click();
+    await companyPage.waitForLoadState("networkidle");
+
+    await expect(
+      companyPage.getByText(
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ),
+    ).not.toBeVisible();
+    await userPage.reload();
+    await expect(
+      userPage.getByText(
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      ),
+    ).not.toBeVisible();
+
   });
 });
 
