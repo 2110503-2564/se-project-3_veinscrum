@@ -425,10 +425,10 @@ test.describe("Chat ", () => {
 
     // Verify the message is not sent
     await expect(
-      companyPage.getByText("You cannot send an empty message."),
+      companyPage.getByText("Type a message..."),
     ).not.toBeVisible();
     await expect(
-      userPage.getByText("You cannot send an empty message."),
+      userPage.getByText("Type a message..."),
     ).not.toBeVisible();
   });
 
