@@ -5,11 +5,18 @@ import { faker } from "@faker-js/faker";
 import { expect, Page, test } from "@playwright/test";
 import { signIn } from "../utils/signIn";
 import { signUp } from "../utils/signUp";
+import { use } from "react";
 
 test.describe("Chat ", () => {
   let companyPage: Page;
   let userPage: Page;
   let jobId: string | undefined;
+
+  let userEmailTemp: string;
+  let userPasswordTemp: string;
+
+  let companyEmailTemp: string;
+  let companyPasswordTemp: string;
 
   const companyName = faker.company.name();
   const address = faker.location.streetAddress();
@@ -33,6 +40,8 @@ test.describe("Chat ", () => {
       companyPage,
       "company",
     );
+    companyEmailTemp = companyEmail;
+    companyPasswordTemp = companyPassword;
     await signIn(companyPage, {
       email: companyEmail,
       password: companyPassword,
@@ -141,6 +150,8 @@ test.describe("Chat ", () => {
       userPage,
       "user",
     );
+    userEmailTemp = userEmail;
+    userPasswordTemp = userPassword;
     await signIn(userPage, {
       email: userEmail,
       password: userPassword,
@@ -231,32 +242,28 @@ test.describe("Chat ", () => {
     await userPage.waitForLoadState("networkidle");
 
     // Verify the message is sent
-    await expect(
-      userPage.getByText("sup bro, how are you?"),
-    ).toBeVisible();
-    await expect(
-      companyPage.getByText("sup bro, how are you?"),
-    ).toBeVisible();
+    await expect(userPage.getByText("sup bro, how are you?")).toBeVisible();
+    await expect(companyPage.getByText("sup bro, how are you?")).toBeVisible();
 
     // User refresh the page
     await userPage.reload();
     await userPage.waitForLoadState("networkidle");
 
     // Verify the message is still there
-    await expect(
-      userPage.getByText("sup bro, how are you?"),
-    ).toBeVisible();
-    await expect(
-      companyPage.getByText("sup bro, how are you?"),
-    ).toBeVisible();
+    await expect(userPage.getByText("sup bro, how are you?")).toBeVisible();
+    await expect(companyPage.getByText("sup bro, how are you?")).toBeVisible();
   });
 
-  test("US2-2: Users edit messages", async ({ browser }) => {
+  test("US2-2.1: Users edit messages", async ({ browser }) => {
     // User sends a message to the company
     await userPage.getByPlaceholder("Type a message...").fill("ggez");
     await userPage.getByRole("button", { name: "Send" }).click();
     await userPage.waitForLoadState("networkidle");
+
+    // Verify the message is sent
     await expect(userPage.getByText("ggez")).toBeVisible();
+    await companyPage.reload();
+    await expect(companyPage.getByText("ggez")).toBeVisible();
 
     // User edits the message
     const messageContainer = userPage
@@ -271,6 +278,7 @@ test.describe("Chat ", () => {
     const dropdownTrigger = messageContainer.locator("button").first();
     await dropdownTrigger.click();
 
+    // Click on the edit message button and fill the input
     await userPage.getByRole("menuitem", { name: "Edit Message" }).click();
     await userPage.getByPlaceholder("Enter message").fill("Sorry bro");
     await userPage.getByRole("button", { name: "Save changes" }).click();
@@ -282,7 +290,42 @@ test.describe("Chat ", () => {
     await expect(companyPage.getByText("Sorry bro")).toBeVisible();
   });
 
-  test("US2-3: Users delete messages", async ({ browser }) => {
+  test("US2-2.2: Editing a message without changing", async ({ browser }) => {
+    // User sends a message to the company
+    await userPage.getByPlaceholder("Type a message...").fill("notedit");
+    await userPage.getByRole("button", { name: "Send" }).click();
+    await userPage.waitForLoadState("networkidle");
+
+    // Verify the message is sent
+    await expect(userPage.getByText("notedit")).toBeVisible();
+    await companyPage.reload();
+    await expect(companyPage.getByText("notedit")).toBeVisible();
+
+    // User edits the message
+    const messageContainer = userPage
+      .locator("div.group", { hasText: /^notedit$/ })
+      .first();
+
+    // Use mouse to hover the dropdown menu
+    const box = await messageContainer.boundingBox();
+    if (box) {
+      await userPage.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    }
+    const dropdownTrigger = messageContainer.locator("button").first();
+    await dropdownTrigger.click();
+
+    // Click on the edit message button but don't change the message
+    await userPage.getByRole("menuitem", { name: "Edit Message" }).click();
+    await userPage.getByRole("button", { name: "Save changes" }).click();
+    await userPage.waitForLoadState("networkidle");
+
+    // Verify the message is still the same
+    await expect(userPage.getByText("notedit")).toBeVisible();
+    await companyPage.reload();
+    await expect(companyPage.getByText("notedit")).toBeVisible();
+  });
+
+  test("US2-3.1: Users delete messages", async ({ browser }) => {
     // User sends a message to the company
     await userPage
       .getByPlaceholder("Type a message...")
@@ -320,7 +363,49 @@ test.describe("Chat ", () => {
     ).not.toBeVisible();
   });
 
-  test("US2-4: Company send messages to user", async ({ browser }) => {
+  test("US2-3.2: Not logged in user clicking Delete", async ({ browser }) => {
+    // User sends a message to the company
+    await userPage
+      .getByPlaceholder("Type a message...")
+      .fill("not logged");
+    await userPage.getByRole("button", { name: "Send" }).click();
+    await userPage.waitForLoadState("networkidle");
+
+    // Verify the message is sent
+    await expect(userPage.getByText("not logged")).toBeVisible();
+    await companyPage.reload();
+    await expect(companyPage.getByText("not logged")).toBeVisible();
+
+    // Temp URL chat page
+    const tempURL = userPage.url();
+
+    // log out the user
+    await userPage.getByTestId("auth-dropdown-menu-trigger").click();
+    await userPage.getByRole("menuitem", { name: "Logout" }).click();
+    await userPage.waitForURL(FrontendRoutes.AUTH_SIGN_IN);
+    await userPage.waitForLoadState("networkidle");
+
+    // go to the chat page but go to the sign in page
+    await userPage.goto(tempURL);
+    await userPage.waitForLoadState("networkidle");
+    await expect(userPage).toHaveURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
+
+    // Sign in as a user
+    await signIn(userPage, {
+      email: userEmailTemp,
+      password: userPasswordTemp,
+    });
+    await userPage.waitForLoadState("networkidle");
+    await expect(userPage).toHaveURL(withFrontendRoute(FrontendRoutes.HOME));
+
+    // go to the chat page
+    await userPage.goto(tempURL);
+    await userPage.waitForLoadState("networkidle");
+    await expect(userPage).toHaveURL(/\/chat\/.+/);
+    await expect(userPage.getByText("not logged")).toBeVisible();
+  });
+
+  test("US2-4.1: Company send messages to user", async ({ browser }) => {
     // Company sends a message to the user
     await companyPage
       .getByPlaceholder("Type a message...")
@@ -333,7 +418,21 @@ test.describe("Chat ", () => {
     await expect(userPage.getByText("Hello, I am Big Boss.")).toBeVisible();
   });
 
-  test("US2-5: Company edit messages", async ({ browser }) => {
+  test("US2-4.2: Company sending empty message", async ({ browser }) => {
+    // Company sends an empty message to the user
+    await companyPage.getByRole("button", { name: "Send" }).click();
+    await companyPage.waitForLoadState("networkidle");
+
+    // Verify the message is not sent
+    await expect(
+      companyPage.getByText("Type a message..."),
+    ).not.toBeVisible();
+    await expect(
+      userPage.getByText("Type a message..."),
+    ).not.toBeVisible();
+  });
+
+  test("US2-5.1: Company edit messages", async ({ browser }) => {
     // User sends a message to the company
     await companyPage
       .getByPlaceholder("Type a message...")
@@ -375,7 +474,42 @@ test.describe("Chat ", () => {
     ).toBeVisible();
   });
 
-  test("US2-6: Company delete messages", async ({ browser }) => {
+  test("US2-5.2: Company editing a message without change", async ({ browser }) => {
+    // Company sends a message to the company
+    await companyPage.getByPlaceholder("Type a message...").fill("company not edit");
+    await companyPage.getByRole("button", { name: "Send" }).click();
+    await companyPage.waitForLoadState("networkidle");
+
+    // Verify the message is sent
+    await expect(companyPage.getByText("company not edit")).toBeVisible();
+    await userPage.reload();
+    await expect(userPage.getByText("company not edit")).toBeVisible();
+
+    // Company edits the message
+    const messageContainer = companyPage
+      .locator("div.group", { hasText: /^company not edit$/ })
+      .first();
+
+    // Use mouse to hover the dropdown menu
+    const box = await messageContainer.boundingBox();
+    if (box) {
+      await companyPage.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    }
+    const dropdownTrigger = messageContainer.locator("button").first();
+    await dropdownTrigger.click();
+
+    // Click on the edit message button but don't change the message
+    await companyPage.getByRole("menuitem", { name: "Edit Message" }).click();
+    await companyPage.getByRole("button", { name: "Save changes" }).click();
+    await companyPage.waitForLoadState("networkidle");
+
+    // Verify the message is still the same
+    await expect(companyPage.getByText("company not edit")).toBeVisible();
+    await userPage.reload();
+    await expect(userPage.getByText("company not edit")).toBeVisible();
+  });
+
+  test("US2-6.1: Company delete messages", async ({ browser }) => {
     // Company sends a message to the user
     await companyPage
       .getByPlaceholder("Type a message...")
@@ -417,5 +551,47 @@ test.describe("Chat ", () => {
     await expect(
       userPage.getByText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
     ).not.toBeVisible();
+  });
+
+  test("US2-6.2: Company not logged in clicking Delete", async ({ browser }) => {
+    // Company sends a message to the company
+    await companyPage
+      .getByPlaceholder("Type a message...")
+      .fill("Company not logged");
+    await companyPage.getByRole("button", { name: "Send" }).click();
+    await companyPage.waitForLoadState("networkidle");
+
+    // Verify the message is sent
+    await expect(companyPage.getByText("Company not logged")).toBeVisible();
+    await userPage.reload();
+    await expect(userPage.getByText("Company not logged")).toBeVisible();
+
+    // Temp URL chat page
+    const tempURL = companyPage.url();
+
+    // log out the user
+    await companyPage.getByTestId("auth-dropdown-menu-trigger").click();
+    await companyPage.getByRole("menuitem", { name: "Logout" }).click();
+    await companyPage.waitForURL(FrontendRoutes.AUTH_SIGN_IN);
+    await companyPage.waitForLoadState("networkidle");
+
+    // go to the chat page but go to the sign in page
+    await companyPage.goto(tempURL);
+    await companyPage.waitForLoadState("networkidle");
+    await expect(companyPage).toHaveURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
+
+    // Sign in as a user
+    await signIn(companyPage, {
+      email: companyEmailTemp,
+      password: companyPasswordTemp,
+    });
+    await companyPage.waitForLoadState("networkidle");
+    await expect(companyPage).toHaveURL(withFrontendRoute(FrontendRoutes.HOME));
+
+    // go to the chat page
+    await companyPage.goto(tempURL);
+    await companyPage.waitForLoadState("networkidle");
+    await expect(companyPage).toHaveURL(/\/chat\/.+/);
+    await expect(companyPage.getByText("Company not logged")).toBeVisible();
   });
 });
