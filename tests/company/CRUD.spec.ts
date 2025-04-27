@@ -25,7 +25,7 @@ test.describe("US1-1: Create Company Profile", () => {
 
   test.describe.configure({ mode: "serial" });
 
-  test("Create Company (fail)", async () => {
+  test("US1-1A: Create Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await expect(
@@ -65,7 +65,7 @@ test.describe("US1-1: Create Company Profile", () => {
     await expect(page.getByText("You havent created a company")).toBeVisible();
   });
 
-  test("Create Company (success)", async () => {
+  test("US1-1B: Create Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await expect(
@@ -124,7 +124,7 @@ test.describe("US1-2: View Company Profile", () => {
 
   test.describe.configure({ mode: "serial" });
 
-  test("View Company (fail)", async () => {
+  test("US1-2A: View Company", async () => {
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
 
@@ -181,7 +181,7 @@ test.describe("US1-2: View Company Profile", () => {
     await page.waitForLoadState("domcontentloaded");
   });
 
-  test("View Company (success)", async () => {
+  test("US1-2B: View Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
     await page.waitForLoadState("domcontentloaded");
     await page.getByTestId("auth-dropdown-menu-trigger").click();
@@ -223,7 +223,7 @@ test.describe("US1-3: Update Company Profile", () => {
 
   test.describe.configure({ mode: "serial" });
 
-  test("MATERIAL: Create Company (success)", async () => {
+  test("MATERIAL: Create Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await expect(
@@ -261,7 +261,7 @@ test.describe("US1-3: Update Company Profile", () => {
     await page.waitForLoadState("domcontentloaded");
   });
 
-  test("Edit Company (fail)", async () => {
+  test("US1-3A:Edit Company", async () => {
     const newCompanyName = faker.company.name();
     const newAddress = faker.location.streetAddress();
     const newWebsite = faker.internet.url();
@@ -335,7 +335,7 @@ test.describe("US1-3: Update Company Profile", () => {
     await expect(page.getByText(newDescription)).not.toBeVisible();
   });
 
-  test("Edit Company (success)", async () => {
+  test("US1-3B:Edit Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
     await page.waitForLoadState("domcontentloaded");
 
@@ -414,7 +414,7 @@ test.describe("US1-3: Update Company Profile", () => {
   });
 });
 
-test.describe("US1-4 : Delete Company Profile", () => {
+test.describe("US1-4: Delete Company Profile", () => {
   let page: Page;
   const companyName = faker.company.name();
   const address = faker.location.streetAddress();
@@ -434,7 +434,7 @@ test.describe("US1-4 : Delete Company Profile", () => {
 
   test.describe.configure({ mode: "serial" });
 
-  test("Delete Company (fail)", async () => {
+  test("US1-4A: Delete Company", async () => {
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
 
@@ -488,7 +488,7 @@ test.describe("US1-4 : Delete Company Profile", () => {
     await page.waitForLoadState("domcontentloaded");
   });
 
-  test("Delete Company (success)", async () => {
+  test("US1-4B: Delete Company (success)", async () => {
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
 

@@ -63,7 +63,7 @@ test.describe("Job Listing CRUD", () => {
     await page.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
   });
 
-  test("US1-5: Create Job Listing by Company", async () => {
+  test("US1-5A: Create Job Listing by Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
 
     await expect(
@@ -94,7 +94,8 @@ test.describe("Job Listing CRUD", () => {
 
     jobId = response.data._id;
   });
-  test("US1-5: Create Job Listing by Company(fail)", async () => {
+
+  test("US1-5B: Create Job Listing by Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
 
     await expect(
@@ -114,7 +115,7 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByText("Job Title is required")).toBeVisible();
   });
 
-  test("US1-6: View Job Listing by Company", async () => {
+  test("US1-6A: View Job Listing by Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
@@ -126,7 +127,19 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByText(jobTitle)).toBeVisible();
   });
 
-  test("US1-7: Edit Job Listing by Company", async () => {
+  test("US1-6B: Unauthenticated user tries to view job listings and is redirected", async ({
+    browser,
+  }) => {
+    const context = await browser.newContext();
+    const newPage = await context.newPage();
+    await newPage.goto(withFrontendRoute(FrontendRoutes.PROFILE));
+
+    await expect(newPage).toHaveURL(
+      withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN),
+    );
+  });
+
+  test("US1-7A: Edit Job Listing by Company", async () => {
     const newJobTitle = faker.person.jobTitle();
     const newJobDescription = faker.lorem.paragraph();
 
@@ -167,7 +180,7 @@ test.describe("Job Listing CRUD", () => {
     await submitButton.click();
   });
 
-  test("US1-7: Edit Job Listing by Company(fail)", async () => {
+  test("US1-7B: Edit Job Listing by Company", async () => {
     const newJobDescription = faker.lorem.paragraph();
 
     if (!jobId) {
@@ -207,7 +220,7 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByText("Job Title is required")).toBeVisible();
   });
 
-  test("US1-8: delete Job Listing by Company", async () => {
+  test("US1-8A: delete Job Listing by Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
