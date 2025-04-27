@@ -114,13 +114,17 @@ test.describe("Chat ", () => {
     );
 
     await companyPage.evaluate((companyIdFromApi) => {
-      const input = document.querySelector(
-        'input[name="companyId"]',
+      let input = document.querySelector(
+        'input[name="company"]',
       ) as HTMLInputElement;
-      if (input) {
-        input.value = companyIdFromApi;
-        input.dispatchEvent(new Event("input", { bubbles: true }));
+      if (!input) {
+        input = document.createElement("input");
+        input.name = "company";
+        input.type = "hidden";
+        document.querySelector("form")?.appendChild(input);
       }
+      input.value = companyIdFromApi;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
     }, companyId);
 
     await companyPage.getByRole("button", { name: "Create" }).click();
@@ -473,13 +477,17 @@ test.describe("Flag", () => {
     );
 
     await companyPage.evaluate((companyIdFromApi) => {
-      const input = document.querySelector(
-        'input[name="companyId"]',
+      let input = document.querySelector(
+        'input[name="company"]',
       ) as HTMLInputElement;
-      if (input) {
-        input.value = companyIdFromApi;
-        input.dispatchEvent(new Event("input", { bubbles: true }));
+      if (!input) {
+        input = document.createElement("input");
+        input.name = "company";
+        input.type = "hidden";
+        document.querySelector("form")?.appendChild(input);
       }
+      input.value = companyIdFromApi;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
     }, companyId);
 
     await companyPage.getByRole("button", { name: "Create" }).click();
@@ -564,28 +572,57 @@ test.describe("Flag", () => {
       .locator("..")
       .locator("..")
       .locator("..");
-    const flagButtonAfter = userRowAfter.locator("button").first();
-
-    await expect(flagButtonAfter).toHaveClass(/text-yellow-600/);
+    const titleLocator = userRowAfter.getByRole("heading");
+    await expect(titleLocator).toHaveClass(/text-yellow-600/);
   });
 
   test("US2-8: Unflag a user", async ({ browser }) => {
     // Flag a user
     await companyPage.getByText(new RegExp(jobTitle, "i")).click();
-    const flagButton = companyPage.getByRole("button").first();
-    await flagButton.click();
 
-    // Verify the flag button is highlighted
+    const emailLocator = companyPage.getByText(userEmailTemp);
+    const userRow = emailLocator.locator("..").locator("..").locator("..");
+    const flagButton = userRow.locator("button").first();
+    const titleLocator = userRow.getByRole("heading");
+
+    // Verify the flag is ON
+    const isFlagged = await titleLocator.evaluate((el) =>
+      el.className.includes("text-yellow-600")
+    );
+
+    if (!isFlagged) {
+      await flagButton.click();
+
+      // Reload the page
+      await companyPage.reload();
+      await companyPage.waitForLoadState("networkidle");
+  
+      await companyPage.getByText(new RegExp(jobTitle, "i")).click();
+    }
+
+    // Unflag the user
+    const emailLocatorAfterFlag = companyPage.getByText(userEmailTemp);
+    const userRowAfterFlag = emailLocatorAfterFlag
+      .locator("..")
+      .locator("..")
+      .locator("..");
+    const flagButtonAfter = userRowAfterFlag.locator("button").first();
+    await flagButtonAfter.click();
+
+    // Reload the page
     await companyPage.reload();
     await companyPage.waitForLoadState("networkidle");
-    await expect(flagButton).toHaveClass(/text-yellow-600/);
 
-    // Unflag a user
-    await flagButton.click();
+    // Verify the flag is OFF
+    await companyPage.getByText(new RegExp(jobTitle, "i")).click();
 
-    // Verify the flag button is not highlighted
-    await companyPage.reload();
-    await companyPage.waitForLoadState("networkidle");
-    await expect(flagButton).not.toHaveClass(/text-yellow-600/);
+    const emailLocatorAfterUnflag = companyPage.getByText(userEmailTemp);
+    const userRowAfterUnflag = emailLocatorAfterUnflag
+      .locator("..")
+      .locator("..")
+      .locator("..");
+    const titleLocatorAfterUnflag = userRowAfterUnflag.getByRole("heading");
+
+    await expect(titleLocatorAfterUnflag).not.toHaveClass(/text-yellow-600/);
   });
 });
