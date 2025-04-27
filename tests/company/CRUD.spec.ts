@@ -488,7 +488,7 @@ test.describe("US1-4: Delete Company Profile", () => {
     await page.waitForLoadState("domcontentloaded");
   });
 
-  test("US1-4B: Delete Company (success)", async () => {
+  test("US1-4B: Delete Company", async () => {
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
 
