@@ -94,6 +94,25 @@ test.describe("Job Listing CRUD", () => {
 
     jobId = response.data._id;
   });
+  test("US1-5: Create Job Listing by Company(fail)", async () => {
+    await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
+
+    await expect(
+      page.getByRole("heading", { name: "Create Job" }),
+    ).toBeVisible();
+    await page
+      .getByRole("textbox", { name: "editable markdown" })
+      .getByRole("paragraph")
+      .click();
+    await page
+      .getByRole("textbox", { name: "editable markdown" })
+      .fill(jobDescription);
+
+    await page.waitForTimeout(1000);
+    await page.getByRole("button", { name: "Create" }).click();
+
+    await expect(page.getByText("Job Title is required")).toBeVisible();
+  });
 
   test("US1-6: View Job Listing by Company", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
@@ -146,6 +165,46 @@ test.describe("Job Listing CRUD", () => {
 
     // Submit
     await submitButton.click();
+  });
+
+  test("US1-7: Edit Job Listing by Company(fail)", async () => {
+    const newJobDescription = faker.lorem.paragraph();
+
+    if (!jobId) {
+      throw new Error("Job ID is not set");
+    }
+
+    await page.goto(
+      withFrontendRoute(FrontendRoutes.JOB_LISTINGS_ID_EDIT({ jobId })),
+    );
+    await page.waitForLoadState("domcontentloaded");
+
+    // Wait for form
+    await expect(page.locator("form")).toBeVisible();
+
+    // Get form elements and wait for them
+    const titleInput = page.locator("input[name='jobTitle']");
+    const descriptionEditor = page.locator("[contenteditable='true']");
+
+    await expect(titleInput).toBeVisible();
+    await expect(descriptionEditor).toBeVisible();
+
+    // Fill in the title
+    await titleInput.clear();
+
+    // Fill in the description using the rich text editor
+    await descriptionEditor.click();
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.keyboard.press("Backspace");
+    await page.keyboard.type(newJobDescription);
+
+    // Find and click the submit button
+    const submitButton = page.locator('button[type="submit"]');
+    await expect(submitButton).toBeVisible();
+
+    // Submit
+    await submitButton.click();
+    await expect(page.getByText("Job Title is required")).toBeVisible();
   });
 
   test("US1-8: delete Job Listing by Company", async () => {
