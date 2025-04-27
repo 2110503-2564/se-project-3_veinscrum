@@ -85,6 +85,7 @@ test.describe("Job Listing CRUD", () => {
         response.status() === 201,
     );
 
+    await page.waitForTimeout(1000);
     await page.getByRole("button", { name: "Create" }).click();
 
     const response = (await (await responsePromise).json()) as {
