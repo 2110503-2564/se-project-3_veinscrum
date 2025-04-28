@@ -1,6 +1,7 @@
 "use client";
 
 import { JobCardProfile } from "@/components/card/JobCardProfile";
+import { JobCardProfileSkeleton } from "@/components/card/JobCardProfileSkeleton";
 import {
   Pagination,
   PaginationContent,
@@ -125,10 +126,14 @@ export default function AdminJobListingsPage() {
           <h1 className="text-center text-4xl font-bold">All Job Listings</h1>
         </div>
         <div className="mt-4 flex w-full flex-wrap items-center justify-center gap-4">
-          {jobListings ? (
-            jobListings.data.map((job, idx) => (
+          {isJobListingsLoading || !jobListings ? (
+            Array.from({ length: 4 }).map((_, idx) => (
+              <JobCardProfileSkeleton key={idx} buttonNumbers={3} />
+            ))
+          ) : jobListings.data.length > 0 ? (
+            jobListings.data.map((job) => (
               <JobCardProfile
-                key={idx}
+                key={job._id}
                 jobListing={job}
                 company={job.company}
                 requestedUser={me}
@@ -144,7 +149,7 @@ export default function AdminJobListingsPage() {
               />
             ))
           ) : (
-            <p className="text-gray-500">jobListings not found</p>
+            <p className="text-gray-500">No job listings found.</p>
           )}
         </div>
       </div>
