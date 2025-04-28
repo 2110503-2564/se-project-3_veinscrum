@@ -1,6 +1,7 @@
 "use client";
 
 import { FlagUserCard } from "@/components/card/FlagUserCard";
+import { FlagUserCardSkeleton } from "@/components/card/FlagUserCardSkeleton";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
 import {
@@ -161,21 +162,26 @@ export default function CompanySessionPage() {
     <main className="mx-auto mt-16 max-w-3xl space-y-8 px-4">
       <h1 className="text-center text-4xl font-bold">Flag User By Job Title</h1>
 
-      {isSessionLoading && <p>Loading sessions...</p>}
       {sessionError && <p>Error loading sessions.</p>}
 
-      <div className="w-full space-y-4">
-        {Array.from(groupedWithFlags.entries()).map(
-          ([_, interviewSessionWithFlags], idx) => (
-            <FlagUserCard
-              key={idx}
-              isToggleStartPending={isDeleteFlagPending || isCreateFlagPending}
-              toggleStar={toggleStar}
-              interviewSessions={interviewSessionWithFlags}
-            />
-          ),
-        )}
-      </div>
+      {isSessionLoading ? (
+        <FlagUserCardSkeleton />
+      ) : (
+        <div className="w-full space-y-4">
+          {Array.from(groupedWithFlags.entries()).map(
+            ([_, interviewSessionWithFlags], idx) => (
+              <FlagUserCard
+                key={idx}
+                isToggleStartPending={
+                  isDeleteFlagPending || isCreateFlagPending
+                }
+                toggleStar={toggleStar}
+                interviewSessions={interviewSessionWithFlags}
+              />
+            ),
+          )}
+        </div>
+      )}
     </main>
   );
 }

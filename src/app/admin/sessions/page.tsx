@@ -141,15 +141,6 @@ export default function AdminSessionsPage() {
             : Array.from({ length: 4 }).map((_, idx) => (
                 <InterviewSessionCardSkeleton key={idx} infoNumbers={4} />
               ))}
-          {/* {sessions?.data && */}
-          {/*   sessions?.data?.data?.map((session, idx) => ( */}
-          {/*     <AdminSessionCard */}
-          {/*       key={idx} */}
-          {/*       interviewSession={session} */}
-          {/*       onDelete={() => setInterviewSessionToDelete(session)} */}
-          {/*       onEdit={() => setInterviewSessionToUpdate(session)} */}
-          {/*     /> */}
-          {/*   ))} */}
         </div>
       </div>
 
