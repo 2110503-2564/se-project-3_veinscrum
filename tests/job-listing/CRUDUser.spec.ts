@@ -35,9 +35,7 @@ test.describe("Job Listing CRUD", () => {
       password: companyPassword,
     });
 
-    await expect(
-      page.getByRole("heading", { name: "Online Job Fair Registration" }),
-    ).toBeVisible();
+    await expect(page.getByTestId("home-title")).toBeVisible();
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
     await page.getByTestId("auth-dropdown-menu-create-company").click();

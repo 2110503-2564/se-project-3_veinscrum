@@ -77,7 +77,7 @@ export default function CreateCompanyPage() {
       queryClient.invalidateQueries({
         queryKey: [BackendRoutes.AUTH_ME],
       });
-      router.push(FrontendRoutes.ADMIN_COMPANY);
+      router.push(FrontendRoutes.PROFILE);
     },
     onError: (error) => {
       toast.error("Failed to create company", {

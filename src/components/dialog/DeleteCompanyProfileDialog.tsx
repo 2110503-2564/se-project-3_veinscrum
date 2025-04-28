@@ -31,12 +31,14 @@ export function DeleteCompanyProfileDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the company profile.
+            This action cannot be undone. This will permanently delete the
+            company profile.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
+            data-testid="company-profile-delete-profile-button"
             className={buttonVariants({ variant: "destructive" })}
             onClick={() => onDelete()}
             disabled={isPending}

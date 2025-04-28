@@ -66,7 +66,7 @@ test.describe("Job Listing CRUD", () => {
         response.status() === 201,
     );
 
-    await page.getByRole("button", { name: "Create" }).click();
+    await page.getByTestId("company-create-submit-button").click();
 
     const response: { data: Company } = await responsePromise.then(
       async (response) => await response.json(),
@@ -74,7 +74,7 @@ test.describe("Job Listing CRUD", () => {
 
     companyId = response.data.id;
 
-    await page.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
+    await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
   });
 
   test("US1-5A: Create Job Listing by Company (Success)", async () => {
@@ -122,7 +122,7 @@ test.describe("Job Listing CRUD", () => {
     ).toBeVisible();
   });
 
-  test("US1-6A: View Job Listing by Company (Success)", async () => {
+  test("US1-6A: View Job Listing in Profile (Success)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
@@ -134,7 +134,7 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByText(jobTitle)).toBeVisible();
   });
 
-  test("US1-6B: View Job Listing by Company (Fail)", async () => {
+  test("US1-6B: View Job Listing in Profile (Not Logged In)", async () => {
     await notLoginPage.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await notLoginPage.getByTestId("auth-dropdown-menu-trigger").click();
@@ -232,10 +232,12 @@ test.describe("Job Listing CRUD", () => {
 
     await page.getByTestId("job-listing-edit-submit-button").click();
 
-    await expect(page.getByText("Job Title is required")).toBeVisible();
+    await expect(
+      page.getByTestId("job-listing-edit-job-title-error"),
+    ).toBeVisible();
   });
 
-  test("US1-8A: delete Job Listing by Company (Success)", async () => {
+  test("US1-8A: Delete Job Listing by Company (Success)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
@@ -246,10 +248,12 @@ test.describe("Job Listing CRUD", () => {
 
     await page.getByTestId("job-card-delete-button").click();
     await page.getByTestId("job-listing-delete-dialog-submit-button").click();
-    await expect(page.getByText("No job listings available.")).toBeVisible();
+    await expect(
+      page.getByTestId("company-profile-no-job-listings"),
+    ).toBeVisible();
   });
 
-  test("US1-8B: delete Job Listing by Company (Fail)", async () => {
+  test("US1-8B: Delete Job Listing by Company (No Job Listing)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
@@ -263,6 +267,8 @@ test.describe("Job Listing CRUD", () => {
       page.getByTestId("job-listing-delete-dialog-submit-button"),
     ).not.toBeVisible();
 
-    await expect(page.getByText("No job listings available.")).toBeVisible();
+    await expect(
+      page.getByTestId("company-profile-no-job-listings"),
+    ).toBeVisible();
   });
 });

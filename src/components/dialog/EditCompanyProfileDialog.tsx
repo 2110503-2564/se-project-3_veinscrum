@@ -75,7 +75,11 @@ export const EditCompanyProfileDialog: React.FC<
                   <FormLabel htmlFor="name" className="text-sm font-medium">
                     Company Name
                   </FormLabel>
-                  <Input placeholder="Enter company name" {...field} />
+                  <Input
+                    data-testid="company-profile-company-name-input"
+                    placeholder="Enter company name"
+                    {...field}
+                  />
                 </FormItem>
               )}
             />
@@ -102,7 +106,11 @@ export const EditCompanyProfileDialog: React.FC<
                   <FormLabel htmlFor="address" className="text-sm font-medium">
                     Address
                   </FormLabel>
-                  <Input placeholder="Enter company address" {...field} />
+                  <Input
+                    data-testid="company-profile-address-input"
+                    placeholder="Enter company address"
+                    {...field}
+                  />
                 </FormItem>
               )}
             />
@@ -115,7 +123,11 @@ export const EditCompanyProfileDialog: React.FC<
                   <FormLabel htmlFor="website" className="text-sm font-medium">
                     Website
                   </FormLabel>
-                  <Input placeholder="Enter company website" {...field} />
+                  <Input
+                    data-testid="company-profile-website-input"
+                    placeholder="Enter company website"
+                    {...field}
+                  />
                 </FormItem>
               )}
             />
@@ -128,7 +140,11 @@ export const EditCompanyProfileDialog: React.FC<
                   <FormLabel htmlFor="tel" className="text-sm font-medium">
                     Telephone
                   </FormLabel>
-                  <Input placeholder="Enter telephone number" {...field} />
+                  <Input
+                    data-testid="company-profile-telephone-input"
+                    placeholder="Enter telephone number"
+                    {...field}
+                  />
                 </FormItem>
               )}
             />
@@ -155,7 +171,11 @@ export const EditCompanyProfileDialog: React.FC<
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={isPending}>
+              <Button
+                data-testid="company-profile-submit-button"
+                type="submit"
+                disabled={isPending}
+              >
                 Save changes
               </Button>
             </DialogFooter>
