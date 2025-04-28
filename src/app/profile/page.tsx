@@ -135,7 +135,12 @@ export default function ProfilePage() {
                 {isCompanyLoading ? (
                   <Skeleton className="h-8 w-52" />
                 ) : (
-                  <h1 className="w-full text-2xl font-bold">{company?.name}</h1>
+                  <h1
+                    data-testid="company-profile-name"
+                    className="w-full text-2xl font-bold"
+                  >
+                    {company?.name}
+                  </h1>
                 )}
               </div>
 
