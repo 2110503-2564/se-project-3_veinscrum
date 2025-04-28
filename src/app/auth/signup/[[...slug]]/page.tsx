@@ -105,7 +105,7 @@ export default function SignUpPage() {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input data-testid="signup-name-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -118,7 +118,11 @@ export default function SignUpPage() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" {...field} />
+                  <Input
+                    data-testid="signup-email-input"
+                    type="email"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,7 +135,7 @@ export default function SignUpPage() {
               <FormItem>
                 <FormLabel>Telephone number</FormLabel>
                 <FormControl>
-                  <Input type="tel" {...field} />
+                  <Input data-testid="signup-tel-input" type="tel" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -144,7 +148,11 @@ export default function SignUpPage() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    data-testid="signup-password-input"
+                    type="password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -157,13 +165,22 @@ export default function SignUpPage() {
               <FormItem>
                 <FormLabel>Confirm password</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    data-testid="signup-confirm-password-input"
+                    type="password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" size="lg">
+          <Button
+            data-testid="signup-submit-button"
+            type="submit"
+            className="w-full"
+            size="lg"
+          >
             Sign up
           </Button>
           <div className="text-muted-foreground flex items-center justify-center gap-x-2 text-sm">

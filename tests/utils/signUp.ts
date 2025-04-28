@@ -14,23 +14,19 @@ export async function signUp(page: Page, role: "company" | "user") {
         : FrontendRoutes.AUTH_SIGN_UP,
     ),
   );
-  await page.getByRole("textbox", { name: "Name" }).click();
+  await page.getByTestId("signup-name-input").click();
+  await page.getByTestId("signup-name-input").fill(faker.person.fullName());
+  await page.getByTestId("signup-email-input").click();
+  await page.getByTestId("signup-email-input").fill(email);
+  await page.getByTestId("signup-tel-input").click();
   await page
-    .getByRole("textbox", { name: "Name" })
-    .fill(faker.person.fullName());
-  await page.getByRole("textbox", { name: "Email" }).click();
-  await page.getByRole("textbox", { name: "Email" }).fill(email);
-  await page.getByRole("textbox", { name: "Telephone number" }).click();
-  await page
-    .getByRole("textbox", { name: "Telephone number" })
+    .getByTestId("signup-tel-input")
     .fill(faker.phone.number({ style: "international" }));
-  await page.getByRole("textbox", { name: "Password", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "Password", exact: true })
-    .fill(password);
-  await page.getByRole("textbox", { name: "Confirm password" }).click();
-  await page.getByRole("textbox", { name: "Confirm password" }).fill(password);
-  await page.getByRole("main").getByRole("button", { name: "Sign up" }).click();
+  await page.getByTestId("signup-password-input").click();
+  await page.getByTestId("signup-password-input").fill(password);
+  await page.getByTestId("signup-confirm-password-input").click();
+  await page.getByTestId("signup-confirm-password-input").fill(password);
+  await page.getByTestId("signup-submit-button").click();
   await page.waitForURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
 
   return {
