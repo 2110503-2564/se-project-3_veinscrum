@@ -159,7 +159,7 @@ export default function EditJobPage() {
                 <FormLabel>Description</FormLabel>
                 <FormControl>
                   <TextEditor
-                    markdown={field.value}
+                    value={field.value}
                     onChange={field.onChange}
                     ref={textEditorRef}
                   />

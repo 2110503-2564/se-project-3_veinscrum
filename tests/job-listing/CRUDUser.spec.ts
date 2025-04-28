@@ -153,7 +153,7 @@ test.describe("Job Listing CRUD", () => {
       async (response) => await response.json(),
     );
 
-    const companyId = response.data.id;
+    const companyId = response.data._id;
 
     await newPage.waitForLoadState("networkidle");
 

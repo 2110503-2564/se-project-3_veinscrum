@@ -72,7 +72,7 @@ test.describe("Job Listing CRUD", () => {
       async (response) => await response.json(),
     );
 
-    companyId = response.data.id;
+    companyId = response.data._id;
 
     await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
   });

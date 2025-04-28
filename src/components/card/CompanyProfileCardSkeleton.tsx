@@ -34,11 +34,6 @@ export const CompanyProfileCardSkeleton: React.FC<
         </div>
 
         <Skeleton className="h-15 w-full rounded-md" />
-        {/* <TextEditor */}
-        {/*   key={company?.description} */}
-        {/*   markdown={company?.description} */}
-        {/*   readOnly */}
-        {/* /> */}
       </div>
     </div>
   );

@@ -8,7 +8,6 @@ import { Building2, CalendarIcon, PhoneIcon } from "lucide-react";
 import { Button } from "../ui/shadcn/button";
 import { InterviewSessionCardInfo } from "./InterviewSessionCardInfo";
 import { InterviewSessionCardWithDropdown } from "./InterviewSessionCardWithDropdown";
-import { Button } from "../ui/shadcn/button";
 
 interface UserInterviewSessionCardProps {
   interviewSession: InterviewSession;

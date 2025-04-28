@@ -126,10 +126,6 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const toggleStar = () => {
-    setFlagUser(!flagUser);
-  };
-
   const setupSocket = () => {
     if (status !== "authenticated" || !session?.token) return;
 
