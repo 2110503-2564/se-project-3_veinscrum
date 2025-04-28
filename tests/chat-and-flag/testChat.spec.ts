@@ -27,14 +27,12 @@ test.describe("Chat ", () => {
   const jobDescription = faker.lorem.paragraph();
 
   test.beforeAll(async ({ browser }) => {
-    // Create a new browser context for the company and user
     const companyContext = await browser.newContext();
     const userContext = await browser.newContext();
 
     companyPage = await companyContext.newPage();
     userPage = await userContext.newPage();
 
-    // Sign in as a company
     const { email: companyEmail, password: companyPassword } = await signUp(
       companyPage,
       "company",
@@ -50,71 +48,44 @@ test.describe("Chat ", () => {
 
     // Create company profile
     await companyPage.getByTestId("auth-dropdown-menu-trigger").click();
-    await companyPage.getByRole("menuitem", { name: "Create Company" }).click();
+    await companyPage.getByTestId("auth-dropdown-menu-create-company").click();
+
     await companyPage.waitForURL(FrontendRoutes.COMPANY_CREATE);
     await companyPage.waitForLoadState("domcontentloaded");
 
-    await expect(
-      companyPage.getByRole("heading", { name: "Create Company" }),
-    ).toBeVisible();
-    await companyPage.getByRole("textbox", { name: "Company Name" }).click();
+    await expect(companyPage.getByTestId("company-create-title")).toBeVisible();
     await companyPage
-      .getByRole("textbox", { name: "Company Name" })
+      .getByTestId("company-create-name-input")
       .fill(companyName);
-    await companyPage.getByRole("textbox", { name: "Address" }).click();
-    await companyPage.getByRole("textbox", { name: "Address" }).fill(address);
-    await companyPage.getByRole("textbox", { name: "Website" }).click();
-    await companyPage.getByRole("textbox", { name: "Website" }).fill(website);
-    await companyPage.getByRole("textbox", { name: "Telephone" }).click();
-    await companyPage
-      .getByRole("textbox", { name: "Telephone" })
-      .fill(telephone);
-    await companyPage
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
+    await companyPage.getByTestId("company-create-address-input").fill(address);
+    await companyPage.getByTestId("company-create-website-input").fill(website);
+    await companyPage.getByTestId("company-create-tel-input").fill(telephone);
     await companyPage
       .getByRole("textbox", { name: "editable markdown" })
       .fill(description);
 
-    const createCompanyResponsePromise = companyPage.waitForResponse(
-      (response) =>
-        response.url().includes("/api/v1/companies") &&
-        response.request().method() === "POST" &&
-        response.status() === 201,
-    );
+    await companyPage.getByTestId("company-create-submit-button").click();
 
-    await companyPage.getByRole("button", { name: "Create" }).click();
-
-    const createCompanyResponse = await createCompanyResponsePromise;
-    const createdCompany = await createCompanyResponse.json();
-    const companyId = createdCompany.data._id;
-
-    await companyPage.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
+    await companyPage.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
     await companyPage.waitForLoadState("domcontentloaded");
 
-    // Create job listing
     await companyPage.goto(
       withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE),
     );
+
     await companyPage.waitForURL(FrontendRoutes.JOB_LISTINGS_CREATE);
     await companyPage.waitForLoadState("domcontentloaded");
 
     await expect(
-      companyPage.getByRole("heading", { name: "Create Job" }),
+      companyPage.getByTestId("job-listing-create-title"),
     ).toBeVisible();
-    await companyPage.getByRole("textbox", { name: "Job Title" }).click();
+
     await companyPage
-      .getByRole("textbox", { name: "Job Title" })
+      .getByTestId("job-listing-create-job-title-input")
       .fill(jobTitle);
     await companyPage
       .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
-    await companyPage
-      .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
-    await companyPage.waitForTimeout(2000);
 
     const responsePromise = companyPage.waitForResponse(
       (response) =>
@@ -122,32 +93,16 @@ test.describe("Chat ", () => {
         response.status() === 201,
     );
 
-    await companyPage.evaluate((companyIdFromApi) => {
-      let input = document.querySelector(
-        'input[name="company"]',
-      ) as HTMLInputElement;
-      if (!input) {
-        input = document.createElement("input");
-        input.name = "company";
-        input.type = "hidden";
-        document.querySelector("form")?.appendChild(input);
-      }
-      input.value = companyIdFromApi;
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-    }, companyId);
-
     await companyPage.waitForTimeout(2000);
 
-    await companyPage.getByRole("button", { name: "Create" }).click();
+    await companyPage.getByTestId("job-listing-create-submit-button").click();
 
-    const response = (await (await responsePromise).json()) as {
-      data: JobListing;
-    };
+    const response: { data: JobListing } = await responsePromise.then(
+      async (response) => await response.json(),
+    );
 
     jobId = response.data._id;
 
-    // User -----------------------------------------------------------------
-    // Sign in as a user
     const { email: userEmail, password: userPassword } = await signUp(
       userPage,
       "user",
@@ -161,19 +116,16 @@ test.describe("Chat ", () => {
 
     await userPage.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
 
-    // User goes to the job listing page
     if (!jobId) {
       throw new Error("jobId is undefined");
     }
+
     await userPage.goto(
       withFrontendRoute(FrontendRoutes.JOB_LISTINGS_ID({ jobId })),
     );
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
 
-    // User Books a job
-    await userPage
-      .getByRole("button", { name: "Book Interview Session" })
-      .click();
+    await userPage.getByTestId("book-interview-session-button").click();
 
     await userPage.keyboard.press("Enter");
     await userPage.keyboard.press("Enter");
@@ -181,52 +133,61 @@ test.describe("Chat ", () => {
     await userPage.keyboard.press("Enter");
     await userPage.mouse.click(0, 0);
 
-    await userPage
-      .getByRole("button", { name: "Book Interview Session" })
-      .click();
-    await userPage.waitForLoadState("networkidle");
+    const sessionIdPromise = userPage.waitForResponse(
+      (response) =>
+        response.url().includes(BackendRoutes.SESSIONS) &&
+        response.status() === 201,
+    );
 
-    // User goes to the My Sessions page
+    await userPage.getByTestId("book-interview-session-button-submit").click();
+    await userPage.waitForLoadState("domcontentloaded");
+
+    const sessionId = await sessionIdPromise.then(async (response) => {
+      const json = await response.json();
+      return json.data._id;
+    });
+
     await userPage.goto(withFrontendRoute(FrontendRoutes.SESSION_LIST));
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
 
-    // User goes to the chat page
-    await userPage.getByRole("button", { name: "Start Chat" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage
+      .getByTestId("user-interview-session-card-chat-button")
+      .click();
 
-    // Company goes to the chat page
+    await userPage.waitForURL(
+      withFrontendRoute(FrontendRoutes.CHAT_SESSION({ sessionId })),
+    );
+    await userPage.waitForLoadState("domcontentloaded");
+
     await companyPage.goto(withFrontendRoute(FrontendRoutes.SESSION_LIST));
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.waitForLoadState("domcontentloaded");
 
-    await companyPage.getByText(new RegExp(jobTitle, "i")).click();
+    await companyPage.getByTestId("flag-user-card-accordion-trigger").click();
 
-    const emailLocator = companyPage.getByText(userEmail);
-    await emailLocator.waitFor({ state: "attached" });
-    const dropdownButton = emailLocator
-      .locator("..")
-      .locator("..")
-      .locator("..")
-      .locator("div.flex.w-full.items-center.justify-between")
-      .locator("button");
+    await companyPage
+      .getByTestId("flag-user-card-dropdown-menu-trigger")
+      .click();
+    await companyPage
+      .getByTestId("flag-user-card-dropdown-menu-item-chat")
+      .click();
 
-    await dropdownButton.click();
-    await companyPage.getByRole("menuitem", { name: "Chat" }).click();
+    await companyPage.waitForLoadState("domcontentloaded");
 
-    await companyPage.waitForLoadState("networkidle");
-    await expect(companyPage).toHaveURL(/\/chat\/.+/);
+    await expect(companyPage).toHaveURL(
+      withFrontendRoute(FrontendRoutes.CHAT_SESSION({ sessionId })),
+    );
   });
 
   test.describe.configure({ mode: "serial" });
 
   test("US2-1A: Users send messages to company", async () => {
-    // User sends a message to the company
     await userPage
-      .getByPlaceholder("Type a message...")
+      .getByTestId("chat-input")
       .fill("Hello, I am interested in this job.");
-    await userPage.getByRole("button", { name: "Send" }).click();
-    await userPage.waitForLoadState("networkidle");
 
-    // Verify the message is sent
+    await userPage.getByTestId("chat-send-button").click();
+    await userPage.waitForLoadState("domcontentloaded");
+
     await expect(
       userPage.getByText("Hello, I am interested in this job."),
     ).toBeVisible();
@@ -237,11 +198,9 @@ test.describe("Chat ", () => {
 
   test("US2-1B: Refresh page should see full history", async () => {
     // User sends a message to the company
-    await userPage
-      .getByPlaceholder("Type a message...")
-      .fill("sup bro, how are you?");
-    await userPage.getByRole("button", { name: "Send" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.getByTestId("chat-input").fill("sup bro, how are you?");
+    await userPage.getByTestId("chat-send-button").click();
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(userPage.getByText("sup bro, how are you?")).toBeVisible();
@@ -249,7 +208,7 @@ test.describe("Chat ", () => {
 
     // User refresh the page
     await userPage.reload();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is still there
     await expect(userPage.getByText("sup bro, how are you?")).toBeVisible();
@@ -258,9 +217,9 @@ test.describe("Chat ", () => {
 
   test("US2-2A: Users edit messages", async () => {
     // User sends a message to the company
-    await userPage.getByPlaceholder("Type a message...").fill("ggez");
-    await userPage.getByRole("button", { name: "Send" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.getByTestId("chat-input").fill("ggez");
+    await userPage.getByTestId("chat-send-button").click();
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(userPage.getByText("ggez")).toBeVisible();
@@ -284,7 +243,7 @@ test.describe("Chat ", () => {
     await userPage.getByRole("menuitem", { name: "Edit Message" }).click();
     await userPage.getByPlaceholder("Enter message").fill("Sorry bro");
     await userPage.getByRole("button", { name: "Save changes" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is updated
     await expect(userPage.getByText("Sorry bro")).toBeVisible();
@@ -294,9 +253,9 @@ test.describe("Chat ", () => {
 
   test("US2-2B: Editing a message without changing", async () => {
     // User sends a message to the company
-    await userPage.getByPlaceholder("Type a message...").fill("notedit");
-    await userPage.getByRole("button", { name: "Send" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.getByTestId("chat-input").fill("notedit");
+    await userPage.getByTestId("chat-send-button").click();
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(userPage.getByText("notedit")).toBeVisible();
@@ -319,7 +278,7 @@ test.describe("Chat ", () => {
     // Click on the edit message button but don't change the message
     await userPage.getByRole("menuitem", { name: "Edit Message" }).click();
     await userPage.getByRole("button", { name: "Save changes" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is still the same
     await expect(userPage.getByText("notedit")).toBeVisible();
@@ -329,11 +288,9 @@ test.describe("Chat ", () => {
 
   test("US2-3A: Users delete messages", async () => {
     // User sends a message to the company
-    await userPage
-      .getByPlaceholder("Type a message...")
-      .fill("free robux click here");
-    await userPage.getByRole("button", { name: "Send" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.getByTestId("chat-input").fill("free robux click here");
+    await userPage.getByTestId("chat-send-button").click();
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(userPage.getByText("free robux click here")).toBeVisible();
@@ -355,7 +312,7 @@ test.describe("Chat ", () => {
 
     await userPage.getByRole("menuitem", { name: "Delete Message" }).click();
     await userPage.getByRole("button", { name: "Delete" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is deleted
     await expect(userPage.getByText("free robux click here")).not.toBeVisible();
@@ -367,11 +324,9 @@ test.describe("Chat ", () => {
 
   test("US2-3B: Not logged in user clicking Delete", async () => {
     // User sends a message to the company
-    await userPage
-      .getByPlaceholder("Type a message...")
-      .fill("not logged");
-    await userPage.getByRole("button", { name: "Send" }).click();
-    await userPage.waitForLoadState("networkidle");
+    await userPage.getByTestId("chat-input").fill("not logged");
+    await userPage.getByTestId("chat-send-button").click();
+    await userPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(userPage.getByText("not logged")).toBeVisible();
@@ -385,35 +340,35 @@ test.describe("Chat ", () => {
     await userPage.getByTestId("auth-dropdown-menu-trigger").click();
     await userPage.getByRole("menuitem", { name: "Logout" }).click();
     await userPage.waitForURL(FrontendRoutes.AUTH_SIGN_IN);
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
 
     // go to the chat page but go to the sign in page
     await userPage.goto(tempURL);
-    await userPage.waitForLoadState("networkidle");
-    await expect(userPage).toHaveURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
+    await userPage.waitForLoadState("domcontentloaded");
+    await expect(userPage).toHaveURL(
+      withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN),
+    );
 
     // Sign in as a user
     await signIn(userPage, {
       email: userEmailTemp,
       password: userPasswordTemp,
     });
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
     await expect(userPage).toHaveURL(withFrontendRoute(FrontendRoutes.HOME));
 
     // go to the chat page
     await userPage.goto(tempURL);
-    await userPage.waitForLoadState("networkidle");
+    await userPage.waitForLoadState("domcontentloaded");
     await expect(userPage).toHaveURL(/\/chat\/.+/);
     await expect(userPage.getByText("not logged")).toBeVisible();
   });
 
   test("US2-4A: Company send messages to user", async () => {
     // Company sends a message to the user
-    await companyPage
-      .getByPlaceholder("Type a message...")
-      .fill("Hello, I am Big Boss.");
-    await companyPage.getByRole("button", { name: "Send" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.getByTestId("chat-input").fill("Hello, I am Big Boss.");
+    await companyPage.getByTestId("chat-send-button").click();
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(companyPage.getByText("Hello, I am Big Boss.")).toBeVisible();
@@ -422,25 +377,19 @@ test.describe("Chat ", () => {
 
   test("US2-4B: Company sending empty message", async () => {
     // Company sends an empty message to the user
-    await companyPage.getByRole("button", { name: "Send" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.getByTestId("chat-send-button").click();
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is not sent
-    await expect(
-      companyPage.getByText("Type a message..."),
-    ).not.toBeVisible();
-    await expect(
-      userPage.getByText("Type a message..."),
-    ).not.toBeVisible();
+    await expect(companyPage.getByText("Type a message...")).not.toBeVisible();
+    await expect(userPage.getByText("Type a message...")).not.toBeVisible();
   });
 
   test("US2-5A: Company edit messages", async () => {
     // User sends a message to the company
-    await companyPage
-      .getByPlaceholder("Type a message...")
-      .fill("omgto is among us");
-    await companyPage.getByRole("button", { name: "Send" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.getByTestId("chat-input").fill("omgto is among us");
+    await companyPage.getByTestId("chat-send-button").click();
+    await companyPage.waitForLoadState("domcontentloaded");
     await expect(companyPage.getByText("omgto is among us")).toBeVisible();
 
     // User edits the message
@@ -464,7 +413,7 @@ test.describe("Chat ", () => {
       .getByPlaceholder("Enter message")
       .fill("My company is the best in the world");
     await companyPage.getByRole("button", { name: "Save changes" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is updated
     await expect(
@@ -478,9 +427,9 @@ test.describe("Chat ", () => {
 
   test("US2-5B: Company editing a message without change", async () => {
     // Company sends a message to the company
-    await companyPage.getByPlaceholder("Type a message...").fill("company not edit");
-    await companyPage.getByRole("button", { name: "Send" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.getByTestId("chat-input").fill("company not edit");
+    await companyPage.getByTestId("chat-send-button").click();
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(companyPage.getByText("company not edit")).toBeVisible();
@@ -495,7 +444,10 @@ test.describe("Chat ", () => {
     // Use mouse to hover the dropdown menu
     const box = await messageContainer.boundingBox();
     if (box) {
-      await companyPage.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await companyPage.mouse.move(
+        box.x + box.width / 2,
+        box.y + box.height / 2,
+      );
     }
     const dropdownTrigger = messageContainer.locator("button").first();
     await dropdownTrigger.click();
@@ -503,7 +455,7 @@ test.describe("Chat ", () => {
     // Click on the edit message button but don't change the message
     await companyPage.getByRole("menuitem", { name: "Edit Message" }).click();
     await companyPage.getByRole("button", { name: "Save changes" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is still the same
     await expect(companyPage.getByText("company not edit")).toBeVisible();
@@ -514,10 +466,10 @@ test.describe("Chat ", () => {
   test("US2-6A: Company delete messages", async () => {
     // Company sends a message to the user
     await companyPage
-      .getByPlaceholder("Type a message...")
+      .getByTestId("chat-input")
       .fill("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    await companyPage.getByRole("button", { name: "Send" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.getByTestId("chat-send-button").click();
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(
@@ -536,14 +488,17 @@ test.describe("Chat ", () => {
     // Use mouse to hover the dropdown menu
     const box = await messageContainer.boundingBox();
     if (box) {
-      await companyPage.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await companyPage.mouse.move(
+        box.x + box.width / 2,
+        box.y + box.height / 2,
+      );
     }
     const dropdownTrigger = messageContainer.locator("button").first();
     await dropdownTrigger.click();
 
     await companyPage.getByRole("menuitem", { name: "Delete Message" }).click();
     await companyPage.getByRole("button", { name: "Delete" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is deleted
     await expect(
@@ -557,11 +512,9 @@ test.describe("Chat ", () => {
 
   test("US2-6B: Company not logged in clicking Delete", async () => {
     // Company sends a message to the company
-    await companyPage
-      .getByPlaceholder("Type a message...")
-      .fill("Company not logged");
-    await companyPage.getByRole("button", { name: "Send" }).click();
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.getByTestId("chat-input").fill("Company not logged");
+    await companyPage.getByTestId("chat-send-button").click();
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // Verify the message is sent
     await expect(companyPage.getByText("Company not logged")).toBeVisible();
@@ -575,24 +528,26 @@ test.describe("Chat ", () => {
     await companyPage.getByTestId("auth-dropdown-menu-trigger").click();
     await companyPage.getByRole("menuitem", { name: "Logout" }).click();
     await companyPage.waitForURL(FrontendRoutes.AUTH_SIGN_IN);
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.waitForLoadState("domcontentloaded");
 
     // go to the chat page but go to the sign in page
     await companyPage.goto(tempURL);
-    await companyPage.waitForLoadState("networkidle");
-    await expect(companyPage).toHaveURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
+    await companyPage.waitForLoadState("domcontentloaded");
+    await expect(companyPage).toHaveURL(
+      withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN),
+    );
 
     // Sign in as a user
     await signIn(companyPage, {
       email: companyEmailTemp,
       password: companyPasswordTemp,
     });
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.waitForLoadState("domcontentloaded");
     await expect(companyPage).toHaveURL(withFrontendRoute(FrontendRoutes.HOME));
 
     // go to the chat page
     await companyPage.goto(tempURL);
-    await companyPage.waitForLoadState("networkidle");
+    await companyPage.waitForLoadState("domcontentloaded");
     await expect(companyPage).toHaveURL(/\/chat\/.+/);
     await expect(companyPage.getByText("Company not logged")).toBeVisible();
   });

@@ -385,11 +385,13 @@ export default function Chat() {
       >
         <Input
           ref={inputRef}
+          data-testid="chat-input"
           type="text"
           placeholder="Type a message..."
           className="flex-grow"
         />
         <button
+          data-testid="chat-send-button"
           type="submit"
           className="rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800"
         >

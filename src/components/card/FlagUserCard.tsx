@@ -40,7 +40,10 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
         value={jobListing.jobTitle}
         className="w-full rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md"
       >
-        <AccordionTrigger className="px-6 py-4 hover:no-underline">
+        <AccordionTrigger
+          data-testid="flag-user-card-accordion-trigger"
+          className="px-6 py-4 hover:no-underline"
+        >
           <div className="w-full text-left">
             <h3 className="text-lg font-semibold text-gray-900">
               {jobListing.jobTitle}
@@ -84,6 +87,7 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
+                              data-testid="flag-user-card-dropdown-menu-trigger"
                               disabled={isToggleStartPending}
                               variant="ghost"
                               className="h-fit rounded-full p-1"
@@ -93,6 +97,7 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-32">
                             <DropdownMenuItem
+                              data-testid="flag-user-card-dropdown-menu-item-chat"
                               onSelect={() =>
                                 router.push(
                                   FrontendRoutes.CHAT_SESSION({

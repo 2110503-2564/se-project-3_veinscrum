@@ -28,6 +28,7 @@ const adminRoutes = [
 
 const userRoutes = [
   FrontendRouteTargets.SESSION_LIST,
+  FrontendRouteTargets.CHAT_SESSION,
   FrontendRouteTargets.SESSION_CREATE,
   FrontendRouteTargets.SESSION_CREATE_ID,
 ];

@@ -47,6 +47,7 @@ export const UserInterviewSessionCard: React.FC<
       topRightElement={
         <div className="flex justify-end gap-2">
           <Button
+            data-testid="user-interview-session-card-chat-button"
             className="bg-black text-white hover:bg-zinc-800 hover:text-white"
             variant="outline"
             size="sm"

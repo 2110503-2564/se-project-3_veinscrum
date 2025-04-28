@@ -167,7 +167,6 @@ export default function UserInterviewSessionsPage() {
               interviewSession={interviewSession}
               onDelete={() => setInterviewSessionToDelete(interviewSession)}
               onEdit={() => setInterviewSessionToUpdate(interviewSession)}
-             
               onChat={() =>
                 router.push(
                   FrontendRoutes.CHAT_SESSION({
