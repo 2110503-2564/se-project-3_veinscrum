@@ -197,8 +197,8 @@ test.describe("Job Listing CRUD", () => {
 
     await page.waitForURL(
       withFrontendRoute(
-        FrontendRoutes.COMPANY_PROFILE({
-          companyId: companyId,
+        FrontendRoutes.JOB_LISTINGS_ID({
+          jobId,
         }),
       ),
     );
@@ -248,6 +248,7 @@ test.describe("Job Listing CRUD", () => {
 
     await page.getByTestId("job-card-delete-button").click();
     await page.getByTestId("job-listing-delete-dialog-submit-button").click();
+
     await expect(
       page.getByTestId("company-profile-no-job-listings"),
     ).toBeVisible();

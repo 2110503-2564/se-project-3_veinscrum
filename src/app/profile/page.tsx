@@ -235,7 +235,10 @@ export default function ProfilePage() {
             <div className="mx-auto max-w-3xl space-y-4">
               {!isCompanyLoading ? (
                 company?.jobListings?.length === 0 ? (
-                  <p className="text-center text-gray-500">
+                  <p
+                    data-testid="company-profile-no-job-listings"
+                    className="text-center text-gray-500"
+                  >
                     No job listings available.
                   </p>
                 ) : (

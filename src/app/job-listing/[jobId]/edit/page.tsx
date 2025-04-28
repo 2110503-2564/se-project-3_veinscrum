@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/shadcn/form";
 import { Input } from "@/components/ui/shadcn/input";
 import { BackendRoutes } from "@/constants/routes/Backend";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MDXEditorMethods } from "@mdxeditor/editor";
@@ -93,8 +94,11 @@ export default function EditJobPage() {
         queryKey: [BackendRoutes.JOB_LISTINGS_ID({ id: params.jobId })],
       });
 
-      // consider this
-      router.back();
+      router.push(
+        FrontendRoutes.JOB_LISTINGS_ID({
+          jobId: params.jobId,
+        }),
+      );
     },
     onError: (error) => {
       toast.error("Failed to edit Job", {
@@ -169,6 +173,7 @@ export default function EditJobPage() {
             )}
           />
           <Button
+            data-testid="job-listing-edit-submit-button"
             type="submit"
             className="w-full"
             size="lg"

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/shadcn/button";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { Globe, MapPin, Phone, PlusIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -16,7 +16,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export default function CompanyProfilePage() {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const { status } = useSession();
   const { companyId } = useParams<{ companyId: string }>();
@@ -31,6 +30,7 @@ export default function CompanyProfilePage() {
       isLoading: isCompanyLoading,
       isError: isCompanyError,
       error: companyError,
+      refetch: refreshCompany,
     },
   ] = useQueries({
     queries: [
@@ -52,13 +52,6 @@ export default function CompanyProfilePage() {
       },
     ],
   });
-
-  // Refresh data helper function
-  const refreshCompany = () => {
-    queryClient.invalidateQueries({
-      queryKey: [BackendRoutes.COMPANIES_ID({ companyId })],
-    });
-  };
 
   const { mutate: deleteJobListing, isPending: isDeleteJobListingPending } =
     useMutation({

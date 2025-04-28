@@ -551,6 +551,8 @@ test.describe("Chat ", () => {
     await companyPage.waitForLoadState("domcontentloaded");
     await expect(companyPage).toHaveURL(/\/chat\/.+/);
 
+    await companyPage.waitForTimeout(2000);
+
     await expect(companyPage.getByText("Company not logged")).toBeVisible();
   });
 });
