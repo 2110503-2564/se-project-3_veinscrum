@@ -25,7 +25,11 @@ export const AuthenticatedDropdownMenu: React.FC<
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button data-testid="auth-dropdown-menu-trigger" variant="ghost" size="lg">
+        <Button
+          data-testid="auth-dropdown-menu-trigger"
+          variant="ghost"
+          size="lg"
+        >
           <p>{user?.name}</p>
           <ChevronDownIcon />
         </Button>
@@ -33,13 +37,24 @@ export const AuthenticatedDropdownMenu: React.FC<
       <DropdownMenuContent>
         {user.role === "company" && user.company === null ? (
           <DropdownMenuItem asChild>
-            <Link href={FrontendRoutes.COMPANY_CREATE}>Create Company</Link>
+            <Link
+              data-testid="auth-dropdown-menu-create-company"
+              href={FrontendRoutes.COMPANY_CREATE}
+            >
+              Create Company
+            </Link>
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuItem asChild>
-          <Link href={FrontendRoutes.PROFILE}>Profile</Link>
+          <Link
+            data-testid="auth-dropdown-menu-profile"
+            href={FrontendRoutes.PROFILE}
+          >
+            Profile
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem
+          data-testid="auth-dropdown-menu-logout"
           onClick={async () => {
             await fetch(withBaseRoute(BackendRoutes.AUTH_LOGOUT), {
               headers: {

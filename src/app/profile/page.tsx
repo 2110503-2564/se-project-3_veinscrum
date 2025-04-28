@@ -226,7 +226,7 @@ export default function ProfilePage() {
 
                 <TextEditor
                   key={company?.description}
-                  markdown={company?.description}
+                  value={company?.description}
                   readOnly
                 />
               </div>

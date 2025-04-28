@@ -117,6 +117,7 @@ export default function JobDetailPage() {
       });
     },
   });
+
   if (isJobLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -197,7 +198,8 @@ export default function JobDetailPage() {
         <div className="w-full space-y-4">
           <TextEditor
             readOnly
-            markdown={job.description}
+            key={job.description}
+            value={job.description}
             data-testid="job-description"
           />
         </div>

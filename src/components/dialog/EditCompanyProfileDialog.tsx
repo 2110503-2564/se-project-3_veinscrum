@@ -144,10 +144,7 @@ export const EditCompanyProfileDialog: React.FC<
                   >
                     Description
                   </FormLabel>
-                  <TextEditor
-                    markdown={field.value}
-                    onChange={field.onChange}
-                  />
+                  <TextEditor {...field} />
                 </FormItem>
               )}
             />

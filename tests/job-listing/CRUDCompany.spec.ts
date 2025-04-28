@@ -10,6 +10,7 @@ test.describe("Job Listing CRUD", () => {
   let page: Page;
   let notLoginPage: Page;
   let jobId: string | undefined;
+  let companyId: string | undefined;
 
   const jobTitle = faker.person.jobTitle();
   const jobDescription = faker.lorem.paragraph();
@@ -36,101 +37,96 @@ test.describe("Job Listing CRUD", () => {
       password,
     });
 
+    await page.waitForTimeout(2000);
+
     await signIn(notLoginPage, {
       email,
       password,
     });
 
-    await expect(
-      page.getByRole("heading", { name: "Online Job Fair Registration" }),
-    ).toBeVisible();
+    await expect(page.getByTestId("home-title")).toBeVisible();
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
+    await page.getByTestId("auth-dropdown-menu-create-company").click();
 
-    await page.getByRole("menuitem", { name: "Create Company" }).click();
     await page.waitForURL(withFrontendRoute(FrontendRoutes.COMPANY_CREATE));
 
-    await expect(
-      page.getByRole("heading", { name: "Create Company" }),
-    ).toBeVisible();
-    await page.getByRole("textbox", { name: "Company Name" }).click();
-    await page.getByRole("textbox", { name: "Company Name" }).fill(companyName);
-    await page.getByRole("textbox", { name: "Address" }).click();
-    await page.getByRole("textbox", { name: "Address" }).fill(address);
-    await page.getByRole("textbox", { name: "Website" }).click();
-    await page.getByRole("textbox", { name: "Website" }).fill(website);
-    await page.getByRole("textbox", { name: "Telephone" }).click();
-    await page.getByRole("textbox", { name: "Telephone" }).fill(telephone);
-    await page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
+    await expect(page.getByTestId("company-create-title")).toBeVisible();
+    await page.getByTestId("company-create-name-input").fill(companyName);
+    await page.getByTestId("company-create-address-input").fill(address);
+    await page.getByTestId("company-create-website-input").fill(website);
+    await page.getByTestId("company-create-tel-input").fill(telephone);
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(description);
+
+    const responsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes(BackendRoutes.COMPANIES) &&
+        response.status() === 201,
+    );
+
     await page.getByRole("button", { name: "Create" }).click();
+
+    const response: { data: Company } = await responsePromise.then(
+      async (response) => await response.json(),
+    );
+
+    companyId = response.data.id;
 
     await page.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
   });
 
-  test("US1-5A: Create Job Listing by Company", async () => {
+  test("US1-5A: Create Job Listing by Company (Success)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
 
-    await expect(
-      page.getByRole("heading", { name: "Create Job" }),
-    ).toBeVisible();
-    await page.getByRole("textbox", { name: "Job Title" }).click();
-    await page.getByRole("textbox", { name: "Job Title" }).fill(jobTitle);
-    await page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
+    await expect(page.getByTestId("job-listing-create-title")).toBeVisible();
+
+    await page.getByTestId("job-listing-create-job-title-input").fill(jobTitle);
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
+
     await page.waitForTimeout(2000);
-    
+
     const responsePromise = page.waitForResponse(
       (response) =>
         response.url().includes(BackendRoutes.JOB_LISTINGS) &&
         response.status() === 201,
     );
 
-    await page.waitForTimeout(2000);
-    await page.getByRole("button", { name: "Create" }).click();
+    await page.getByTestId("job-listing-create-submit-button").click();
 
-    const response = (await (await responsePromise).json()) as {
-      data: JobListing;
-    };
+    const response: { data: JobListing } = await responsePromise.then(
+      async (response) => await response.json(),
+    );
 
     jobId = response.data._id;
   });
 
-  test("US1-5B: Create Job Listing by Company(fail)", async () => {
+  test("US1-5B: Create Job Listing by Company (Fail)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
 
-    await expect(
-      page.getByRole("heading", { name: "Create Job" }),
-    ).toBeVisible();
-    await page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
+    await expect(page.getByTestId("job-listing-create-title")).toBeVisible();
+
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
 
     await page.waitForTimeout(2000);
-    await page.getByRole("button", { name: "Create" }).click();
 
-    await expect(page.getByText("Job Title is required")).toBeVisible();
+    await page.getByTestId("job-listing-create-submit-button").click();
+
+    await expect(
+      page.getByTestId("job-listing-create-job-title-error"),
+    ).toBeVisible();
   });
 
-  test("US1-6A: View Job Listing by Company", async () => {
+  test("US1-6A: View Job Listing by Company (Success)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
-    await page.getByRole("menuitem", { name: "Profile" }).click();
+    await page.getByTestId("auth-dropdown-menu-profile").click();
 
     await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
     await page.waitForLoadState("domcontentloaded");
@@ -138,29 +134,33 @@ test.describe("Job Listing CRUD", () => {
     await expect(page.getByText(jobTitle)).toBeVisible();
   });
 
-  test("US1-6B: View Job Listing by Company (fail)", async () => {
+  test("US1-6B: View Job Listing by Company (Fail)", async () => {
     await notLoginPage.goto(withFrontendRoute(FrontendRoutes.HOME));
 
-    await notLoginPage.getByTestId('auth-dropdown-menu-trigger').click();
-    await notLoginPage.getByRole('menuitem', { name: 'Profile' }).click();
+    await notLoginPage.getByTestId("auth-dropdown-menu-trigger").click();
+    await notLoginPage.getByTestId("auth-dropdown-menu-profile").click();
+
     await notLoginPage.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
     await notLoginPage.waitForLoadState("domcontentloaded");
 
     await expect(notLoginPage.getByText(jobTitle)).toBeVisible();
 
-    await notLoginPage.getByTestId('auth-dropdown-menu-trigger').click();
-    await notLoginPage.getByRole('menuitem', { name: 'Logout' }).click();
-    await notLoginPage.waitForURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
+    await notLoginPage.getByTestId("auth-dropdown-menu-trigger").click();
+    await notLoginPage.getByTestId("auth-dropdown-menu-logout").click();
 
-    await notLoginPage.getByRole('link', { name: 'Online Job Fair Registration' }).click();
+    await notLoginPage.waitForTimeout(2000);
+
+    await notLoginPage.waitForURL(
+      withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN),
+    );
+    await notLoginPage.waitForLoadState("domcontentloaded");
 
     await notLoginPage.goto(withFrontendRoute(FrontendRoutes.PROFILE));
 
-    await expect(notLoginPage.getByRole("heading", { name: "Sign in" }),
-    ).toBeVisible();
+    await expect(notLoginPage.getByTestId("signin-title")).toBeVisible();
   });
 
-  test("US1-7A: Edit Job Listing by Company", async () => {
+  test("US1-7A: Edit Job Listing by Company (Success)", async () => {
     const newJobTitle = faker.person.jobTitle();
     const newJobDescription = faker.lorem.paragraph();
 
@@ -173,35 +173,38 @@ test.describe("Job Listing CRUD", () => {
     );
     await page.waitForLoadState("domcontentloaded");
 
-    // Wait for form
     await expect(page.locator("form")).toBeVisible();
 
-    // Get form elements and wait for them
-    const titleInput = page.locator("input[name='jobTitle']");
-    const descriptionEditor = page.locator("[contenteditable='true']");
+    const titleInput = page.getByTestId("job-listing-edit-job-title-input");
+    const descriptionEditor = page.getByRole("textbox", {
+      name: "editable markdown",
+    });
 
     await expect(titleInput).toBeVisible();
     await expect(descriptionEditor).toBeVisible();
 
-    // Fill in the title
     await titleInput.clear();
     await titleInput.fill(newJobTitle);
 
-    // Fill in the description using the rich text editor
-    await descriptionEditor.click();
-    await page.keyboard.press("ControlOrMeta+A");
-    await page.keyboard.press("Backspace");
-    await page.keyboard.type(newJobDescription);
+    await descriptionEditor.clear();
+    await descriptionEditor.fill(newJobDescription);
 
-    // Find and click the submit button
-    const submitButton = page.locator('button[type="submit"]');
-    await expect(submitButton).toBeVisible();
+    await page.getByTestId("job-listing-edit-submit-button").click();
 
-    // Submit
-    await submitButton.click();
+    if (!companyId) {
+      throw new Error("Company ID is not set");
+    }
+
+    await page.waitForURL(
+      withFrontendRoute(
+        FrontendRoutes.COMPANY_PROFILE({
+          companyId: companyId,
+        }),
+      ),
+    );
   });
 
-  test("US1-7B: Edit Job Listing by Company(fail)", async () => {
+  test("US1-7B: Edit Job Listing by Company (Fail)", async () => {
     const newJobDescription = faker.lorem.paragraph();
 
     if (!jobId) {
@@ -213,59 +216,53 @@ test.describe("Job Listing CRUD", () => {
     );
     await page.waitForLoadState("domcontentloaded");
 
-    // Wait for form
     await expect(page.locator("form")).toBeVisible();
 
-    // Get form elements and wait for them
-    const titleInput = page.locator("input[name='jobTitle']");
-    const descriptionEditor = page.locator("[contenteditable='true']");
+    const titleInput = page.getByTestId("job-listing-edit-job-title-input");
+    const descriptionEditor = page.getByRole("textbox", {
+      name: "editable markdown",
+    });
 
     await expect(titleInput).toBeVisible();
     await expect(descriptionEditor).toBeVisible();
 
-    // Fill in the title
     await titleInput.clear();
+    await descriptionEditor.clear();
+    await descriptionEditor.fill(newJobDescription);
 
-    // Fill in the description using the rich text editor
-    await descriptionEditor.click();
-    await page.keyboard.press("ControlOrMeta+A");
-    await page.keyboard.press("Backspace");
-    await page.keyboard.type(newJobDescription);
+    await page.getByTestId("job-listing-edit-submit-button").click();
 
-    // Find and click the submit button
-    const submitButton = page.locator('button[type="submit"]');
-    await expect(submitButton).toBeVisible();
-
-    // Submit
-    await submitButton.click();
     await expect(page.getByText("Job Title is required")).toBeVisible();
   });
 
-  test("US1-8A: delete Job Listing by Company", async () => {
+  test("US1-8A: delete Job Listing by Company (Success)", async () => {
     await page.goto(withFrontendRoute(FrontendRoutes.HOME));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
-    await page.getByRole("menuitem", { name: "Profile" }).click();
-    await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
-    await page.waitForLoadState("domcontentloaded");
-
-    await page.getByRole("button", { name: "Delete Details" }).click();
-    await page.getByRole("button", { name: "Delete" }).click();
-    await expect(page.getByText("No job listings available.")).toBeVisible();
-  });
-
-  test("US1-8B: delete Job Listing by Company", async () => {
-    await page.goto(withFrontendRoute(FrontendRoutes.HOME));
-
-    await page.getByTestId("auth-dropdown-menu-trigger").click();
-    await page.getByRole("menuitem", { name: "Profile" }).click();
+    await page.getByTestId("auth-dropdown-menu-profile").click();
 
     await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
     await page.waitForLoadState("domcontentloaded");
 
-    await expect(page.getByRole("button", { name: "Delete Details" })).not.toBeVisible();
-    await expect(page.getByRole("button", { name: "Delete" })).not.toBeVisible();
+    await page.getByTestId("job-card-delete-button").click();
+    await page.getByTestId("job-listing-delete-dialog-submit-button").click();
     await expect(page.getByText("No job listings available.")).toBeVisible();
   });
 
+  test("US1-8B: delete Job Listing by Company (Fail)", async () => {
+    await page.goto(withFrontendRoute(FrontendRoutes.HOME));
+
+    await page.getByTestId("auth-dropdown-menu-trigger").click();
+    await page.getByTestId("auth-dropdown-menu-profile").click();
+
+    await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
+    await page.waitForLoadState("domcontentloaded");
+
+    await expect(page.getByTestId("job-card-delete-button")).not.toBeVisible();
+    await expect(
+      page.getByTestId("job-listing-delete-dialog-submit-button"),
+    ).not.toBeVisible();
+
+    await expect(page.getByText("No job listings available.")).toBeVisible();
+  });
 });

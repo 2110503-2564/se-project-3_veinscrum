@@ -34,7 +34,6 @@ export async function signIn(
   credentials: SignInCredentials | SignInRole,
 ) {
   await page.goto(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
-  await page.getByTestId("signin-email-input").click();
   await page
     .getByTestId("signin-email-input")
     .fill(
@@ -42,7 +41,6 @@ export async function signIn(
         ? CREDENTIALS[credentials.role].email
         : credentials.email,
     );
-  await page.getByTestId("signin-password-input").click();
   await page
     .getByTestId("signin-password-input")
     .fill(

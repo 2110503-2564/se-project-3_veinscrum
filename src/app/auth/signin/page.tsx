@@ -47,7 +47,12 @@ export default function SignInPage() {
             }),
           )}
         >
-          <h1 className="text-center text-3xl font-bold">Sign in</h1>
+          <h1
+            data-testid="signin-title"
+            className="text-center text-3xl font-bold"
+          >
+            Sign in
+          </h1>
           <FormField
             control={form.control}
             name="email"

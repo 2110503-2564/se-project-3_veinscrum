@@ -86,7 +86,12 @@ export default function CreateCompanyPage() {
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
           onSubmit={form.handleSubmit((e) => createJob(e))}
         >
-          <h1 className="text-center text-3xl font-bold">Create Job</h1>
+          <h1
+            data-testid="job-listing-create-title"
+            className="text-center text-3xl font-bold"
+          >
+            Create Job
+          </h1>
           <FormField
             control={form.control}
             name="jobTitle"
@@ -94,9 +99,12 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Job Title</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    data-testid="job-listing-create-job-title-input"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage data-testid="job-listing-create-job-title-error" />
               </FormItem>
             )}
           />
@@ -123,16 +131,18 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <TextEditor
-                    markdown={field.value}
-                    onChange={field.onChange}
-                  />
+                  <TextEditor {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" size="lg">
+          <Button
+            data-testid="job-listing-create-submit-button"
+            type="submit"
+            className="w-full"
+            size="lg"
+          >
             Create
           </Button>
         </form>

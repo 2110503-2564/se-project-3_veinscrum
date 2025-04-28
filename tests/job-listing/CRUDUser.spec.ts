@@ -40,46 +40,28 @@ test.describe("Job Listing CRUD", () => {
     ).toBeVisible();
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
+    await page.getByTestId("auth-dropdown-menu-create-company").click();
 
-    await page.getByRole("menuitem", { name: "Create Company" }).click();
     await page.waitForURL(withFrontendRoute(FrontendRoutes.COMPANY_CREATE));
 
-    await expect(
-      page.getByRole("heading", { name: "Create Company" }),
-    ).toBeVisible();
-    await page.getByRole("textbox", { name: "Company Name" }).click();
-    await page.getByRole("textbox", { name: "Company Name" }).fill(companyName);
-    await page.getByRole("textbox", { name: "Address" }).click();
-    await page.getByRole("textbox", { name: "Address" }).fill(address);
-    await page.getByRole("textbox", { name: "Website" }).click();
-    await page.getByRole("textbox", { name: "Website" }).fill(website);
-    await page.getByRole("textbox", { name: "Telephone" }).click();
-    await page.getByRole("textbox", { name: "Telephone" }).fill(telephone);
-    await page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
+    await expect(page.getByTestId("company-create-title")).toBeVisible();
+    await page.getByTestId("company-create-name-input").fill(companyName);
+    await page.getByTestId("company-create-address-input").fill(address);
+    await page.getByTestId("company-create-website-input").fill(website);
+    await page.getByTestId("company-create-tel-input").fill(telephone);
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(description);
 
-    await page.getByRole("button", { name: "Create" }).click();
+    await page.getByTestId("company-create-submit-button").click();
 
     await page.goto(withFrontendRoute(FrontendRoutes.JOB_LISTINGS_CREATE));
 
-    await expect(
-      page.getByRole("heading", { name: "Create Job" }),
-    ).toBeVisible();
-    await page.getByRole("textbox", { name: "Job Title" }).click();
-    await page.getByRole("textbox", { name: "Job Title" }).fill(jobTitle);
-    await page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
+    await expect(page.getByTestId("job-listing-create-title")).toBeVisible();
+    await page.getByTestId("job-listing-create-job-title-input").fill(jobTitle);
     await page
       .getByRole("textbox", { name: "editable markdown" })
       .fill(jobDescription);
-    await page.waitForTimeout(2000);
 
     const responsePromise = page.waitForResponse(
       (response) =>
@@ -89,26 +71,29 @@ test.describe("Job Listing CRUD", () => {
 
     await page.waitForTimeout(2000);
 
-    await page.getByRole("button", { name: "Create" }).click();
+    await page.getByTestId("job-listing-create-submit-button").click();
 
-    const response = (await (await responsePromise).json()) as {
-      data: JobListing;
-    };
+    const response: { data: JobListing } = await responsePromise.then(
+      async (response) => await response.json(),
+    );
 
     jobId = response.data._id;
 
-    await page.waitForTimeout(2000);
+    await page.waitForURL(withFrontendRoute(FrontendRoutes.PROFILE));
 
     await page.getByTestId("auth-dropdown-menu-trigger").click();
-    await page.getByRole("menuitem", { name: "Logout" }).click();
+    await page.getByTestId("auth-dropdown-menu-logout").click();
 
     await page.waitForURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
     await page.waitForLoadState("domcontentloaded");
+
+    await page.waitForTimeout(2000);
 
     const { email: userEmail, password: userPassword } = await signUp(
       page,
       "user",
     );
+
     await signIn(page, {
       email: userEmail,
       password: userPassword,
@@ -124,53 +109,67 @@ test.describe("Job Listing CRUD", () => {
       withFrontendRoute(FrontendRoutes.JOB_LISTINGS_ID({ jobId })),
     );
 
-    await expect(page.getByRole("heading", { name: jobTitle })).toBeVisible();
+    await expect(page.getByTestId("job-title")).toBeVisible();
   });
 
-  test("US1-9B: User View Job Listings on Company Profile When None Exist", async () => {
-    const context = await page.context().browser()?.newContext();
-    if (!context) throw new Error("Could not create browser context");
-
-    const newPage = await context.newPage();
-
-    const { email: emptyCompanyEmail, password: emptyCompanyPassword } =
-      await signUp(newPage, "company");
-    await signIn(newPage, {
-      email: emptyCompanyEmail,
-      password: emptyCompanyPassword,
-    });
-
-    await newPage.getByTestId("auth-dropdown-menu-trigger").click();
-    await newPage.getByRole("menuitem", { name: "Create Company" }).click();
-    await newPage.waitForURL(withFrontendRoute(FrontendRoutes.COMPANY_CREATE));
-
+  test("US1-9B: User View Job Listings on Company Profile When None Exist", async ({
+    page: newPage,
+  }) => {
     const companyNameWithoutJobs = faker.company.name();
     const address = faker.location.streetAddress();
     const website = faker.internet.url();
     const telephone = faker.phone.number({ style: "international" });
     const description = faker.lorem.paragraph();
 
+    const { email: emptyCompanyEmail, password: emptyCompanyPassword } =
+      await signUp(newPage, "company");
+
+    await signIn(newPage, {
+      email: emptyCompanyEmail,
+      password: emptyCompanyPassword,
+    });
+
+    await newPage.getByTestId("auth-dropdown-menu-trigger").click();
+    await newPage.getByTestId("auth-dropdown-menu-create-company").click();
+    await newPage.waitForURL(withFrontendRoute(FrontendRoutes.COMPANY_CREATE));
+
     await newPage
-      .getByRole("textbox", { name: "Company Name" })
+      .getByTestId("company-create-name-input")
       .fill(companyNameWithoutJobs);
-    await newPage.getByRole("textbox", { name: "Address" }).fill(address);
-    await newPage.getByRole("textbox", { name: "Website" }).fill(website);
-    await newPage.getByRole("textbox", { name: "Telephone" }).fill(telephone);
+    await newPage.getByTestId("company-create-address-input").fill(address);
+    await newPage.getByTestId("company-create-website-input").fill(website);
+    await newPage.getByTestId("company-create-tel-input").fill(telephone);
     await newPage
       .getByRole("textbox", { name: "editable markdown" })
       .fill(description);
-    await newPage.getByRole("button", { name: "Create" }).click();
+
+    const responsePromise = newPage.waitForResponse(
+      (response) =>
+        response.url().includes(BackendRoutes.COMPANIES) &&
+        response.status() === 201,
+    );
+
+    await newPage.getByTestId("company-create-submit-button").click();
+
+    const response: { data: Company } = await responsePromise.then(
+      async (response) => await response.json(),
+    );
+
+    const companyId = response.data.id;
 
     await newPage.waitForLoadState("networkidle");
-    const companyProfileUrl = newPage.url();
 
     await newPage.getByTestId("auth-dropdown-menu-trigger").click();
-    await newPage.getByRole("menuitem", { name: "Logout" }).click();
+    await newPage.getByTestId("auth-dropdown-menu-logout").click();
     await newPage.close();
 
-    await page.goto(companyProfileUrl);
+    await page.goto(
+      withFrontendRoute(FrontendRoutes.COMPANY_PROFILE({ companyId })),
+    );
     await page.waitForLoadState("domcontentloaded");
 
-    await expect(page.getByTestId("job-listing-card")).toHaveCount(0);
+    await expect(
+      page.getByTestId("company-profile-no-job-listings"),
+    ).toBeVisible();
   });
 });

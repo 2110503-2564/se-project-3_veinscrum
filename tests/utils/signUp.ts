@@ -14,19 +14,16 @@ export async function signUp(page: Page, role: "company" | "user") {
         : FrontendRoutes.AUTH_SIGN_UP,
     ),
   );
-  await page.getByTestId("signup-name-input").click();
   await page.getByTestId("signup-name-input").fill(faker.person.fullName());
-  await page.getByTestId("signup-email-input").click();
   await page.getByTestId("signup-email-input").fill(email);
-  await page.getByTestId("signup-tel-input").click();
   await page
     .getByTestId("signup-tel-input")
     .fill(faker.phone.number({ style: "international" }));
-  await page.getByTestId("signup-password-input").click();
   await page.getByTestId("signup-password-input").fill(password);
-  await page.getByTestId("signup-confirm-password-input").click();
   await page.getByTestId("signup-confirm-password-input").fill(password);
+
   await page.getByTestId("signup-submit-button").click();
+
   await page.waitForURL(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
 
   return {

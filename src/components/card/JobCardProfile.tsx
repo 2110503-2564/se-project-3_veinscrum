@@ -97,6 +97,7 @@ export function JobCardProfile({
             {(requestedUser?.role === "admin" ||
               requestedUser?.role === "company") && (
               <Button
+                data-testid="job-card-delete-button"
                 variant="destructive"
                 size="sm"
                 disabled={
