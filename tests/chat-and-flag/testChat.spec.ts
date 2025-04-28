@@ -338,7 +338,7 @@ test.describe("Chat ", () => {
 
     // log out the user
     await userPage.getByTestId("auth-dropdown-menu-trigger").click();
-    await userPage.getByRole("menuitem", { name: "Logout" }).click();
+    await userPage.getByTestId("auth-dropdown-menu-logout").click();
     await userPage.waitForURL(FrontendRoutes.AUTH_SIGN_IN);
     await userPage.waitForLoadState("domcontentloaded");
 
@@ -526,7 +526,8 @@ test.describe("Chat ", () => {
 
     // log out the user
     await companyPage.getByTestId("auth-dropdown-menu-trigger").click();
-    await companyPage.getByRole("menuitem", { name: "Logout" }).click();
+    await companyPage.getByTestId("auth-dropdown-menu-logout").click();
+
     await companyPage.waitForURL(FrontendRoutes.AUTH_SIGN_IN);
     await companyPage.waitForLoadState("domcontentloaded");
 
@@ -549,6 +550,7 @@ test.describe("Chat ", () => {
     await companyPage.goto(tempURL);
     await companyPage.waitForLoadState("domcontentloaded");
     await expect(companyPage).toHaveURL(/\/chat\/.+/);
+
     await expect(companyPage.getByText("Company not logged")).toBeVisible();
   });
 });

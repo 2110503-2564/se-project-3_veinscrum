@@ -17,7 +17,7 @@ import {
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -28,7 +28,6 @@ import { z } from "zod";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { status } = useSession();
   const [isUpdateCompanyDialogOpen, setIsUpdateCompanyDialogOpen] =
     useState(false);
@@ -44,7 +43,11 @@ export default function ProfilePage() {
     select: (data) => data?.data?.data,
   });
 
-  const { data: company, isLoading: isCompanyLoading } = useQuery({
+  const {
+    data: company,
+    isLoading: isCompanyLoading,
+    refetch: refetchCompany,
+  } = useQuery({
     queryKey: [BackendRoutes.COMPANIES_ID({ companyId: me?.company ?? "" })],
     queryFn: async () =>
       await axios.get<GETCompanyResponse>(
@@ -53,13 +56,6 @@ export default function ProfilePage() {
     enabled: status === "authenticated" && !!me?.company,
     select: (data) => data?.data?.data,
   });
-
-  // Refresh data helper function
-  const refreshCompany = () => {
-    queryClient.invalidateQueries({
-      queryKey: [BackendRoutes.COMPANIES_ID({ companyId: me?.company ?? "" })],
-    });
-  };
 
   const { mutate: updateCompany, isPending: isUpdateCompanyPending } =
     useMutation({
@@ -77,7 +73,7 @@ export default function ProfilePage() {
       onSuccess: () => {
         toast.success("Company updated successfully", { id: "update-company" });
         setIsUpdateCompanyDialogOpen(false);
-        refreshCompany();
+        refetchCompany();
       },
     });
 
@@ -96,7 +92,7 @@ export default function ProfilePage() {
       onSuccess: async () => {
         toast.success("Company deleted successfully", { id: "delete-company" });
         setIsDeleteCompanyDialogOpen(false);
-        refreshCompany();
+        refetchCompany();
       },
     });
 
@@ -112,7 +108,7 @@ export default function ProfilePage() {
       },
       onSuccess: () => {
         toast.success("Job deleted successfully", { id: "delete-job" });
-        refreshCompany();
+        refetchCompany();
         setIsDeleteJobListingDialogOpen(false);
       },
     });

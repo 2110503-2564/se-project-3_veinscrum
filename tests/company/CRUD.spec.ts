@@ -1,3 +1,4 @@
+import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { withFrontendRoute } from "@/utils/routes/withFrontendRoute";
 import { faker } from "@faker-js/faker";
@@ -308,6 +309,17 @@ test.describe("US1-3: Update Company Profile", () => {
 
     await page.getByTestId("company-profile-submit-button").click();
 
+    await page.waitForResponse(
+      (response) =>
+        response
+          .url()
+          .includes(BackendRoutes.COMPANIES_ID({ companyId: "" })) &&
+        response.status() === 200,
+    );
+
+    await page.reload();
+    await page.waitForLoadState("domcontentloaded");
+
     await expect(page.getByText(newCompanyName)).toBeVisible();
     await expect(page.getByText(newAddress)).toBeVisible();
     await expect(page.getByText(newWebsite)).toBeVisible();
@@ -388,6 +400,14 @@ test.describe("US1-4: Delete Company Profile", () => {
     await page.getByTestId("company-profile-delete-profile").click();
 
     await page.getByTestId("company-profile-delete-profile-button").click();
+
+    await page.waitForResponse(
+      (response) =>
+        response
+          .url()
+          .includes(BackendRoutes.COMPANIES_ID({ companyId: "" })) &&
+        response.status() === 200,
+    );
 
     await page.reload();
     await page.waitForLoadState("domcontentloaded");
