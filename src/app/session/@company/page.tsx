@@ -158,10 +158,8 @@ export default function CompanySessionPage() {
   };
 
   return (
-    <main className="mx-auto mt-16 max-w-3xl px-4">
-      <h1 className="mb-8 text-center text-4xl font-bold">
-        Flagged Users by Job Title
-      </h1>
+    <main className="mx-auto mt-16 max-w-3xl space-y-8 px-4">
+      <h1 className="text-center text-4xl font-bold">Flag User By Job Title</h1>
 
       {isSessionLoading && <p>Loading sessions...</p>}
       {sessionError && <p>Error loading sessions.</p>}
