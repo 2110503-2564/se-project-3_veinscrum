@@ -28,7 +28,7 @@ export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
       <div className="space-y-2">
-        <h1 className="text-center text-4xl font-bold">
+        <h1 data-testid="home-title" className="text-center text-4xl font-bold">
           Online Job Fair Registration
         </h1>
         <p className="text-muted-foreground text-center text-lg">

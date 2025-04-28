@@ -34,23 +34,21 @@ export async function signIn(
   credentials: SignInCredentials | SignInRole,
 ) {
   await page.goto(withFrontendRoute(FrontendRoutes.AUTH_SIGN_IN));
-  await page.getByRole("textbox", { name: "Email" }).click();
   await page
-    .getByRole("textbox", { name: "Email" })
+    .getByTestId("signin-email-input")
     .fill(
       credentials.role
         ? CREDENTIALS[credentials.role].email
         : credentials.email,
     );
-  await page.getByRole("textbox", { name: "Password" }).click();
   await page
-    .getByRole("textbox", { name: "Password" })
+    .getByTestId("signin-password-input")
     .fill(
       credentials.role
         ? CREDENTIALS[credentials.role].password
         : credentials.password,
     );
-  await page.getByRole("main").getByRole("button", { name: "Sign in" }).click();
+  await page.getByTestId("signin-submit-button").click();
   await page.waitForURL(withFrontendRoute(FrontendRoutes.HOME));
   await page.waitForLoadState("domcontentloaded");
 }

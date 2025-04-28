@@ -17,7 +17,7 @@ import {
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { FrontendRoutes } from "@/constants/routes/Frontend";
 import { axios } from "@/lib/axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { EllipsisIcon, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -28,7 +28,6 @@ import { z } from "zod";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { status } = useSession();
   const [isUpdateCompanyDialogOpen, setIsUpdateCompanyDialogOpen] =
     useState(false);
@@ -44,7 +43,11 @@ export default function ProfilePage() {
     select: (data) => data?.data?.data,
   });
 
-  const { data: company, isLoading: isCompanyLoading } = useQuery({
+  const {
+    data: company,
+    isLoading: isCompanyLoading,
+    refetch: refetchCompany,
+  } = useQuery({
     queryKey: [BackendRoutes.COMPANIES_ID({ companyId: me?.company ?? "" })],
     queryFn: async () =>
       await axios.get<GETCompanyResponse>(
@@ -53,13 +56,6 @@ export default function ProfilePage() {
     enabled: status === "authenticated" && !!me?.company,
     select: (data) => data?.data?.data,
   });
-
-  // Refresh data helper function
-  const refreshCompany = () => {
-    queryClient.invalidateQueries({
-      queryKey: [BackendRoutes.COMPANIES_ID({ companyId: me?.company ?? "" })],
-    });
-  };
 
   const { mutate: updateCompany, isPending: isUpdateCompanyPending } =
     useMutation({
@@ -77,7 +73,7 @@ export default function ProfilePage() {
       onSuccess: () => {
         toast.success("Company updated successfully", { id: "update-company" });
         setIsUpdateCompanyDialogOpen(false);
-        refreshCompany();
+        refetchCompany();
       },
     });
 
@@ -96,7 +92,7 @@ export default function ProfilePage() {
       onSuccess: async () => {
         toast.success("Company deleted successfully", { id: "delete-company" });
         setIsDeleteCompanyDialogOpen(false);
-        refreshCompany();
+        refetchCompany();
       },
     });
 
@@ -112,7 +108,7 @@ export default function ProfilePage() {
       },
       onSuccess: () => {
         toast.success("Job deleted successfully", { id: "delete-job" });
-        refreshCompany();
+        refetchCompany();
         setIsDeleteJobListingDialogOpen(false);
       },
     });
@@ -136,9 +132,16 @@ export default function ProfilePage() {
             <div className="mb-8 text-center">
               {!company ? (
                 <div className="mx-auto">
-                  <h1 className="text-xl font-semibold">No Company Profile</h1>
+                  <h1
+                    data-testid="company-profile-no-company-profile-title"
+                    className="text-xl font-semibold"
+                  >
+                    No Company Profile
+                  </h1>
                   <div className="flex flex-row items-center justify-center gap-4">
-                    <p>You havent created a company profile yet.</p>
+                    <p data-testid="company-profile-no-company-profile-description">
+                      You havent created a company profile yet.
+                    </p>
                     <Button
                       onClick={() => router.push(FrontendRoutes.COMPANY_CREATE)}
                     >
@@ -160,11 +163,13 @@ export default function ProfilePage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem
+                        data-testid="company-profile-edit-profile"
                         onClick={() => setIsUpdateCompanyDialogOpen(true)}
                       >
                         Edit Profile
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        data-testid="company-profile-delete-profile"
                         className="text-red-600 focus:text-red-600"
                         onClick={() => setIsDeleteCompanyDialogOpen(true)}
                       >
@@ -190,7 +195,12 @@ export default function ProfilePage() {
                   />
                 </div>
               )}
-              <h1 className="text-2xl font-bold">{company?.name}</h1>
+              <h1
+                data-testid="company-profile-name"
+                className="text-2xl font-bold"
+              >
+                {company?.name}
+              </h1>
             </div>
 
             <div className="space-y-8 gap-x-8 md:grid md:grid-cols-3">
@@ -206,19 +216,31 @@ export default function ProfilePage() {
 
               <div className="col-span-2 w-full space-y-4">
                 <div className="space-y-2 rounded-lg bg-gray-100 p-4 text-sm">
-                  <p className="flex items-center gap-x-3">
+                  <p
+                    data-testid="company-profile-address"
+                    className="flex items-center gap-x-3"
+                  >
                     <MapPin className="size-5 text-gray-600" />
                     {company?.address}
                   </p>
-                  <p className="flex items-center gap-x-3">
+                  <p
+                    data-testid="company-profile-email"
+                    className="flex items-center gap-x-3"
+                  >
                     <Mail className="size-5 text-gray-600" />
                     {me?.email}
                   </p>
-                  <p className="flex items-center gap-x-3">
+                  <p
+                    data-testid="company-profile-website"
+                    className="flex items-center gap-x-3"
+                  >
                     <Globe className="size-5 text-gray-600" />
                     {company?.website}
                   </p>
-                  <p className="flex items-center gap-x-3">
+                  <p
+                    data-testid="company-profile-telephone"
+                    className="flex items-center gap-x-3"
+                  >
                     <Phone className="size-5 text-gray-600" />
                     {company?.tel}
                   </p>
@@ -226,7 +248,7 @@ export default function ProfilePage() {
 
                 <TextEditor
                   key={company?.description}
-                  markdown={company?.description}
+                  value={company?.description}
                   readOnly
                 />
               </div>
@@ -249,7 +271,10 @@ export default function ProfilePage() {
             </div>
             <div className="mx-auto max-w-3xl space-y-4">
               {company?.jobListings?.length === 0 ? (
-                <p className="text-center text-gray-500">
+                <p
+                  data-testid="company-profile-no-job-listings"
+                  className="text-center text-gray-500"
+                >
                   No job listings available.
                 </p>
               ) : (

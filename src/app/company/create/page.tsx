@@ -77,7 +77,7 @@ export default function CreateCompanyPage() {
       queryClient.invalidateQueries({
         queryKey: [BackendRoutes.AUTH_ME],
       });
-      router.push(FrontendRoutes.ADMIN_COMPANY);
+      router.push(FrontendRoutes.PROFILE);
     },
     onError: (error) => {
       toast.error("Failed to create company", {
@@ -96,7 +96,12 @@ export default function CreateCompanyPage() {
           className="mx-auto max-w-2xl space-y-6 rounded-xl bg-white px-4 py-8 drop-shadow-md"
           onSubmit={form.handleSubmit((e) => createCompany(e))}
         >
-          <h1 className="text-center text-3xl font-bold">Create Company</h1>
+          <h1
+            data-testid="company-create-title"
+            className="text-center text-3xl font-bold"
+          >
+            Create Company
+          </h1>
           <FormField
             control={form.control}
             name="name"
@@ -104,7 +109,7 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Company Name</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input data-testid="company-create-name-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -134,7 +139,10 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Address</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    data-testid="company-create-address-input"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -149,7 +157,10 @@ export default function CreateCompanyPage() {
                   <FormItem>
                     <FormLabel>Website</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        data-testid="company-create-website-input"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -164,7 +175,10 @@ export default function CreateCompanyPage() {
                   <FormItem>
                     <FormLabel>Telephone</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        data-testid="company-create-tel-input"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -179,16 +193,18 @@ export default function CreateCompanyPage() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <TextEditor
-                    markdown={field.value}
-                    onChange={field.onChange}
-                  />
+                  <TextEditor {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" size="lg">
+          <Button
+            data-testid="company-create-submit-button"
+            type="submit"
+            className="w-full"
+            size="lg"
+          >
             Create
           </Button>
         </form>

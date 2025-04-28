@@ -40,7 +40,7 @@ const Toolbar = () => (
 );
 
 export interface EditorProps {
-  markdown?: string;
+  value?: string;
   onChange?: (markdown: string) => void;
   readOnly?: boolean;
   placeholder?: string;
@@ -48,7 +48,7 @@ export interface EditorProps {
 
 const BaseTextEditor = ({
   editorRef,
-  markdown = "",
+  value = "",
   onChange,
   readOnly,
   placeholder,
@@ -62,7 +62,7 @@ const BaseTextEditor = ({
     contentEditableClassName={`${figTree.className} text-sm leading-6`}
     onChange={onChange}
     ref={editorRef}
-    markdown={markdown}
+    markdown={value}
     plugins={plugins(readOnly)}
     readOnly={readOnly}
     placeholder={placeholder}

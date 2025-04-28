@@ -24,7 +24,11 @@ export const Navbar = async () => {
     <nav className="h-18 w-full bg-white px-4 shadow-md">
       <div className="mx-auto flex max-w-(--breakpoint-2xl) items-center justify-between py-4">
         <div className="flex items-center gap-x-6">
-          <Link href={FrontendRoutes.HOME} className="text-lg font-semibold">
+          <Link
+            data-testid="navbar-home-link"
+            href={FrontendRoutes.HOME}
+            className="text-lg font-semibold"
+          >
             Online Job Fair Registration
           </Link>
           {user?.data.role === "admin" ? (
@@ -38,6 +42,7 @@ export const Navbar = async () => {
             <>
               {session?.token && (
                 <Link
+                  data-testid="navbar-my-session-link"
                   className="transition-all hover:font-medium"
                   href={FrontendRoutes.SESSION_LIST}
                 >
@@ -56,10 +61,14 @@ export const Navbar = async () => {
         <div className="flex items-center gap-x-4">
           {!user ? (
             <>
-              <Button variant="outline">
+              <Button
+                asChild
+                data-testid="navbar-sign-up-link"
+                variant="outline"
+              >
                 <Link href={FrontendRoutes.AUTH_SIGN_UP}>Sign up</Link>
               </Button>
-              <Button>
+              <Button asChild data-testid="navbar-sign-in-link">
                 <Link href={FrontendRoutes.AUTH_SIGN_IN}>Sign in</Link>
               </Button>
             </>

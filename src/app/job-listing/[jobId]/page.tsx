@@ -117,6 +117,7 @@ export default function JobDetailPage() {
       });
     },
   });
+
   if (isJobLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -197,7 +198,8 @@ export default function JobDetailPage() {
         <div className="w-full space-y-4">
           <TextEditor
             readOnly
-            markdown={job.description}
+            key={job.description}
+            value={job.description}
             data-testid="job-description"
           />
         </div>
@@ -209,7 +211,12 @@ export default function JobDetailPage() {
           onOpenChange={setIsCreateInterviewSessionDialogOpen}
         >
           <DialogTrigger asChild>
-            <Button className="w-full">Book Interview Session</Button>
+            <Button
+              data-testid="book-interview-session-button"
+              className="w-full"
+            >
+              Book Interview Session
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -242,6 +249,7 @@ export default function JobDetailPage() {
                   )}
                 />
                 <Button
+                  data-testid="book-interview-session-button-submit"
                   type="submit"
                   className="w-full"
                   disabled={

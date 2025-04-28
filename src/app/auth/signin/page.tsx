@@ -47,7 +47,12 @@ export default function SignInPage() {
             }),
           )}
         >
-          <h1 className="text-center text-3xl font-bold">Sign in</h1>
+          <h1
+            data-testid="signin-title"
+            className="text-center text-3xl font-bold"
+          >
+            Sign in
+          </h1>
           <FormField
             control={form.control}
             name="email"
@@ -55,7 +60,7 @@ export default function SignInPage() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input data-testid="signin-email-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -68,13 +73,22 @@ export default function SignInPage() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    data-testid="signin-password-input"
+                    type="password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" size="lg">
+          <Button
+            data-testid="signin-submit-button"
+            type="submit"
+            className="w-full"
+            size="lg"
+          >
             Sign in
           </Button>
           <div className="text-muted-foreground flex items-center justify-center gap-x-2 text-sm">

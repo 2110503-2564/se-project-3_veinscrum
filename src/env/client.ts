@@ -9,10 +9,12 @@ export const env = createEnv({
       .url()
       .optional()
       .default("http://localhost:3000"),
+    NEXT_PUBLIC_WS_BASE_URL: z.string().url(),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
     NEXT_PUBLIC_FRONTEND_URL: process.env.NEXT_PUBLIC_FRONTEND_URL,
+    NEXT_PUBLIC_WS_BASE_URL: process.env.NEXT_PUBLIC_WS_BASE_URL,
   },
   skipValidation: process.env.IS_ACTION === "true",
 });

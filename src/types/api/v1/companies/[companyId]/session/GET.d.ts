@@ -1,0 +1,1 @@
+type GETInterviewSessionByCompany = DefaultResponse<Array<InterviewSession>>

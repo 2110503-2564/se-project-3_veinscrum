@@ -31,12 +31,14 @@ export function DeleteJobListingDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the job listing.
+            This action cannot be undone. This will permanently delete the job
+            listing.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
+            data-testid="job-listing-delete-dialog-submit-button"
             className={buttonVariants({ variant: "destructive" })}
             onClick={() => onDelete()}
             disabled={isPending}

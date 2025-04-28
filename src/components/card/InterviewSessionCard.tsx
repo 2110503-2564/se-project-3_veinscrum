@@ -17,6 +17,7 @@ export const SessionCard: React.FC<InterviewSessionCardProps> = ({
       </div>
 
       {children ? <div className="flex flex-col">{children}</div> : null}
+      
     </div>
   );
 };

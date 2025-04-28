@@ -112,9 +112,12 @@ export default function EditJobPage() {
               <FormItem>
                 <FormLabel>Job Title</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    data-testid="job-listing-edit-job-title-input"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage data-testid="job-listing-edit-job-title-error" />
               </FormItem>
             )}
           />
@@ -141,16 +144,18 @@ export default function EditJobPage() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <TextEditor
-                    markdown={field.value}
-                    onChange={field.onChange}
-                  />
+                  <TextEditor {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" size="lg">
+          <Button
+            data-testid="job-listing-edit-submit-button"
+            type="submit"
+            className="w-full"
+            size="lg"
+          >
             Update
           </Button>
         </form>

@@ -28,11 +28,13 @@ const adminRoutes = [
 
 const userRoutes = [
   FrontendRouteTargets.SESSION_LIST,
+  FrontendRouteTargets.CHAT_SESSION,
   FrontendRouteTargets.SESSION_CREATE,
   FrontendRouteTargets.SESSION_CREATE_ID,
 ];
 
 const companyRoutes = [
+  FrontendRouteTargets.CHAT_SESSION,
   FrontendRouteTargets.COMPANY_CREATE,
   FrontendRouteTargets.SESSION_LIST,
 ];

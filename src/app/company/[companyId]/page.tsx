@@ -141,12 +141,15 @@ export default function CompanyProfilePage() {
             </div>
           </div>
         </div>
-        <TextEditor markdown={company.description} readOnly />
+        <TextEditor
+          key={company.description}
+          value={company.description}
+          readOnly
+        />
       </div>
 
       <div className="rounded-xl bg-white px-6 py-10 shadow-md">
         <div className="mb-8 grid grid-cols-3 items-center">
-          <div></div>
           <h2 className="text-center text-2xl font-bold">Job Listings</h2>
 
           {me?.role === "company" && (
@@ -167,7 +170,10 @@ export default function CompanyProfilePage() {
 
         <div className="mx-auto max-w-3xl space-y-4">
           {jobs.length === 0 ? (
-            <p className="text-center text-gray-500">
+            <p
+              data-testid="company-profile-no-job-listings"
+              className="text-center text-gray-500"
+            >
               No job listings available.
             </p>
           ) : (
