@@ -1,5 +1,6 @@
 "use client";
 
+import { InterviewSessionCardSkeleton } from "@/components/card/InterviewSessionCardSkeleton";
 import { UserInterviewSessionCard } from "@/components/card/UserInterviewSessionCard";
 import { DeleteInterviewSessionDialog } from "@/components/dialog/DeleteInterviewSessionDialog";
 import {
@@ -157,7 +158,7 @@ export default function UserInterviewSessionsPage() {
 
       <div className="mx-auto min-h-[calc(100dvh-4.5rem)] max-w-2xl space-y-2 overflow-y-auto pr-4">
         {isInterviewSessionLoading || !interviewSessions ? (
-          <p className="text-center">Loading sessions...</p>
+          <InterviewSessionCardSkeleton infoNumbers={2} />
         ) : interviewSessions?.data.data.length == 0 ? (
           <p className="text-center">There&apos;s nothing here.</p>
         ) : (

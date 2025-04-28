@@ -1,29 +1,23 @@
 "use client";
 
 import { CompanyCard } from "@/components/card/CompanyCard";
+import { CompanyCardSkeleton } from "@/components/card/CompanyCardSkeleton";
 import { BackendRoutes } from "@/constants/routes/Backend";
 import { axios } from "@/lib/axios";
-import { useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
-  const queries = useQueries({
-    queries: [
-      {
-        queryKey: [BackendRoutes.COMPANIES],
-        queryFn: async () =>
-          await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES, {
-            params: {
-              page: 1,
-              limit: 8,
-            },
-          }),
-      },
-    ],
+  const { data: companies, isLoading } = useQuery({
+    queryKey: [BackendRoutes.COMPANIES],
+    queryFn: async () =>
+      await axios.get<GETAllCompaniesResponse>(BackendRoutes.COMPANIES, {
+        params: {
+          page: 1,
+          limit: 8,
+        },
+      }),
+    select: (data) => data.data,
   });
-
-  const [companiesQuery] = queries;
-
-  const companiesData = companiesQuery?.data;
 
   return (
     <main className="mx-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-between gap-y-16 px-4 py-4 md:py-16">
@@ -40,10 +34,13 @@ export default function Home() {
           Some of the companies that are hiring
         </h2>
         <div className="flex w-full flex-wrap items-center justify-center gap-4">
-          {companiesData?.data.data &&
-            companiesData?.data.data.map((company) => (
-              <CompanyCard key={company.id} company={company} />
-            ))}
+          {isLoading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <CompanyCardSkeleton key={i} />
+              ))
+            : companies?.data.map((company) => (
+                <CompanyCard key={company._id} company={company} />
+              ))}
         </div>
       </div>
     </main>

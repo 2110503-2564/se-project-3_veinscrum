@@ -4,7 +4,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/shadcn/dropdown-menu";
-import { CalendarIcon, PhoneIcon, UserIcon } from "lucide-react";
+import { FrontendRoutes } from "@/constants/routes/Frontend";
+import { BuildingIcon, CalendarIcon, PhoneIcon, UserIcon } from "lucide-react";
+import Link from "next/link";
 import { InterviewSessionCardInfo } from "./InterviewSessionCardInfo";
 import { InterviewSessionCardWithDropdown } from "./InterviewSessionCardWithDropdown";
 
@@ -39,7 +41,7 @@ export const AdminSessionCard: React.FC<AdminSessionCardProps> = ({
 
   return (
     <InterviewSessionCardWithDropdown
-      title={interviewSession.jobListing.company.name}
+      title={interviewSession.jobListing.jobTitle}
       description={interviewSession.jobListing.company.description}
       dropdownContent={dropdownContent}
     >
@@ -47,6 +49,17 @@ export const AdminSessionCard: React.FC<AdminSessionCardProps> = ({
         icon={UserIcon}
         text={interviewSession.user.name}
       />
+      <Link
+        href={FrontendRoutes.COMPANY_PROFILE({
+          companyId: interviewSession.jobListing.company._id,
+        })}
+        className="hover:underline"
+      >
+        <InterviewSessionCardInfo
+          icon={BuildingIcon}
+          text={interviewSession.jobListing.company.name}
+        />
+      </Link>
       <InterviewSessionCardInfo
         icon={PhoneIcon}
         text={interviewSession.user.tel}
