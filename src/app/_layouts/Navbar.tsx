@@ -42,6 +42,7 @@ export const Navbar = async () => {
             <>
               {session?.token && (
                 <Link
+                  data-testid="navbar-my-session-link"
                   className="transition-all hover:font-medium"
                   href={FrontendRoutes.SESSION_LIST}
                 >
@@ -60,10 +61,14 @@ export const Navbar = async () => {
         <div className="flex items-center gap-x-4">
           {!user ? (
             <>
-              <Button variant="outline">
+              <Button
+                asChild
+                data-testid="navbar-sign-up-link"
+                variant="outline"
+              >
                 <Link href={FrontendRoutes.AUTH_SIGN_UP}>Sign up</Link>
               </Button>
-              <Button>
+              <Button asChild data-testid="navbar-sign-in-link">
                 <Link href={FrontendRoutes.AUTH_SIGN_IN}>Sign in</Link>
               </Button>
             </>

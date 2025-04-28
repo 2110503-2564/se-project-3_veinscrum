@@ -11,12 +11,14 @@ export const FlagButton: React.FC<{
 }> = ({ starred, disabled = false, setStarred }) => {
   return (
     <Button
+      data-testid="flag-button"
       variant="ghost"
       disabled={disabled}
       className="h-fit rounded-full p-1"
       onClick={() => setStarred((prev) => !prev)}
     >
       <StarIcon
+        data-testid="flag-button-icon"
         size={16}
         className={cn(
           "transition-all",
