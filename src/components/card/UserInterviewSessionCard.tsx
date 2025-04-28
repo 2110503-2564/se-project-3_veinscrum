@@ -22,9 +22,6 @@ export const UserInterviewSessionCard: React.FC<
   const dropdownContent = (
     <DropdownMenuContent>
       <DropdownMenuLabel>Interview Session</DropdownMenuLabel>
-      {/* <DropdownMenuItem variant="default" disabled={!onChat} onClick={onChat}>
-        Chat
-      </DropdownMenuItem> */}
       <DropdownMenuSeparator />
       <DropdownMenuItem disabled={!onChat} onClick={onChat}>
         Chat

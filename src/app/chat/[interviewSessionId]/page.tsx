@@ -20,15 +20,12 @@ import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import {
-  Building,
   BuildingIcon,
   EllipsisVerticalIcon,
+  LucideProps,
   MessagesSquare,
-  Star,
   StarIcon,
-  User,
   UserIcon,
-  Wrench,
   WrenchIcon,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -208,13 +205,11 @@ export default function Chat() {
       setIsDeleteOpen(false);
       setSelectedMessage(null);
 
-      // ลบข้อความออกจาก state
       setMessages((prevMessages) =>
         prevMessages.filter((m) => m._id !== variables.messageId),
       );
 
-      // scroll ลงล่างสุด
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      scrollToBottom();
     },
     onError: (error) => {
       toast.error("Failed to delete message", {
@@ -230,64 +225,61 @@ export default function Chat() {
   useEffect(setupSocket, [status, session?.token, interviewSessionId]);
 
   useEffect(() => {
-    if (status !== "authenticated" || me?.role !== "company") return;
+    if (
+      status !== "authenticated" ||
+      me?.role !== "company" ||
+      !interviewSession
+    )
+      return;
 
-    if (interviewSession) {
-      axios
-        .get(
-          BackendRoutes.JOB_LISTINGS_ID_FLAGS({
-            id: interviewSession.jobListing._id,
-          }),
-        )
-        .then((response) => {
-          const flags = response.data.data as Array<{
-            _id: string;
-            user: { _id: string };
-          }>;
+    axios
+      .get<{ data: Array<{ _id: string; user: { _id: string } }> }>(
+        BackendRoutes.JOB_LISTINGS_ID_FLAGS({
+          id: interviewSession.jobListing._id,
+        }),
+      )
+      .then((response) => {
+        const flags = response.data.data;
 
-          const matchedFlag = flags.find(
-            (flag) =>
-              String(flag.user._id) === String(interviewSession.user._id),
-          );
+        const matchedFlag = flags.find(
+          (flag) => String(flag.user._id) === String(interviewSession.user._id),
+        );
 
-          if (matchedFlag) {
-            setFlagId(matchedFlag._id);
-          }
-        })
-        .catch(console.error);
-    }
+        if (!matchedFlag) return;
+
+        setFlagId(matchedFlag._id);
+      })
+      .catch(console.error);
   }, [status, interviewSession, me?.role]);
 
   const sendMessage = () => {
     const msg = inputRef.current?.value;
-    if (msg && socketRef.current) {
-      socketRef.current.emit("chat-message", msg);
 
-      if (inputRef.current) {
-        inputRef.current.value = "";
-      }
+    if (!msg || !socketRef.current) return;
+
+    socketRef.current.emit("chat-message", msg);
+
+    if (!inputRef.current) return;
+
+    inputRef.current.value = "";
+  };
+
+  const RoleEmojis = ({
+    role,
+    ...props
+  }: { role: User["role"] } & LucideProps) => {
+    switch (role) {
+      case "admin":
+        return <WrenchIcon {...props} />;
+      case "company":
+        return <BuildingIcon {...props} />;
+      case "user":
+        return <UserIcon {...props} />;
     }
   };
 
-  const roleStylesMap = {
-    admin: "text-nigga-500 font-semibold",
-    company: "text-black-500 font-semibold",
-    user: "text-black-500 font-semibold",
-  } as const;
-
-  const roleEmojis = {
-    admin: <WrenchIcon className="h-4 w-4" />,
-    company: <BuildingIcon className="h-4 w-4" />,
-    user: <UserIcon className="h-4 w-4" />,
-  } as const;
-
   const renderMessage = (msg: Message, index: number) => {
     const isMe = String(msg.sender._id) === String(me?._id);
-    const previousSenderId = index > 0 ? messages[index - 1].sender._id : null;
-    const isDifferent = msg.sender._id !== previousSenderId;
-
-    const roleStyle = roleStylesMap[msg.sender.role] ?? "text-gray-500";
-    const roleEmoji = roleEmojis[msg.sender.role];
 
     return (
       <div
@@ -297,12 +289,16 @@ export default function Chat() {
         <div
           className={cn("flex flex-col", isMe ? "items-end" : "items-start")}
         >
-          {isDifferent && (
+          {msg.sender._id !==
+            (index > 0 ? messages[index - 1].sender._id : null) && (
             <div className="mb-1 flex items-center gap-1">
-              <span className={roleStyle}>{roleEmoji}</span>
-              <span className={cn(roleStyle, "text-sm font-bold capitalize")}>
+              <RoleEmojis
+                role={msg.sender.role}
+                className="size-4 text-black"
+              />
+              <p className="text-sm font-semibold capitalize">
                 {msg.sender.name}
-              </span>
+              </p>
             </div>
           )}
 
@@ -352,16 +348,10 @@ export default function Chat() {
     );
   };
   return (
-    <div
-      className={cn(
-        "mx-auto flex flex-col p-6",
-        "h-[calc(100vh-80px)] max-w-3xl",
-      )}
-    >
-      {/* 80px is example navbar height */}
-      <div className={cn("mb-2 flex items-center justify-between")}>
-        <h2 className={cn("flex items-center gap-2 text-2xl font-semibold")}>
-          <MessagesSquare className="h-8 w-8" />
+    <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-3xl flex-col p-6">
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-2xl font-semibold">
+          <MessagesSquare className="size-8" />
           Chat
         </h2>
 
@@ -372,21 +362,16 @@ export default function Chat() {
             onClick={toggleStar}
             disabled={isLoadingSession}
           >
-            {flagId ? (
-              <StarIcon className="fill-yellow-400 text-yellow-400" />
-            ) : (
-              <StarIcon className="text-gray-400" />
-            )}
+            <StarIcon
+              className={cn(
+                flagId ? "fill-yellow-400 text-yellow-400" : "text-gray-400",
+              )}
+            />
           </Button>
         )}
       </div>
 
-      <div
-        className={cn(
-          "flex-1 overflow-y-auto rounded-lg border bg-white shadow-inner",
-          "space-y-2 p-4 px-8 pt-8",
-        )}
-      >
+      <div className="flex-1 space-y-2 overflow-y-auto rounded-lg border bg-white p-4 px-8 pt-8 shadow-inner">
         {messages.map(renderMessage)}
         <div ref={messagesEndRef} />
       </div>
@@ -396,7 +381,7 @@ export default function Chat() {
           e.preventDefault();
           sendMessage();
         }}
-        className={cn("mt-4 flex gap-2")}
+        className="mt-4 flex gap-2"
       >
         <Input
           ref={inputRef}
@@ -406,10 +391,7 @@ export default function Chat() {
         />
         <button
           type="submit"
-          className={cn(
-            "rounded-lg bg-black px-4 py-2 text-white",
-            "hover:bg-gray-800",
-          )}
+          className="rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800"
         >
           Send
         </button>

@@ -59,7 +59,7 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                   <div className="w-full space-y-2">
                     <div className="flex w-full items-center gap-1">
                       <FlagButton
-                        starred={interviewSession.flag ? true : false}
+                        starred={!!interviewSession.flag}
                         disabled={isToggleStartPending}
                         setStarred={() =>
                           toggleStar(
@@ -104,18 +104,6 @@ export const FlagUserCard: React.FC<FlagUserCardProps> = ({
                             >
                               Chat
                             </DropdownMenuItem>
-                            {/* {isFlagged && ( */}
-                            {/*   <DropdownMenuItem */}
-                            {/*     onSelect={() => { */}
-                            {/*       unflagUser(interviewSession.user._id); */}
-                            {/*     }} */}
-                            {/*     disabled={isUnflagging} */}
-                            {/*     variant="destructive" */}
-                            {/*     className="text-sm text-red-600" */}
-                            {/*   > */}
-                            {/*     {isUnflagging ? "Unflagging..." : "Unflag"} */}
-                            {/*   </DropdownMenuItem> */}
-                            {/* )} */}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
